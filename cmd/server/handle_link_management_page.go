@@ -18,9 +18,9 @@ var (
 )
 
 func (s *State) handleLinkManagementPage(w http.ResponseWriter, r *http.Request) error {
-	links, err := listLinks(s.prefix, s.db)
+	links, err := s.getLinksView()
 	if err != nil {
-		return fmt.Errorf("failed to list links: %w", err)
+		return fmt.Errorf("failed to get links view: %w", err)
 	}
 
 	var b bytes.Buffer

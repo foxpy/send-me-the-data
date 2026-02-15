@@ -19,19 +19,18 @@ var (
 
 func (s *State) handleViewPage(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
-	ok, err := doesLinkExist(s.db, id)
+	ok, err := s.db.DoesLinkExist(id)
 	if err != nil {
 		return fmt.Errorf("failed to check if link is published: %w", err)
 	}
 
 	if !ok {
-		respond404(w)
-		return nil
+		return respond404(w)
 	}
 
-	files, err := listFiles(s.prefix, id)
+	files, err := s.getFilesView(id)
 	if err != nil {
-		return fmt.Errorf("failed to obtain a list of files: %w", err)
+		return fmt.Errorf("failed to obtain files view for link %s: %w", id, err)
 	}
 
 	var b bytes.Buffer

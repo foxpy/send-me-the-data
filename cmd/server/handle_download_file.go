@@ -7,18 +7,17 @@ import (
 
 func (s *State) handleDownloadFile(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
-	ok, err := doesLinkExist(s.db, id)
+	ok, err := s.db.DoesLinkExist(id)
 	if err != nil {
 		return fmt.Errorf("failed to check if link is published: %w", err)
 	}
 
 	if !ok {
-		respond404(w)
-		return nil
+		return respond404(w)
 	}
 
 	name := r.PathValue("name")
-	path := fmt.Sprintf("%s/%s/%s", s.prefix, id, name)
-	http.ServeFile(w, r, path)
+	// TODO: figure out how to sanitize file name
+	http.ServeFileFS(w, r, s.fs.FS(), name)
 	return nil
 }

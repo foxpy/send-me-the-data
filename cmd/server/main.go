@@ -15,10 +15,21 @@ var static embed.FS
 
 func main() {
 	postgresURL := os.Getenv("POSTGRES_URL")
+	if postgresURL == "" {
+		slog.Error("required environment variable POSTGRES_URL is not defined")
+		os.Exit(1)
+	}
+
+	prefix := os.Getenv("PREFIX")
+	if prefix == "" {
+		slog.Error("required environment variable PREFIX is not defined")
+		os.Exit(1)
+	}
+
 	userListenAddress := cmp.Or(os.Getenv("USER_LISTEN_ADDRESS"), ":6969")
 	adminListenAddress := cmp.Or(os.Getenv("ADMIN_LISTEN_ADDRESS"), ":6767")
 
-	state, err := NewState(postgresURL)
+	state, err := NewState(postgresURL, prefix)
 	if err != nil {
 		slog.Error("failed to initialize the app", "error", err)
 		os.Exit(1)
