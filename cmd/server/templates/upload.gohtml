@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Send me the Data</title>
+    <meta charset="utf-8">
+    <link href="/static/style.css" rel="stylesheet" />
+</head>
+
+<body>
+    <h2>List of files</h2>
+
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Uploaded at</th>
+                    <th>Size</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range . }}
+                <tr>
+                    <td>{{ .Name }}</td>
+                    <td>{{ .UploadedAt }}</td>
+                    <td>{{ .Size }}</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+
+    </div>
+
+    <h2>Upload new file</h2>
+
+    <div>
+        <form enctype="multipart/form-data" action="" method="post">
+            <div>
+                <label for="file">Select file to upload: </label>
+                <input type="file" name="file" id="file" required />
+            </div>
+            <div>
+                <input type="submit" value="Upload" />
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

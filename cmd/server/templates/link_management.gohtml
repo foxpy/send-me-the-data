@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Send me the Data</title>
+    <meta charset="utf-8">
+    <link href="/static/style.css" rel="stylesheet" />
+</head>
+
+<body>
+    <h2>List of links</h2>
+
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Created at</th>
+                    <th>Total files</th>
+                    <th>Total size</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range . }}
+                <tr>
+                    <td><a href="{{ .ViewLinkURL }}">{{ .Name }}</a></td>
+                    <td>{{ .CreatedAt }}</td>
+                    <td>{{ .TotalFiles }}</td>
+                    <td>{{ .TotalSize }}</td>
+                    <td>
+                        <form action="{{ .DeleteLinkURL }}" method="post">
+                            <input type="submit" value="Delete" />
+                        </form>
+                    </td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

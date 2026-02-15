@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Send me the Data</title>
+    <meta charset="utf-8">
+    <link href="/static/style.css" rel="stylesheet" />
+</head>
+
+<body>
+    <h2>List of files</h2>
+
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Uploaded at</th>
+                    <th>Size</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range . }}
+                <tr>
+                    <td><a href="{{ .DownloadLink }}">{{ .Name }}</a></td>
+                    <td>{{ .UploadedAt }}</td>
+                    <td>{{ .Size }}</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
