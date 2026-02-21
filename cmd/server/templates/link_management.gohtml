@@ -9,6 +9,20 @@
 </head>
 
 <body>
+    <h2>Create new link</h2>
+
+    <div>
+        <form action="/create" method="post">
+            <div>
+                <label for="name">New link name: </label>
+                <input type="text" name="name" id="name" required />
+            </div>
+            <div>
+                <input type="submit" value="Create link" />
+            </div>
+        </form>
+    </div>
+
     <h2>List of links</h2>
 
     <div>

@@ -35,6 +35,4 @@ func (s *State) handleLinkManagementPage(w http.ResponseWriter, r *http.Request)
 	}
 
 	return nil
-
-	// TODO: Create link form
 }

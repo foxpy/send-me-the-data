@@ -79,6 +79,15 @@ func (d *Database) AllLinks() ([]Link, error) {
 	return links, nil
 }
 
+func (d *Database) CreateLink(name, externalKey string) error {
+	_, err := d.db.Exec("INSERT INTO smtd.links (name, external_key) VALUES ($1, $2)", name, externalKey)
+	if err != nil {
+		return fmt.Errorf("failed to create new link %s: %w", externalKey, err)
+	}
+
+	return nil
+}
+
 func (d *Database) AcquireLinkRLock(externalKey string) (*LinkRLock, error) {
 	tx, err := d.db.Begin()
 	if err != nil {

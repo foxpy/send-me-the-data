@@ -66,6 +66,7 @@ func adminServer(state *State, listenAddress string) {
 	m.HandleFunc("GET /f/{id}/{name}", handleWith500OnError(state.handleDownloadFile))
 	m.HandleFunc("GET /{$}", handleWith500OnError(state.handleLinkManagementPage))
 	m.HandleFunc("POST /delete/{id}", handleWith500OnError(state.handleDeleteLink))
+	m.HandleFunc("POST /create", handleWith500OnError(state.handleCreateLink))
 	// TODO: other admin endpoints
 	m.Handle("GET /static/", http.FileServerFS(static))
 

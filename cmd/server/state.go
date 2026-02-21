@@ -8,8 +8,6 @@ import (
 
 	"github.com/foxpy/send-me-the-data/cmd/server/database"
 	"github.com/foxpy/send-me-the-data/cmd/server/filesystem"
-
-	_ "github.com/lib/pq"
 )
 
 type State struct {
