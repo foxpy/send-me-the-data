@@ -12,6 +12,34 @@ type Link struct {
 	CreatedAt         time.Time
 }
 
+type LinkRLock struct {
+	tx *sql.Tx
+}
+
+func (l LinkRLock) Close() error {
+	return l.tx.Rollback()
+}
+
+type LinkWLock struct {
+	externalKey string
+	tx          *sql.Tx
+}
+
+func (l LinkWLock) Close() error {
+	return l.tx.Commit()
+}
+
+func (l LinkWLock) DeleteLink() error {
+	_, err := l.tx.Exec("DELETE FROM smtd.links WHERE external_key = $1", l.externalKey)
+	if err != nil {
+		return fmt.Errorf("failed to delete link %s: %w", l.externalKey, err)
+	}
+
+	return nil
+}
+
+// TODO: maybe I should just take RLock everywhere I use this method
+// TODO: delete this method?
 func (d *Database) DoesLinkExist(externalKey string) (bool, error) {
 	var n int
 	err := d.db.QueryRow("SELECT 1 FROM smtd.links WHERE external_key = $1", externalKey).Scan(&n)
@@ -49,4 +77,41 @@ func (d *Database) AllLinks() ([]Link, error) {
 	}
 
 	return links, nil
+}
+
+func (d *Database) AcquireLinkRLock(externalKey string) (*LinkRLock, error) {
+	tx, err := d.db.Begin()
+	if err != nil {
+		return nil, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	var n int
+	err = tx.QueryRow("SELECT 1 FROM smtd.links WHERE external_key = $1 FOR SHARE", externalKey).Scan(&n)
+	if err != nil {
+		_ = tx.Rollback()
+		return nil, fmt.Errorf("failed to acquire read lock on link %s: %w", externalKey, err)
+	}
+
+	return &LinkRLock{
+		tx,
+	}, nil
+}
+
+func (d *Database) AcquireLinkWLock(externalKey string) (*LinkWLock, error) {
+	tx, err := d.db.Begin()
+	if err != nil {
+		return nil, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	var n int
+	err = tx.QueryRow("SELECT 1 FROM smtd.links WHERE external_key = $1 FOR UPDATE", externalKey).Scan(&n)
+	if err != nil {
+		_ = tx.Rollback()
+		return nil, fmt.Errorf("failed to acquire write lock on link %s: %w", externalKey, err)
+	}
+
+	return &LinkWLock{
+		externalKey,
+		tx,
+	}, nil
 }

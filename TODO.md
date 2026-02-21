@@ -14,12 +14,16 @@
     - [ ] optional feature: download files if allowed by admin
   - [x] upload endpoint
 - [ ] Admin server
-  - [ ] Link management page
-    - [ ] with link management endpoints (create, edit, delete)
+  - [x] Link management page
+    - [ ] with link management endpoints:
+      - [ ] create
+        - [ ] set maximum file size
+        - [ ] DIFFICULT: set maximum total file size
+      - [ ] edit
+      - [x] delete
   - [x] Link view page (allows downloading files)
     - [x] Download file endpoint
   - [ ] optional: multiple admins (a good case to practice migrations!)
-  - TODO
 
 
 - [ ] Tests

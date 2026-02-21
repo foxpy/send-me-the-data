@@ -38,9 +38,15 @@ func (f *Filesystem) Remove(path string) error {
 
 func (f *Filesystem) ListLinkFiles(linkID string) ([]File, error) {
 	linkFolder, err := f.root.Open(linkID)
-	if err != nil {
+	if os.IsNotExist(err) {
+		return nil, nil
+	} else if err != nil {
 		return nil, fmt.Errorf("failed to open directory of link %s: %w", linkID, err)
 	}
+
+	defer func() {
+		_ = linkFolder.Close()
+	}()
 
 	// FIXME: do not read all dir entries into memory at once
 	// solution: pagination
@@ -66,8 +72,22 @@ func (f *Filesystem) ListLinkFiles(linkID string) ([]File, error) {
 	return files, nil
 }
 
-func (f *Filesystem) FS() fs.FS {
-	return f.root.FS()
+func (f *Filesystem) RemoveLinkFiles(linkID string) error {
+	err := f.root.RemoveAll(linkID)
+	if err != nil {
+		return fmt.Errorf("failed to remove files associated with link %s: %w", linkID, err)
+	}
+
+	return nil
+}
+
+func (f *Filesystem) FS(linkID string) (fs.FS, error) {
+	linkRoot, err := f.root.OpenRoot(linkID)
+	if err != nil {
+		return nil, err
+	}
+
+	return linkRoot.FS(), err
 }
 
 // TODO: should this method be inlined into CreateNewFile?

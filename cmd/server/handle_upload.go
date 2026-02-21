@@ -23,6 +23,15 @@ func (s *State) handleUpload(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("failed to get file from form data: %w", err)
 	}
 
+	lock, err := s.db.AcquireLinkRLock(id)
+	if err != nil {
+		return fmt.Errorf("failed to acquire read lock on link %s: %w", id, err)
+	}
+
+	defer func() {
+		_ = lock.Close()
+	}()
+
 	// TODO: should we somehow validate/sanitize header.Filename?
 	filePath := s.fs.GetPath(id, header.Filename)
 	err = s.db.CreateFileJournalEntry(filePath)

@@ -16,8 +16,14 @@ func (s *State) handleDownloadFile(w http.ResponseWriter, r *http.Request) error
 		return respond404(w)
 	}
 
-	name := r.PathValue("name")
 	// TODO: figure out how to sanitize file name
-	http.ServeFileFS(w, r, s.fs.FS(), name)
+	name := r.PathValue("name")
+
+	fs, err := s.fs.FS(id)
+	if err != nil {
+		return fmt.Errorf("failed to open filesystem to serve file: %w", err)
+	}
+
+	http.ServeFileFS(w, r, fs, name)
 	return nil
 }
