@@ -77,7 +77,7 @@ func (f *Filesystem) RemoveLinkFiles(linkID string) error {
 }
 
 func (f *Filesystem) RemoveLinkFile(linkID, fileName string) error {
-	return f.root.Remove(f.GetPath(linkID, fileName))
+	return f.root.Remove(f.getPath(linkID, fileName))
 }
 
 func (f *Filesystem) FS(linkID string) (fs.FS, error) {
@@ -89,20 +89,15 @@ func (f *Filesystem) FS(linkID string) (fs.FS, error) {
 	return linkRoot.FS(), err
 }
 
-// TODO: should this method be inlined into CreateNewFile?
-func (f *Filesystem) CreateLinkDirectory(linkID string) error {
-	return f.root.MkdirAll(linkID, 0777)
-}
-
-func (f *Filesystem) GetPath(linkID, fileName string) string {
-	return fmt.Sprintf("%s/%s", linkID, fileName)
-}
-
 func (f *Filesystem) CreateNewFile(linkID, fileName string) (*os.File, error) {
-	err := f.CreateLinkDirectory(linkID)
+	err := f.root.MkdirAll(linkID, 0777)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a directory for a new file %s for a link %s: %w", fileName, linkID, err)
 	}
 
-	return f.root.OpenFile(f.GetPath(linkID, fileName), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
+	return f.root.OpenFile(f.getPath(linkID, fileName), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
+}
+
+func (f *Filesystem) getPath(linkID, fileName string) string {
+	return fmt.Sprintf("%s/%s", linkID, fileName)
 }
