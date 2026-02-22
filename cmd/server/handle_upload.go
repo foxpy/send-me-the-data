@@ -70,6 +70,10 @@ func (s *State) handleUpload(w http.ResponseWriter, r *http.Request) error {
 
 	dirty = false
 
+	http.SetCookie(w, &http.Cookie{
+		Name:   "success_flash",
+		MaxAge: 60,
+	})
 	http.Redirect(w, r, fmt.Sprintf("/u/%s", id), http.StatusSeeOther)
 	return nil
 }

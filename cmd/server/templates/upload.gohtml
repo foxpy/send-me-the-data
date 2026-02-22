@@ -9,29 +9,11 @@
 </head>
 
 <body>
-    <h2>List of files</h2>
-
-    <div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Uploaded at</th>
-                    <th>Size</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{ range . }}
-                <tr>
-                    <td>{{ .Name }}</td>
-                    <td>{{ .UploadedAt }}</td>
-                    <td>{{ .Size }}</td>
-                </tr>
-                {{ end }}
-            </tbody>
-        </table>
-
+    {{ if .SuccessFlash }}
+    <div class="success_flash">
+        File uploaded successfully
     </div>
+    {{ end }}
 
     <h2>Upload new file</h2>
 
@@ -45,6 +27,29 @@
                 <input type="submit" value="Upload" />
             </div>
         </form>
+    </div>
+
+    <h2>List of files</h2>
+
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Uploaded at</th>
+                    <th>Size</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .Files }}
+                <tr>
+                    <td>{{ .Name }}</td>
+                    <td>{{ .UploadedAt }}</td>
+                    <td>{{ .Size }}</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
     </div>
 </body>
 

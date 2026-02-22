@@ -40,13 +40,20 @@ func (s *State) handleCreateLink(w http.ResponseWriter, r *http.Request) error {
 	err = s.db.CreateLink(name, externalKey)
 	var pqErr *pq.Error
 	if errors.As(err, &pqErr) && pqErr.Code.Name() == "unique_violation" {
-		// TODO: error flash
+		http.SetCookie(w, &http.Cookie{
+			Name:   "error_flash",
+			MaxAge: 60,
+		})
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return nil
 	} else if err != nil {
 		return fmt.Errorf("failed to create link: %w", err)
 	}
 
+	http.SetCookie(w, &http.Cookie{
+		Name:   "success_flash",
+		MaxAge: 60,
+	})
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	return nil
 }

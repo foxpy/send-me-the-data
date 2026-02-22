@@ -28,13 +28,27 @@ func (s *State) handleUploadPage(w http.ResponseWriter, r *http.Request) error {
 		return respond404(w)
 	}
 
+	successFlash := false
+	_, err = r.Cookie("success_flash")
+	if err == nil {
+		successFlash = true
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:   "success_flash",
+		MaxAge: -1,
+	})
+
 	files, err := s.getFilesView(id)
 	if err != nil {
 		return fmt.Errorf("failed to get files view for link %s: %w", id, err)
 	}
 
 	var b bytes.Buffer
-	err = uploadTemplate.Execute(&b, files)
+	err = uploadTemplate.Execute(&b, map[string]any{
+		"Files":        files,
+		"SuccessFlash": successFlash,
+	})
 	if err != nil {
 		return fmt.Errorf("failed to render a template: %w", err)
 	}

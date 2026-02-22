@@ -9,6 +9,18 @@
 </head>
 
 <body>
+    {{ if .SuccessFlash }}
+    <div class="success_flash">
+        Link created successfully
+    </div>
+    {{ end }}
+
+    {{ if .ErrorFlash }}
+    <div class="error_flash">
+        Failed to create link
+    </div>
+    {{ end }}
+
     <h2>Create new link</h2>
 
     <div>
@@ -37,7 +49,7 @@
                 </tr>
             </thead>
             <tbody>
-                {{ range . }}
+                {{ range .Links }}
                 <tr>
                     <td><a href="{{ .ViewLinkURL }}">{{ .Name }}</a></td>
                     <td>{{ .CreatedAt }}</td>
