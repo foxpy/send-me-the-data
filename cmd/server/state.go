@@ -38,21 +38,24 @@ func NewState(postgresURL, prefix string) (*State, error) {
 
 func (s *State) Cleanup() error {
 	for {
-		path, err := s.db.GetFileJournalEntry()
+		entry, err := s.db.GetFileJournalEntry()
 		if errors.Is(err, sql.ErrNoRows) {
 			break
 		} else if err != nil {
 			return fmt.Errorf("failed to obtain a file journal entry: %w", err)
 		}
 
-		err = s.fs.Remove(path)
+		err = s.fs.RemoveLinkFile(entry.LinkExternalKey, entry.FileName)
 		if err != nil && !os.IsNotExist(err) {
-			return fmt.Errorf("failed to delete a file referenced by the file journal: %s", path)
+			return fmt.Errorf(
+				"failed to delete file %s from link %s referenced by the file journal: %w",
+				entry.FileName, entry.LinkExternalKey, err,
+			)
 		}
 
-		err = s.db.DeleteFileJournalEntry(path)
+		err = s.db.DeleteFileJournalEntry(entry)
 		if err != nil {
-			return fmt.Errorf("failed to delete a file journal entry: %s", path)
+			return fmt.Errorf("failed to delete a file journal entry: %w", err)
 		}
 	}
 

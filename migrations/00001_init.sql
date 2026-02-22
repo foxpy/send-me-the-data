@@ -10,7 +10,9 @@ CREATE TABLE smtd.links (
 );
 
 CREATE TABLE smtd.file_journal (
-    path TEXT PRIMARY KEY
+    link_id BIGINT NOT NULL REFERENCES smtd.links,
+    name TEXT NOT NULL,
+    PRIMARY KEY (link_id, name)
 );
 
 -- +goose Down

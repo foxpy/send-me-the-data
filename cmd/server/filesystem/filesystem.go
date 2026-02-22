@@ -31,11 +31,6 @@ func NewFilesystem(prefix string) (*Filesystem, error) {
 	return &Filesystem{root}, nil
 }
 
-// TODO: this function should really just accept linkID and fileName
-func (f *Filesystem) Remove(path string) error {
-	return f.root.Remove(path)
-}
-
 func (f *Filesystem) ListLinkFiles(linkID string) ([]File, error) {
 	linkFolder, err := f.root.Open(linkID)
 	if os.IsNotExist(err) {
