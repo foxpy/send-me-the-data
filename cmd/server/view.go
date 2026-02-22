@@ -6,12 +6,12 @@ import (
 )
 
 type LinkView struct {
-	Name          string
-	CreatedAt     string
-	TotalFiles    int
-	TotalSize     string
-	ViewLinkURL   string
-	DeleteLinkURL string
+	Name       string
+	CreatedAt  string
+	TotalFiles int
+	TotalSize  string
+	ViewLink   string
+	DeleteLink string
 }
 
 type FileView struct {
@@ -19,6 +19,7 @@ type FileView struct {
 	UploadedAt   string
 	Size         string
 	DownloadLink string
+	DeleteLink   string
 }
 
 func (s *State) getLinksView() ([]LinkView, error) {
@@ -40,12 +41,12 @@ func (s *State) getLinksView() ([]LinkView, error) {
 		}
 
 		linkViews = append(linkViews, LinkView{
-			Name:          link.Name,
-			CreatedAt:     link.CreatedAt.Format(time.Stamp),
-			TotalFiles:    len(files),
-			TotalSize:     bytesToHuman(totalSize),
-			ViewLinkURL:   fmt.Sprintf("/u/%s", link.ExternalKey),
-			DeleteLinkURL: fmt.Sprintf("/delete/%s", link.ExternalKey),
+			Name:       link.Name,
+			CreatedAt:  link.CreatedAt.Format(time.Stamp),
+			TotalFiles: len(files),
+			TotalSize:  bytesToHuman(totalSize),
+			ViewLink:   fmt.Sprintf("/link/%s", link.ExternalKey),
+			DeleteLink: fmt.Sprintf("/link/%s/delete", link.ExternalKey),
 		})
 	}
 
@@ -64,7 +65,8 @@ func (s *State) getFilesView(linkID string) ([]FileView, error) {
 			Name:         file.Name,
 			UploadedAt:   file.ModTime.Format(time.Stamp),
 			Size:         bytesToHuman(file.Size),
-			DownloadLink: fmt.Sprintf("/f/%s/%s", linkID, file.Name),
+			DownloadLink: fmt.Sprintf("/link/%s/file/%s", linkID, file.Name),
+			DeleteLink:   fmt.Sprintf("/link/%s/file/%s/delete", linkID, file.Name),
 		})
 	}
 

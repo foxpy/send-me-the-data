@@ -81,6 +81,10 @@ func (f *Filesystem) RemoveLinkFiles(linkID string) error {
 	return nil
 }
 
+func (f *Filesystem) RemoveLinkFile(linkID, fileName string) error {
+	return f.root.Remove(f.GetPath(linkID, fileName))
+}
+
 func (f *Filesystem) FS(linkID string) (fs.FS, error) {
 	linkRoot, err := f.root.OpenRoot(linkID)
 	if err != nil {

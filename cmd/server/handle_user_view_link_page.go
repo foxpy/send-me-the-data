@@ -11,13 +11,13 @@ import (
 )
 
 var (
-	//go:embed templates/upload.gohtml
+	//go:embed templates/user_view_link.gohtml
 	uploadTemplateStr string
 
 	uploadTemplate = template.Must(template.New("").Parse(uploadTemplateStr))
 )
 
-func (s *State) handleUploadPage(w http.ResponseWriter, r *http.Request) error {
+func (s *State) handleUserViewLinkPage(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
 	ok, err := s.db.DoesLinkExist(id)
 	if err != nil {

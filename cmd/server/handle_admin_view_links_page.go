@@ -11,13 +11,13 @@ import (
 )
 
 var (
-	//go:embed templates/view_links.gohtml
+	//go:embed templates/admin_view_links.gohtml
 	viewLinksStr string
 
 	viewLinksTemplate = template.Must(template.New("").Parse(viewLinksStr))
 )
 
-func (s *State) handleViewLinksPage(w http.ResponseWriter, r *http.Request) error {
+func (s *State) handleAdminViewLinksPage(w http.ResponseWriter, r *http.Request) error {
 	links, err := s.getLinksView()
 	if err != nil {
 		return fmt.Errorf("failed to get links view: %w", err)

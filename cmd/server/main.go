@@ -51,8 +51,8 @@ func main() {
 
 func userServer(state *State, listenAddress string) {
 	m := http.NewServeMux()
-	m.HandleFunc("GET /u/{id}", handleWith500OnError(state.handleUploadPage))
-	m.HandleFunc("POST /u/{id}", handleWith500OnError(state.handleUpload))
+	m.HandleFunc("GET /u/{id}", handleWith500OnError(state.handleUserViewLinkPage))
+	m.HandleFunc("POST /u/{id}", handleWith500OnError(state.handleUserUpload))
 	m.Handle("GET /static/", http.FileServerFS(static))
 
 	slog.Info("Starting user HTTP server", "address", listenAddress)
@@ -62,12 +62,12 @@ func userServer(state *State, listenAddress string) {
 
 func adminServer(state *State, listenAddress string) {
 	m := http.NewServeMux()
-	m.HandleFunc("GET /u/{id}", handleWith500OnError(state.handleViewPage))
-	m.HandleFunc("GET /f/{id}/{name}", handleWith500OnError(state.handleDownloadFile))
-	m.HandleFunc("GET /{$}", handleWith500OnError(state.handleViewLinksPage))
-	m.HandleFunc("POST /delete/{id}", handleWith500OnError(state.handleDeleteLink))
-	m.HandleFunc("POST /create", handleWith500OnError(state.handleCreateLink))
-	// TODO: other admin endpoints
+	m.HandleFunc("GET /{$}", handleWith500OnError(state.handleAdminViewLinksPage))
+	m.HandleFunc("GET /link/{id}", handleWith500OnError(state.handleAdminViewLinkPage))
+	m.HandleFunc("GET /link/{id}/file/{name}", handleWith500OnError(state.handleAdminDownloadFile))
+	m.HandleFunc("POST /link/{id}/file/{name}/delete", handleWith500OnError(state.handleAdminDeleteFile))
+	m.HandleFunc("POST /link/{id}/delete", handleWith500OnError(state.handleAdminDeleteLink))
+	m.HandleFunc("POST /link", handleWith500OnError(state.handleAdminCreateLink))
 	m.Handle("GET /static/", http.FileServerFS(static))
 
 	slog.Info("Starting admin HTTP server", "address", listenAddress)

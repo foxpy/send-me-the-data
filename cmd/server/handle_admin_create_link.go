@@ -30,7 +30,7 @@ func init() {
 	alphabetSize = *big.NewInt(int64(len(alphabet)))
 }
 
-func (s *State) handleCreateLink(w http.ResponseWriter, r *http.Request) error {
+func (s *State) handleAdminCreateLink(w http.ResponseWriter, r *http.Request) error {
 	name := r.FormValue("name")
 	externalKey, err := generateRandomExternalKey()
 	if err != nil {

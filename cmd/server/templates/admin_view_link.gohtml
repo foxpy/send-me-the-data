@@ -18,6 +18,7 @@
                     <th>Name</th>
                     <th>Uploaded at</th>
                     <th>Size</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,6 +27,11 @@
                     <td><a href="{{ .DownloadLink }}">{{ .Name }}</a></td>
                     <td>{{ .UploadedAt }}</td>
                     <td>{{ .Size }}</td>
+                    <td>
+                        <form action="{{ .DeleteLink }}" method="post">
+                            <input type="submit" value="Delete" />
+                        </form>
+                    </td>
                 </tr>
                 {{ end }}
             </tbody>

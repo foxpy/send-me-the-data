@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (s *State) handleDownloadFile(w http.ResponseWriter, r *http.Request) error {
+func (s *State) handleAdminDownloadFile(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
 	ok, err := s.db.DoesLinkExist(id)
 	if err != nil {

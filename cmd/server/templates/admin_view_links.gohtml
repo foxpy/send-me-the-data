@@ -24,7 +24,7 @@
     <h2>Create new link</h2>
 
     <div>
-        <form action="/create" method="post">
+        <form action="/link" method="post">
             <div>
                 <label for="name">New link name: </label>
                 <input type="text" name="name" id="name" required />
@@ -51,12 +51,12 @@
             <tbody>
                 {{ range .Links }}
                 <tr>
-                    <td><a href="{{ .ViewLinkURL }}">{{ .Name }}</a></td>
+                    <td><a href="{{ .ViewLink }}">{{ .Name }}</a></td>
                     <td>{{ .CreatedAt }}</td>
                     <td>{{ .TotalFiles }}</td>
                     <td>{{ .TotalSize }}</td>
                     <td>
-                        <form action="{{ .DeleteLinkURL }}" method="post">
+                        <form action="{{ .DeleteLink }}" method="post">
                             <input type="submit" value="Delete" />
                         </form>
                     </td>

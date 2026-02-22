@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (s *State) handleDeleteLink(w http.ResponseWriter, r *http.Request) error {
+func (s *State) handleAdminDeleteLink(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
 	ok, err := s.db.DoesLinkExist(id)
 	if err != nil {

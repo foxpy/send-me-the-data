@@ -11,13 +11,13 @@ import (
 )
 
 var (
-	//go:embed templates/view.gohtml
+	//go:embed templates/admin_view_link.gohtml
 	viewTemplateStr string
 
 	viewTemplate = template.Must(template.New("").Parse(viewTemplateStr))
 )
 
-func (s *State) handleViewPage(w http.ResponseWriter, r *http.Request) error {
+func (s *State) handleAdminViewLinkPage(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
 	ok, err := s.db.DoesLinkExist(id)
 	if err != nil {
@@ -45,6 +45,4 @@ func (s *State) handleViewPage(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return nil
-
-	// TODO: delete file button
 }
