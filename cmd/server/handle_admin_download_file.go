@@ -16,8 +16,10 @@ func (s *State) handleAdminDownloadFile(w http.ResponseWriter, r *http.Request) 
 		return respond404(w)
 	}
 
-	// TODO: figure out how to sanitize file name
-	name := r.PathValue("name")
+	name, err := sanitizeFileName(r.PathValue("name"))
+	if err != nil {
+		return err
+	}
 
 	fs, err := s.fs.FS(id)
 	if err != nil {

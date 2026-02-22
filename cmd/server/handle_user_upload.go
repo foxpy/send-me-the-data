@@ -5,6 +5,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/database"
 )
@@ -20,10 +21,14 @@ func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
 		return respond404(w)
 	}
 
-	// TODO: should we somehow validate/sanitize header.Filename?
 	file, header, err := r.FormFile("file")
 	if err != nil {
 		return fmt.Errorf("failed to get file from form data: %w", err)
+	}
+
+	fileName, err := sanitizeFileName(header.Filename)
+	if err != nil {
+		return err
 	}
 
 	lock, err := s.db.AcquireLinkRLock(id)
@@ -37,7 +42,7 @@ func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
 
 	fileJournalEntry := &database.FileJournalEntry{
 		LinkExternalKey: id,
-		FileName:        header.Filename,
+		FileName:        fileName,
 	}
 	err = s.db.CreateFileJournalEntry(fileJournalEntry)
 	if err != nil {
@@ -52,25 +57,25 @@ func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
 	}()
 
 	dirty := true
-	localFile, err := s.fs.CreateNewFile(id, header.Filename)
+	localFile, err := s.fs.CreateNewFile(id, fileName)
 	if err != nil {
-		return fmt.Errorf("failed to create file %s for link %s: %w", header.Filename, id, err)
+		return fmt.Errorf("failed to create file %s for link %s: %w", fileName, id, err)
 	}
 
 	defer func() {
 		_ = localFile.Close()
 
 		if dirty {
-			err := s.fs.RemoveLinkFile(id, header.Filename)
+			err := s.fs.RemoveLinkFile(id, fileName)
 			if err != nil {
-				slog.Error("failed to delete a file", "name", header.Filename, "link_id", id, "error", err)
+				slog.Error("failed to delete a file", "name", fileName, "link_id", id, "error", err)
 			}
 		}
 	}()
 
 	_, err = io.Copy(localFile, file)
 	if err != nil {
-		return fmt.Errorf("failed to save file %s from link %s to storage: %w", header.Filename, id, err)
+		return fmt.Errorf("failed to save file %s from link %s to storage: %w", fileName, id, err)
 	}
 
 	dirty = false
@@ -81,4 +86,12 @@ func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
 	})
 	http.Redirect(w, r, fmt.Sprintf("/u/%s", id), http.StatusSeeOther)
 	return nil
+}
+
+func sanitizeFileName(fileName string) (string, error) {
+	if strings.ContainsAny(fileName, "/\\") {
+		return "", fmt.Errorf("Forbidden characters found in file name %s", fileName)
+	}
+
+	return fileName, nil
 }
