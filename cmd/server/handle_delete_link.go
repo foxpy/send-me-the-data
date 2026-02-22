@@ -18,6 +18,13 @@ func (s *State) handleDeleteLink(w http.ResponseWriter, r *http.Request) error {
 
 	// FIXME: since we do not attempt to terminate all active uploads,
 	//        acquiring this lock might take possibly many hours of time.
+	// There is an idea for another fix: we could download files from users
+	// to a temporary designated directory and only take a lock when moving
+	// the file from this directory to the target link directory. This way,
+	// we can delete a link almost instantly, and when the upload endpoint
+	// finishes, it will fail to move the file because it will fail to acquire
+	// a lock on an unexisting link, therefore forced to delete a file it just
+	// finished downloading. Still not perfect, but much better.
 	lock, err := s.db.AcquireLinkWLock(id)
 	if err != nil {
 		return fmt.Errorf("failed to acquire write lock for link %s: %w", id, err)
