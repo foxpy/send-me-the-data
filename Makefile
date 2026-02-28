@@ -1,4 +1,5 @@
 DB_URL = "postgres://postgres:i_am@localhost:5432/postgres?sslmode=disable"
+MIGRATIONS = "cmd/server/database/migrations/"
 
 .PHONY: start-server goose-status
 
@@ -8,19 +9,19 @@ start-server:
 	go run ./cmd/server
 
 goose-status:
-	cd migrations && \
 	GOOSE_DRIVER=postgres \
-	GOOSE_DBSTRING="$(DB_URL)" \
+	GOOSE_DBSTRING=$(DB_URL) \
+	GOOSE_MIGRATION_DIR=$(MIGRATIONS) \
 	goose status
 
 goose-up:
-	cd migrations && \
 	GOOSE_DRIVER=postgres \
-	GOOSE_DBSTRING="$(DB_URL)" \
+	GOOSE_DBSTRING=$(DB_URL) \
+	GOOSE_MIGRATION_DIR=$(MIGRATIONS) \
 	goose up
 
 goose-down:
-	cd migrations && \
 	GOOSE_DRIVER=postgres \
-	GOOSE_DBSTRING="$(DB_URL)" \
+	GOOSE_DBSTRING=$(DB_URL) \
+	GOOSE_MIGRATION_DIR=$(MIGRATIONS) \
 	goose down-to 0

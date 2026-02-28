@@ -1,12 +1,12 @@
 - [x] Postgres schema
-  - [ ] with migrations
+  - [x] with migrations
   - [ ] what can I use instead of postgres passwords?
 
 
 
 - [ ] Client server
   - [x] static upload web page
-    - [ ] successful upload flash
+    - [x] successful upload flash
     - [x] 404 page
     - [x] upload a single file
     - [ ] upload multiple files
@@ -16,7 +16,7 @@
 - [ ] Admin server
   - [x] Link management page
     - [ ] with link management endpoints:
-      - [ ] create
+      - [x] create
         - [ ] set maximum file size
         - [ ] DIFFICULT: set maximum total file size
       - [ ] edit
