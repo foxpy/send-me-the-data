@@ -21,7 +21,7 @@ var (
 
 func (s *State) handleAdminViewLinkPage(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
-	files, err := s.prepareFilesView(id)
+	files, err := s.prepareFilesView(id, true)
 	if errors.Is(err, sql.ErrNoRows) {
 		return respond404(w)
 	} else if err != nil {

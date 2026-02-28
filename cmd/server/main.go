@@ -53,6 +53,7 @@ func userServer(state *State, listenAddress string) {
 	m := http.NewServeMux()
 	m.HandleFunc("GET /u/{id}", handleWith500OnError(state.handleUserViewLinkPage))
 	m.HandleFunc("POST /u/{id}", handleWith500OnError(state.handleUserUpload))
+	m.HandleFunc("GET /link/{id}/file/{name}", handleWith500OnError(state.handleUserDownloadFile))
 	m.Handle("GET /static/", http.FileServerFS(static))
 
 	slog.Info("Starting user HTTP server", "address", listenAddress)

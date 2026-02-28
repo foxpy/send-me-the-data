@@ -12,7 +12,12 @@ type Link struct {
 }
 
 type LinkRLock struct {
-	tx *sql.Tx
+	userDownloadable bool
+	tx               *sql.Tx
+}
+
+func (l LinkRLock) UserDownloadable() bool {
+	return l.userDownloadable
 }
 
 func (l LinkRLock) Close() error {
@@ -64,8 +69,13 @@ func (d *Database) AllLinks() ([]Link, error) {
 	return links, nil
 }
 
-func (d *Database) CreateLink(name, externalKey string) error {
-	_, err := d.db.Exec("INSERT INTO smtd.links (name, external_key) VALUES ($1, $2)", name, externalKey)
+func (d *Database) CreateLink(name, externalKey string, userDownloadable bool) error {
+	_, err := d.db.Exec(
+		"INSERT INTO smtd.links (name, external_key, user_downloadable) VALUES ($1, $2, $3)",
+		name,
+		externalKey,
+		userDownloadable,
+	)
 	if err != nil {
 		return fmt.Errorf("failed to create new link %s: %w", externalKey, err)
 	}
@@ -79,14 +89,18 @@ func (d *Database) AcquireLinkRLock(externalKey string) (*LinkRLock, error) {
 		return nil, fmt.Errorf("failed to begin transaction: %w", err)
 	}
 
-	var n int
-	err = tx.QueryRow("SELECT 1 FROM smtd.links WHERE external_key = $1 FOR SHARE", externalKey).Scan(&n)
+	var userDownloadable bool
+	err = tx.QueryRow(
+		"SELECT user_downloadable FROM smtd.links WHERE external_key = $1 FOR SHARE",
+		externalKey,
+	).Scan(&userDownloadable)
 	if err != nil {
 		_ = tx.Rollback()
 		return nil, fmt.Errorf("failed to acquire read lock on link %s: %w", externalKey, err)
 	}
 
 	return &LinkRLock{
+		userDownloadable,
 		tx,
 	}, nil
 }

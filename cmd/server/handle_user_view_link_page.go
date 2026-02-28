@@ -21,7 +21,7 @@ var (
 
 func (s *State) handleUserViewLinkPage(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
-	files, err := s.prepareFilesView(id)
+	files, err := s.prepareFilesView(id, false)
 	if errors.Is(err, sql.ErrNoRows) {
 		return respond404(w)
 	} else if err != nil {
@@ -56,7 +56,7 @@ func (s *State) handleUserViewLinkPage(w http.ResponseWriter, r *http.Request) e
 	return nil
 }
 
-func (s *State) prepareFilesView(id string) ([]FileView, error) {
+func (s *State) prepareFilesView(id string, forAdmin bool) ([]FileView, error) {
 	lock, err := s.db.AcquireLinkRLock(id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, err
@@ -68,7 +68,8 @@ func (s *State) prepareFilesView(id string) ([]FileView, error) {
 		_ = lock.Close()
 	}()
 
-	files, err := s.getFilesView(id)
+	renderDownloadLinks := forAdmin || lock.UserDownloadable()
+	files, err := s.getFilesView(id, renderDownloadLinks)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get files view for link %s: %w", id, err)
 	}

@@ -37,7 +37,12 @@ func (s *State) handleAdminCreateLink(w http.ResponseWriter, r *http.Request) er
 		return fmt.Errorf("failed to generate a random external key: %w", err)
 	}
 
-	err = s.db.CreateLink(name, externalKey)
+	userDownloadable := false
+	if r.FormValue("user_downloadable") == "on" {
+		userDownloadable = true
+	}
+
+	err = s.db.CreateLink(name, externalKey, userDownloadable)
 	var pqErr *pq.Error
 	if errors.As(err, &pqErr) && pqErr.Code.Name() == "unique_violation" {
 		http.SetCookie(w, &http.Cookie{

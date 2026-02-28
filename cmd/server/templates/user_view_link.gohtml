@@ -43,7 +43,12 @@
             <tbody>
                 {{ range .Files }}
                 <tr>
-                    <td>{{ .Name }}</td>
+                    <td>
+                        {{ if .DownloadLink }}
+                            <a href="{{ .DownloadLink }}">{{ .Name }}</a>
+                        {{ else }}
+                            {{ .Name }}
+                        {{ end }}</td>
                     <td>{{ .UploadedAt }}</td>
                     <td>{{ .Size }}</td>
                 </tr>

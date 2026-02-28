@@ -26,8 +26,12 @@
     <div>
         <form action="/link" method="post">
             <div>
-                <label for="name">New link name: </label>
-                <input type="text" name="name" id="name" required />
+                <label for="link_name">New link name: </label>
+                <input type="text" name="name" id="link_name" required />
+            </div>
+            <div>
+                <input type="checkbox" name="user_downloadable" id="link_user_downloadable" />
+                <label for="link_user_downloadable">Users can download files</label>
             </div>
             <div>
                 <input type="submit" value="Create link" />

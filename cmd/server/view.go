@@ -53,7 +53,7 @@ func (s *State) getLinksView() ([]LinkView, error) {
 	return linkViews, nil
 }
 
-func (s *State) getFilesView(linkID string) ([]FileView, error) {
+func (s *State) getFilesView(linkID string, renderDownloadLinks bool) ([]FileView, error) {
 	files, err := s.fs.ListLinkFiles(linkID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get all files for link %s: %w", linkID, err)
@@ -61,11 +61,16 @@ func (s *State) getFilesView(linkID string) ([]FileView, error) {
 
 	fileViews := make([]FileView, 0, len(files))
 	for _, file := range files {
+		downloadLink := ""
+		if renderDownloadLinks {
+			downloadLink = fmt.Sprintf("/link/%s/file/%s", linkID, file.Name)
+		}
+
 		fileViews = append(fileViews, FileView{
 			Name:         file.Name,
 			UploadedAt:   file.ModTime.Format(time.Stamp),
 			Size:         bytesToHuman(file.Size),
-			DownloadLink: fmt.Sprintf("/link/%s/file/%s", linkID, file.Name),
+			DownloadLink: downloadLink,
 			DeleteLink:   fmt.Sprintf("/link/%s/file/%s/delete", linkID, file.Name),
 		})
 	}
