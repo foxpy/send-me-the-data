@@ -1,6 +1,8 @@
 package main
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -12,14 +14,16 @@ import (
 
 func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
-	ok, err := s.db.DoesLinkExist(id)
-	if err != nil {
-		return fmt.Errorf("failed to check if link is published: %w", err)
+	lock, err := s.db.AcquireLinkRLock(id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return respond404(w)
+	} else if err != nil {
+		return fmt.Errorf("failed to acquire read lock on link %s: %w", id, err)
 	}
 
-	if !ok {
-		return respond404(w)
-	}
+	defer func() {
+		_ = lock.Close()
+	}()
 
 	file, header, err := r.FormFile("file")
 	if err != nil {
@@ -30,15 +34,6 @@ func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-
-	lock, err := s.db.AcquireLinkRLock(id)
-	if err != nil {
-		return fmt.Errorf("failed to acquire read lock on link %s: %w", id, err)
-	}
-
-	defer func() {
-		_ = lock.Close()
-	}()
 
 	fileJournalEntry := &database.FileJournalEntry{
 		LinkExternalKey: id,

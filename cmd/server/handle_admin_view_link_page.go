@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"database/sql"
+	"errors"
 	"fmt"
 	"html/template"
 	"io"
@@ -19,18 +21,11 @@ var (
 
 func (s *State) handleAdminViewLinkPage(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
-	ok, err := s.db.DoesLinkExist(id)
-	if err != nil {
-		return fmt.Errorf("failed to check if link is published: %w", err)
-	}
-
-	if !ok {
+	files, err := s.prepareFilesView(id)
+	if errors.Is(err, sql.ErrNoRows) {
 		return respond404(w)
-	}
-
-	files, err := s.getFilesView(id)
-	if err != nil {
-		return fmt.Errorf("failed to obtain files view for link %s: %w", id, err)
+	} else if err != nil {
+		return err
 	}
 
 	var b bytes.Buffer

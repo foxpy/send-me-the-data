@@ -1,23 +1,18 @@
 package main
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 )
 
 func (s *State) handleAdminDeleteFile(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
-	ok, err := s.db.DoesLinkExist(id)
-	if err != nil {
-		return fmt.Errorf("failed to check if link is published: %w", err)
-	}
-
-	if !ok {
-		return respond404(w)
-	}
-
 	lock, err := s.db.AcquireLinkRLock(id)
-	if err != nil {
+	if errors.Is(err, sql.ErrNoRows) {
+		return respond404(w)
+	} else if err != nil {
 		return fmt.Errorf("failed to acquire read lock for link %s: %w", id, err)
 	}
 

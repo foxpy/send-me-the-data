@@ -1,20 +1,14 @@
 package main
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 )
 
 func (s *State) handleAdminDeleteLink(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
-	ok, err := s.db.DoesLinkExist(id)
-	if err != nil {
-		return fmt.Errorf("failed to check if link is published: %w", err)
-	}
-
-	if !ok {
-		return respond404(w)
-	}
 
 	// FIXME: since we do not attempt to terminate all active uploads,
 	//        acquiring this lock might take possibly many hours of time.
@@ -26,7 +20,9 @@ func (s *State) handleAdminDeleteLink(w http.ResponseWriter, r *http.Request) er
 	// a lock on an unexisting link, therefore forced to delete a file it just
 	// finished downloading. Still not perfect, but much better.
 	lock, err := s.db.AcquireLinkWLock(id)
-	if err != nil {
+	if errors.Is(err, sql.ErrNoRows) {
+		return respond404(w)
+	} else if err != nil {
 		return fmt.Errorf("failed to acquire write lock for link %s: %w", id, err)
 	}
 

@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"time"
 )
@@ -36,20 +35,6 @@ func (l LinkWLock) DeleteLink() error {
 	}
 
 	return nil
-}
-
-// TODO: maybe I should just take RLock everywhere I use this method
-// TODO: delete this method?
-func (d *Database) DoesLinkExist(externalKey string) (bool, error) {
-	var n int
-	err := d.db.QueryRow("SELECT 1 FROM smtd.links WHERE external_key = $1", externalKey).Scan(&n)
-	if errors.Is(err, sql.ErrNoRows) {
-		return false, nil
-	} else if err != nil {
-		return false, err
-	}
-
-	return true, nil
 }
 
 func (d *Database) AllLinks() ([]Link, error) {
