@@ -1,14 +1,16 @@
 package main
 
 import (
-	_ "embed"
+	"log/slog"
 	"net/http"
-)
 
-//go:embed templates/500.gohtml
-var internalServerErrorTemplate string
+	"github.com/foxpy/send-me-the-data/cmd/server/templates"
+)
 
 func respond500(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusInternalServerError)
-	w.Write([]byte(internalServerErrorTemplate))
+	err := templates.Render500(w)
+	if err != nil {
+		slog.Error("failed to write 500 response", "error", err)
+	}
 }

@@ -3,32 +3,17 @@ package main
 import (
 	"fmt"
 	"time"
+
+	"github.com/foxpy/send-me-the-data/cmd/server/templates"
 )
 
-type LinkView struct {
-	Name       string
-	CreatedAt  string
-	TotalFiles int
-	TotalSize  string
-	ViewLink   string
-	DeleteLink string
-}
-
-type FileView struct {
-	Name         string
-	UploadedAt   string
-	Size         string
-	DownloadLink string
-	DeleteLink   string
-}
-
-func (s *State) getLinksView() ([]LinkView, error) {
+func (s *State) getLinksView() ([]templates.LinkView, error) {
 	links, err := s.db.AllLinks()
 	if err != nil {
 		return nil, fmt.Errorf("failed to read all links from database: %w", err)
 	}
 
-	linkViews := make([]LinkView, 0, len(links))
+	linkViews := make([]templates.LinkView, 0, len(links))
 	for _, link := range links {
 		files, err := s.fs.ListLinkFiles(link.ExternalKey)
 		if err != nil {
@@ -40,7 +25,7 @@ func (s *State) getLinksView() ([]LinkView, error) {
 			totalSize += file.Size
 		}
 
-		linkViews = append(linkViews, LinkView{
+		linkViews = append(linkViews, templates.LinkView{
 			Name:       link.Name,
 			CreatedAt:  link.CreatedAt.Format(time.Stamp),
 			TotalFiles: len(files),
@@ -53,20 +38,20 @@ func (s *State) getLinksView() ([]LinkView, error) {
 	return linkViews, nil
 }
 
-func (s *State) getFilesView(linkID string, renderDownloadLinks bool) ([]FileView, error) {
+func (s *State) getFilesView(linkID string, renderDownloadLinks bool) ([]templates.FileView, error) {
 	files, err := s.fs.ListLinkFiles(linkID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get all files for link %s: %w", linkID, err)
 	}
 
-	fileViews := make([]FileView, 0, len(files))
+	fileViews := make([]templates.FileView, 0, len(files))
 	for _, file := range files {
 		downloadLink := ""
 		if renderDownloadLinks {
 			downloadLink = fmt.Sprintf("/link/%s/file/%s", linkID, file.Name)
 		}
 
-		fileViews = append(fileViews, FileView{
+		fileViews = append(fileViews, templates.FileView{
 			Name:         file.Name,
 			UploadedAt:   file.ModTime.Format(time.Stamp),
 			Size:         bytesToHuman(file.Size),

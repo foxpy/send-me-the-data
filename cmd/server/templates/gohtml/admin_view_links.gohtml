@@ -11,13 +11,13 @@
 <body>
     {{ if .SuccessFlash }}
     <div class="success_flash">
-        Link created successfully
+        {{ .SuccessFlash }}
     </div>
     {{ end }}
 
     {{ if .ErrorFlash }}
     <div class="error_flash">
-        Failed to create link
+        {{ .ErrorFlash }}
     </div>
     {{ end }}
 
@@ -53,7 +53,7 @@
                 </tr>
             </thead>
             <tbody>
-                {{ range .Links }}
+                {{ range .Data.Links }}
                 <tr>
                     <td><a href="{{ .ViewLink }}">{{ .Name }}</a></td>
                     <td>{{ .CreatedAt }}</td>

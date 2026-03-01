@@ -9,6 +9,18 @@
 </head>
 
 <body>
+    {{ if .SuccessFlash }}
+    <div class="success_flash">
+        {{ .SuccessFlash }}
+    </div>
+    {{ end }}
+
+    {{ if .ErrorFlash }}
+    <div class="error_flash">
+        {{ .ErrorFlash }}
+    </div>
+    {{ end }}
+
     <h2>List of files</h2>
 
     <div>
@@ -22,7 +34,7 @@
                 </tr>
             </thead>
             <tbody>
-                {{ range . }}
+                {{ range .Data.Files }}
                 <tr>
                     <td><a href="{{ .DownloadLink }}">{{ .Name }}</a></td>
                     <td>{{ .UploadedAt }}</td>

@@ -1,20 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
-	"html/template"
-	"io"
 	"net/http"
 
-	_ "embed"
-)
-
-var (
-	//go:embed templates/admin_view_links.gohtml
-	viewLinksStr string
-
-	viewLinksTemplate = template.Must(template.New("").Parse(viewLinksStr))
+	"github.com/foxpy/send-me-the-data/cmd/server/templates"
 )
 
 func (s *State) handleAdminViewLinksPage(w http.ResponseWriter, r *http.Request) error {
@@ -23,10 +13,12 @@ func (s *State) handleAdminViewLinksPage(w http.ResponseWriter, r *http.Request)
 		return fmt.Errorf("failed to get links view: %w", err)
 	}
 
-	successFlash := false
+	var params templates.Params[templates.AdminViewLinksParams]
+	params.Data.Links = links
+
 	_, err = r.Cookie("success_flash")
 	if err == nil {
-		successFlash = true
+		params.SuccessFlash = "Link created successfully"
 	}
 
 	http.SetCookie(w, &http.Cookie{
@@ -34,10 +26,9 @@ func (s *State) handleAdminViewLinksPage(w http.ResponseWriter, r *http.Request)
 		MaxAge: -1,
 	})
 
-	errorFlash := false
 	_, err = r.Cookie("error_flash")
 	if err == nil {
-		errorFlash = true
+		params.ErrorFlash = "Failed to create link"
 	}
 
 	http.SetCookie(w, &http.Cookie{
@@ -45,20 +36,5 @@ func (s *State) handleAdminViewLinksPage(w http.ResponseWriter, r *http.Request)
 		MaxAge: -1,
 	})
 
-	var b bytes.Buffer
-	err = viewLinksTemplate.Execute(&b, map[string]any{
-		"Links":        links,
-		"SuccessFlash": successFlash,
-		"ErrorFlash":   errorFlash,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to render a template: %w", err)
-	}
-
-	_, err = io.Copy(w, &b)
-	if err != nil {
-		return fmt.Errorf("failed to write rendered template: %w", err)
-	}
-
-	return nil
+	return templates.RenderAdminViewLinks(w, params)
 }

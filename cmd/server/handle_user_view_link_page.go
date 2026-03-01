@@ -1,22 +1,12 @@
 package main
 
 import (
-	"bytes"
 	"database/sql"
 	"errors"
 	"fmt"
-	"html/template"
-	"io"
 	"net/http"
 
-	_ "embed"
-)
-
-var (
-	//go:embed templates/user_view_link.gohtml
-	uploadTemplateStr string
-
-	uploadTemplate = template.Must(template.New("").Parse(uploadTemplateStr))
+	"github.com/foxpy/send-me-the-data/cmd/server/templates"
 )
 
 func (s *State) handleUserViewLinkPage(w http.ResponseWriter, r *http.Request) error {
@@ -28,10 +18,12 @@ func (s *State) handleUserViewLinkPage(w http.ResponseWriter, r *http.Request) e
 		return err
 	}
 
-	successFlash := false
+	var params templates.Params[templates.UserViewLinkParams]
+	params.Data.Files = files
+
 	_, err = r.Cookie("success_flash")
 	if err == nil {
-		successFlash = true
+		params.SuccessFlash = "File uploaded successfully"
 	}
 
 	http.SetCookie(w, &http.Cookie{
@@ -39,24 +31,10 @@ func (s *State) handleUserViewLinkPage(w http.ResponseWriter, r *http.Request) e
 		MaxAge: -1,
 	})
 
-	var b bytes.Buffer
-	err = uploadTemplate.Execute(&b, map[string]any{
-		"Files":        files,
-		"SuccessFlash": successFlash,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to render a template: %w", err)
-	}
-
-	_, err = io.Copy(w, &b)
-	if err != nil {
-		return fmt.Errorf("failed to write rendered template: %w", err)
-	}
-
-	return nil
+	return templates.RenderUserViewLink(w, params)
 }
 
-func (s *State) prepareFilesView(id string, forAdmin bool) ([]FileView, error) {
+func (s *State) prepareFilesView(id string, forAdmin bool) ([]templates.FileView, error) {
 	lock, err := s.db.AcquireLinkRLock(id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, err

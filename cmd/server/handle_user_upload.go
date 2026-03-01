@@ -84,6 +84,10 @@ func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
 }
 
 func sanitizeFileName(fileName string) (string, error) {
+	// TODO: limit file name length somehow:
+	//  - decide whether file name limit should be hardcoded or configurable
+	//  - maybe I can validate file name length limit from HTML??????????
+	//  - decide whether I should return an error or strip file name
 	if strings.ContainsAny(fileName, "/\\") {
 		return "", fmt.Errorf("Forbidden characters found in file name %s", fileName)
 	}

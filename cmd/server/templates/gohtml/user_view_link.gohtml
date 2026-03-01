@@ -9,9 +9,16 @@
 </head>
 
 <body>
+    <!-- TODO: move it to a separate template -->
     {{ if .SuccessFlash }}
     <div class="success_flash">
-        File uploaded successfully
+        {{ .SuccessFlash }}
+    </div>
+    {{ end }}
+
+    {{ if .ErrorFlash }}
+    <div class="error_flash">
+        {{ .ErrorFlash }}
     </div>
     {{ end }}
 
@@ -41,14 +48,15 @@
                 </tr>
             </thead>
             <tbody>
-                {{ range .Files }}
+                {{ range .Data.Files }}
                 <tr>
                     <td>
                         {{ if .DownloadLink }}
-                            <a href="{{ .DownloadLink }}">{{ .Name }}</a>
+                        <a href="{{ .DownloadLink }}">{{ .Name }}</a>
                         {{ else }}
-                            {{ .Name }}
-                        {{ end }}</td>
+                        {{ .Name }}
+                        {{ end }}
+                    </td>
                     <td>{{ .UploadedAt }}</td>
                     <td>{{ .Size }}</td>
                 </tr>

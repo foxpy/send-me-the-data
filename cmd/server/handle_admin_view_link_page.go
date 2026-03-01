@@ -1,22 +1,11 @@
 package main
 
 import (
-	"bytes"
 	"database/sql"
 	"errors"
-	"fmt"
-	"html/template"
-	"io"
 	"net/http"
 
-	_ "embed"
-)
-
-var (
-	//go:embed templates/admin_view_link.gohtml
-	viewTemplateStr string
-
-	viewTemplate = template.Must(template.New("").Parse(viewTemplateStr))
+	"github.com/foxpy/send-me-the-data/cmd/server/templates"
 )
 
 func (s *State) handleAdminViewLinkPage(w http.ResponseWriter, r *http.Request) error {
@@ -28,16 +17,8 @@ func (s *State) handleAdminViewLinkPage(w http.ResponseWriter, r *http.Request) 
 		return err
 	}
 
-	var b bytes.Buffer
-	err = viewTemplate.Execute(&b, files)
-	if err != nil {
-		return fmt.Errorf("failed to render a template: %w", err)
-	}
+	var params templates.Params[templates.AdminViewLinkParams]
+	params.Data.Files = files
 
-	_, err = io.Copy(w, &b)
-	if err != nil {
-		return fmt.Errorf("failed to write rendered template: %w", err)
-	}
-
-	return nil
+	return templates.RenderAdminViewLink(w, params)
 }
