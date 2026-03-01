@@ -2,25 +2,10 @@
 
 <html>
 
-<head>
-    <title>Send me the Data</title>
-    <meta charset="utf-8">
-    <link href="/static/style.css" rel="stylesheet" />
-</head>
+{{ template "head.gohtml" . }}
 
 <body>
-    <!-- TODO: move it to a separate template -->
-    {{ if .SuccessFlash }}
-    <div class="success_flash">
-        {{ .SuccessFlash }}
-    </div>
-    {{ end }}
-
-    {{ if .ErrorFlash }}
-    <div class="error_flash">
-        {{ .ErrorFlash }}
-    </div>
-    {{ end }}
+    {{ template "flash.gohtml" . }}
 
     <h2>Upload new file</h2>
 

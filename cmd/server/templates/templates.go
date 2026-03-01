@@ -17,6 +17,7 @@ var (
 )
 
 type Params[T any] struct {
+	Title        string
 	SuccessFlash string
 	ErrorFlash   string
 	Data         T

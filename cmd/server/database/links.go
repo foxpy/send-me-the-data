@@ -12,12 +12,17 @@ type Link struct {
 }
 
 type LinkRLock struct {
+	name             string
 	userDownloadable bool
 	tx               *sql.Tx
 }
 
 func (l LinkRLock) UserDownloadable() bool {
 	return l.userDownloadable
+}
+
+func (l LinkRLock) Name() string {
+	return l.name
 }
 
 func (l LinkRLock) Close() error {
@@ -90,16 +95,18 @@ func (d *Database) AcquireLinkRLock(externalKey string) (*LinkRLock, error) {
 	}
 
 	var userDownloadable bool
+	var name string
 	err = tx.QueryRow(
-		"SELECT user_downloadable FROM smtd.links WHERE external_key = $1 FOR SHARE",
+		"SELECT name, user_downloadable FROM smtd.links WHERE external_key = $1 FOR SHARE",
 		externalKey,
-	).Scan(&userDownloadable)
+	).Scan(&name, &userDownloadable)
 	if err != nil {
 		_ = tx.Rollback()
 		return nil, fmt.Errorf("failed to acquire read lock on link %s: %w", externalKey, err)
 	}
 
 	return &LinkRLock{
+		name,
 		userDownloadable,
 		tx,
 	}, nil

@@ -14,6 +14,7 @@ func (s *State) handleAdminViewLinksPage(w http.ResponseWriter, r *http.Request)
 	}
 
 	var params templates.Params[templates.AdminViewLinksParams]
+	params.Title = "Send me the Data"
 	params.Data.Links = links
 
 	_, err = r.Cookie("success_flash")
