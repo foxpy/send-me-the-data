@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"crypto/rand"
 	"errors"
 	"fmt"
@@ -64,9 +65,15 @@ func (s *State) handleAdminCreateLink(w http.ResponseWriter, r *http.Request) er
 }
 
 func generateRandomExternalKey() (string, error) {
+	// Usually we only need one byte per character, but there is a probability
+	// we will need more. Assuming an already unlikely case of each call to crypto/rand.Int
+	// requiring 2 random bytes instead of 1, buffering 24 bytes in advance guarantees
+	// that on Linux we will almost never need more than a single call to getrandom(2).
+	r := bufio.NewReaderSize(rand.Reader, 24)
+
 	var result strings.Builder
 	for range 12 {
-		n, err := rand.Int(rand.Reader, &alphabetSize)
+		n, err := rand.Int(r, &alphabetSize)
 		if err != nil {
 			return "", fmt.Errorf("failed to generate random integer: %w", err)
 		}
