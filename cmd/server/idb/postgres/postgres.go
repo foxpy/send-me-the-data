@@ -1,4 +1,4 @@
-package database
+package postgres
 
 import (
 	"database/sql"
@@ -12,11 +12,11 @@ import (
 //go:embed migrations/*.sql
 var embedMigrations embed.FS
 
-type Database struct {
+type Postgres struct {
 	db *sql.DB
 }
 
-func NewDatabase(postgresURL string) (*Database, error) {
+func NewPostgres(postgresURL string) (*Postgres, error) {
 	db, err := sql.Open("postgres", postgresURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create database pool: %w", err)
@@ -38,7 +38,7 @@ func NewDatabase(postgresURL string) (*Database, error) {
 		return nil, fmt.Errorf("failed to apply database migrations: %w", err)
 	}
 
-	return &Database{
+	return &Postgres{
 		db,
 	}, nil
 }

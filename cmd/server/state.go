@@ -6,13 +6,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/foxpy/send-me-the-data/cmd/server/database"
-	"github.com/foxpy/send-me-the-data/cmd/server/filesystem"
+	"github.com/foxpy/send-me-the-data/cmd/server/idb"
+	"github.com/foxpy/send-me-the-data/cmd/server/idb/postgres"
+	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
+	"github.com/foxpy/send-me-the-data/cmd/server/ifs/vfs"
 )
 
 type State struct {
-	db *database.Database
-	fs *filesystem.Filesystem
+	db idb.Database
+	fs ifs.Filesystem
 }
 
 func NewState(postgresURL, prefix string) (*State, error) {
@@ -20,12 +22,12 @@ func NewState(postgresURL, prefix string) (*State, error) {
 		return nil, errors.New("filesystem prefix must not be empty")
 	}
 
-	db, err := database.NewDatabase(postgresURL)
+	db, err := postgres.NewPostgres(postgresURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize database: %w", err)
 	}
 
-	fs, err := filesystem.NewFilesystem(prefix)
+	fs, err := vfs.NewVFS(prefix)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize filesystem: %w", err)
 	}

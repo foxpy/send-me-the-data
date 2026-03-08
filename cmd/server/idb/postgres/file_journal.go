@@ -1,12 +1,9 @@
-package database
+package postgres
 
-type FileJournalEntry struct {
-	LinkExternalKey string
-	FileName        string
-}
+import "github.com/foxpy/send-me-the-data/cmd/server/idb"
 
-func (d *Database) GetFileJournalEntry() (*FileJournalEntry, error) {
-	var entry FileJournalEntry
+func (d *Postgres) GetFileJournalEntry() (*idb.FileJournalEntry, error) {
+	var entry idb.FileJournalEntry
 	err := d.db.QueryRow(`
 		SELECT l.external_key, fj.name
 		FROM smtd.file_journal fj
@@ -20,7 +17,7 @@ func (d *Database) GetFileJournalEntry() (*FileJournalEntry, error) {
 	return &entry, nil
 }
 
-func (d *Database) DeleteFileJournalEntry(entry *FileJournalEntry) error {
+func (d *Postgres) DeleteFileJournalEntry(entry *idb.FileJournalEntry) error {
 	_, err := d.db.Exec(`
 		DELETE FROM smtd.file_journal
 		WHERE name = $1
@@ -29,7 +26,7 @@ func (d *Database) DeleteFileJournalEntry(entry *FileJournalEntry) error {
 	return err
 }
 
-func (d *Database) CreateFileJournalEntry(entry *FileJournalEntry) error {
+func (d *Postgres) CreateFileJournalEntry(entry *idb.FileJournalEntry) error {
 	_, err := d.db.Exec(`
 		INSERT INTO smtd.file_journal (link_id, name)
 		VALUES ((SELECT link_id FROM smtd.links WHERE external_key = $1), $2)

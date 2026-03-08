@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/foxpy/send-me-the-data/cmd/server/database"
+	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 )
 
 func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
@@ -35,7 +35,7 @@ func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	fileJournalEntry := &database.FileJournalEntry{
+	fileJournalEntry := &idb.FileJournalEntry{
 		LinkExternalKey: id,
 		FileName:        fileName,
 	}

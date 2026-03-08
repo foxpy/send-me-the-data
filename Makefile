@@ -1,5 +1,5 @@
 DB_URL = "postgres://postgres:i_am@localhost:5432/postgres?sslmode=disable"
-MIGRATIONS = "cmd/server/database/migrations/"
+MIGRATIONS = "cmd/server/idb/postgres/migrations/"
 
 .PHONY: start-server goose-status
 

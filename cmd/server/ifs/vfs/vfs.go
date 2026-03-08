@@ -1,24 +1,19 @@
-package filesystem
+package vfs
 
 import (
 	"errors"
 	"fmt"
 	"io/fs"
 	"os"
-	"time"
+
+	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 )
 
-type Filesystem struct {
+type VFS struct {
 	root *os.Root
 }
 
-type File struct {
-	Name    string
-	Size    int64
-	ModTime time.Time
-}
-
-func NewFilesystem(prefix string) (*Filesystem, error) {
+func NewVFS(prefix string) (*VFS, error) {
 	if prefix == "" {
 		return nil, errors.New("filesystem prefix must not be an empty string")
 	}
@@ -28,10 +23,10 @@ func NewFilesystem(prefix string) (*Filesystem, error) {
 		return nil, fmt.Errorf("failed to open filesystem root at %s: %w", prefix, err)
 	}
 
-	return &Filesystem{root}, nil
+	return &VFS{root}, nil
 }
 
-func (f *Filesystem) ListLinkFiles(linkID string) ([]File, error) {
+func (f *VFS) ListLinkFiles(linkID string) ([]ifs.File, error) {
 	linkFolder, err := f.root.Open(linkID)
 	if os.IsNotExist(err) {
 		return nil, nil
@@ -43,21 +38,19 @@ func (f *Filesystem) ListLinkFiles(linkID string) ([]File, error) {
 		_ = linkFolder.Close()
 	}()
 
-	// FIXME: do not read all dir entries into memory at once
-	// solution: pagination
 	entries, err := linkFolder.ReadDir(0)
 	if err != nil {
 		return nil, fmt.Errorf("failed to traverse directory of link %s: %w", linkID, err)
 	}
 
-	files := make([]File, 0, len(entries))
+	files := make([]ifs.File, 0, len(entries))
 	for _, entry := range entries {
 		info, err := entry.Info()
 		if err != nil {
 			return nil, fmt.Errorf("failed to get file info: %w", err)
 		}
 
-		files = append(files, File{
+		files = append(files, ifs.File{
 			Name:    entry.Name(),
 			Size:    info.Size(),
 			ModTime: info.ModTime(),
@@ -67,7 +60,7 @@ func (f *Filesystem) ListLinkFiles(linkID string) ([]File, error) {
 	return files, nil
 }
 
-func (f *Filesystem) RemoveLinkFiles(linkID string) error {
+func (f *VFS) RemoveLinkFiles(linkID string) error {
 	err := f.root.RemoveAll(linkID)
 	if err != nil {
 		return fmt.Errorf("failed to remove files associated with link %s: %w", linkID, err)
@@ -76,11 +69,11 @@ func (f *Filesystem) RemoveLinkFiles(linkID string) error {
 	return nil
 }
 
-func (f *Filesystem) RemoveLinkFile(linkID, fileName string) error {
+func (f *VFS) RemoveLinkFile(linkID, fileName string) error {
 	return f.root.Remove(f.getPath(linkID, fileName))
 }
 
-func (f *Filesystem) FS(linkID string) (fs.FS, error) {
+func (f *VFS) FS(linkID string) (fs.FS, error) {
 	linkRoot, err := f.root.OpenRoot(linkID)
 	if err != nil {
 		return nil, err
@@ -89,7 +82,7 @@ func (f *Filesystem) FS(linkID string) (fs.FS, error) {
 	return linkRoot.FS(), err
 }
 
-func (f *Filesystem) CreateNewFile(linkID, fileName string) (*os.File, error) {
+func (f *VFS) CreateNewFile(linkID, fileName string) (*os.File, error) {
 	err := f.root.MkdirAll(linkID, 0777)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a directory for a new file %s for a link %s: %w", fileName, linkID, err)
@@ -98,6 +91,6 @@ func (f *Filesystem) CreateNewFile(linkID, fileName string) (*os.File, error) {
 	return f.root.OpenFile(f.getPath(linkID, fileName), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
 }
 
-func (f *Filesystem) getPath(linkID, fileName string) string {
+func (f *VFS) getPath(linkID, fileName string) string {
 	return fmt.Sprintf("%s/%s", linkID, fileName)
 }
