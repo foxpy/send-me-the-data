@@ -7,7 +7,7 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/templates"
 )
 
-func (s *State) getLinksView() ([]templates.LinkView, error) {
+func (s *State) GetLinksView() ([]templates.LinkView, error) {
 	links, err := s.db.AllLinks()
 	if err != nil {
 		return nil, fmt.Errorf("failed to read all links from database: %w", err)
@@ -26,7 +26,8 @@ func (s *State) getLinksView() ([]templates.LinkView, error) {
 		}
 
 		linkViews = append(linkViews, templates.LinkView{
-			Name:       link.Name,
+			Name: link.Name,
+			// FIXME: using time.Stamp does not include the year
 			CreatedAt:  link.CreatedAt.Format(time.Stamp),
 			TotalFiles: len(files),
 			TotalSize:  bytesToHuman(totalSize),
@@ -38,7 +39,7 @@ func (s *State) getLinksView() ([]templates.LinkView, error) {
 	return linkViews, nil
 }
 
-func (s *State) getFilesView(linkID string, renderDownloadLinks bool) ([]templates.FileView, error) {
+func (s *State) GetFilesView(linkID string, renderDownloadLinks bool) ([]templates.FileView, error) {
 	files, err := s.fs.ListLinkFiles(linkID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get all files for link %s: %w", linkID, err)
@@ -63,6 +64,7 @@ func (s *State) getFilesView(linkID string, renderDownloadLinks bool) ([]templat
 	return fileViews, nil
 }
 
+// TODO: don't use fractional decimals for bytes
 func bytesToHuman(bytes int64) string {
 	b := float64(bytes)
 	sizes := []string{"bytes", "KiB", "MiB", "GiB", "TiB", "PiB"}

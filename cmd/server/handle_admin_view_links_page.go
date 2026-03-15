@@ -8,7 +8,7 @@ import (
 )
 
 func (s *State) handleAdminViewLinksPage(w http.ResponseWriter, r *http.Request) error {
-	links, err := s.getLinksView()
+	links, err := s.GetLinksView()
 	if err != nil {
 		return fmt.Errorf("failed to get links view: %w", err)
 	}

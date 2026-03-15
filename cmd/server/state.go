@@ -32,10 +32,11 @@ func NewState(postgresURL, prefix string) (*State, error) {
 		return nil, fmt.Errorf("failed to initialize filesystem: %w", err)
 	}
 
-	return &State{
-		db,
-		fs,
-	}, nil
+	return &State{db, fs}, nil
+}
+
+func NewStateFromParts(db idb.Database, fs ifs.Filesystem) *State {
+	return &State{db, fs}
 }
 
 func (s *State) Cleanup() error {

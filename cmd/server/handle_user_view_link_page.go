@@ -48,7 +48,7 @@ func (s *State) prepareFilesView(id string, forAdmin bool) (string, []templates.
 	}()
 
 	renderDownloadLinks := forAdmin || lock.UserDownloadable()
-	files, err := s.getFilesView(id, renderDownloadLinks)
+	files, err := s.GetFilesView(id, renderDownloadLinks)
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to get files view for link %s: %w", id, err)
 	}

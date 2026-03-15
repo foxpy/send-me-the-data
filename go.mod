@@ -5,6 +5,7 @@ go 1.25.6
 require (
 	github.com/lib/pq v1.11.1
 	github.com/pressly/goose/v3 v3.27.0
+	golang.org/x/net v0.52.0
 )
 
 require (

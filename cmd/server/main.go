@@ -41,27 +41,34 @@ func main() {
 		os.Exit(1)
 	}
 
-	go adminServer(state, adminListenAddress)
-	go userServer(state, userListenAddress)
+	go func() {
+		m := AdminServer(state)
+		slog.Info("Starting admin HTTP server", "address", adminListenAddress)
+		err := http.ListenAndServe(adminListenAddress, m)
+		slog.Error("admin ListenAndServe failed", "error", err)
+	}()
+	go func() {
+		m := UserServer(state)
+		slog.Info("Starting user HTTP server", "address", userListenAddress)
+		err := http.ListenAndServe(userListenAddress, m)
+		slog.Error("user ListenAndServe failed", "error", err)
+	}()
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 	<-c
 }
 
-func userServer(state *State, listenAddress string) {
+func UserServer(state *State) *http.ServeMux {
 	m := http.NewServeMux()
 	m.HandleFunc("GET /u/{id}", handleWith500OnError(state.handleUserViewLinkPage))
 	m.HandleFunc("POST /u/{id}", handleWith500OnError(state.handleUserUpload))
 	m.HandleFunc("GET /link/{id}/file/{name}", handleWith500OnError(state.handleUserDownloadFile))
 	m.Handle("GET /static/", http.FileServerFS(static))
-
-	slog.Info("Starting user HTTP server", "address", listenAddress)
-	err := http.ListenAndServe(listenAddress, m)
-	slog.Error("user ListenAndServe failed", "error", err)
+	return m
 }
 
-func adminServer(state *State, listenAddress string) {
+func AdminServer(state *State) *http.ServeMux {
 	m := http.NewServeMux()
 	m.HandleFunc("GET /{$}", handleWith500OnError(state.handleAdminViewLinksPage))
 	m.HandleFunc("GET /link/{id}", handleWith500OnError(state.handleAdminViewLinkPage))
@@ -70,8 +77,5 @@ func adminServer(state *State, listenAddress string) {
 	m.HandleFunc("POST /link/{id}/delete", handleWith500OnError(state.handleAdminDeleteLink))
 	m.HandleFunc("POST /link", handleWith500OnError(state.handleAdminCreateLink))
 	m.Handle("GET /static/", http.FileServerFS(static))
-
-	slog.Info("Starting admin HTTP server", "address", listenAddress)
-	err := http.ListenAndServe(listenAddress, m)
-	slog.Error("admin ListenAndServe failed", "error", err)
+	return m
 }

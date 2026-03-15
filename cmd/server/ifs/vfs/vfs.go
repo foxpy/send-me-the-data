@@ -13,6 +13,8 @@ type VFS struct {
 	root *os.Root
 }
 
+var _ ifs.Filesystem = &VFS{}
+
 func NewVFS(prefix string) (*VFS, error) {
 	if prefix == "" {
 		return nil, errors.New("filesystem prefix must not be an empty string")

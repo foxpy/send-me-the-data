@@ -5,16 +5,19 @@ import (
 	"embed"
 	"fmt"
 
+	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
 )
 
-//go:embed migrations/*.sql
-var embedMigrations embed.FS
-
 type Postgres struct {
 	db *sql.DB
 }
+
+//go:embed migrations/*.sql
+var embedMigrations embed.FS
+
+var _ idb.Database = &Postgres{}
 
 func NewPostgres(postgresURL string) (*Postgres, error) {
 	db, err := sql.Open("postgres", postgresURL)
