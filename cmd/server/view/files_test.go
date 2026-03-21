@@ -103,14 +103,14 @@ func TestFiles(t *testing.T) {
 				{
 					Name:         "file 2",
 					UploadedAt:   "Jan  1 00:00:00",
-					Size:         "512.00 bytes",
+					Size:         "512 bytes",
 					DownloadLink: "",
 					DeleteLink:   "/link/abcd/file/file 2/delete",
 				},
 				{
 					Name:         "file 3",
 					UploadedAt:   "Jan  1 00:00:00",
-					Size:         "512.00 bytes",
+					Size:         "512 bytes",
 					DownloadLink: "",
 					DeleteLink:   "/link/abcd/file/file 3/delete",
 				},

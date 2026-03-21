@@ -2,14 +2,23 @@ package view
 
 import "fmt"
 
-// TODO: don't use fractional decimals for bytes
 func bytesToHuman(bytes int64) string {
 	b := float64(bytes)
-	sizes := []string{"bytes", "KiB", "MiB", "GiB", "TiB", "PiB"}
+	sizes := []struct {
+		name, format string
+	}{
+		{"bytes", "%.0f %s"},
+		{"KiB", "%.2f %s"},
+		{"MiB", "%.2f %s"},
+		{"GiB", "%.2f %s"},
+		{"TiB", "%.2f %s"},
+		{"PiB", "%.2f %s"},
+	}
+
 	i := 0
 	for b >= 1024 && i < len(sizes)-1 {
 		i++
 		b /= 1024
 	}
-	return fmt.Sprintf("%.2f %s", b, sizes[i])
+	return fmt.Sprintf(sizes[i].format, b, sizes[i].name)
 }

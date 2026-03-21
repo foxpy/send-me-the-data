@@ -21,12 +21,12 @@ func TestBytesToHuman(t *testing.T) {
 		{
 			name:  "zero",
 			bytes: 0,
-			human: "0.00 bytes",
+			human: "0 bytes",
 		},
 		{
 			name:  "bytes",
 			bytes: 100,
-			human: "100.00 bytes",
+			human: "100 bytes",
 		},
 		{
 			name:  "kibibytes",
@@ -42,6 +42,11 @@ func TestBytesToHuman(t *testing.T) {
 			name:  "pebibytes",
 			bytes: 7_200 * (1 << 50),
 			human: "7200.00 PiB",
+		},
+		{
+			name:  "fractional",
+			bytes: 1024 + 512,
+			human: "1.50 KiB",
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
