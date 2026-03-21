@@ -1,4 +1,4 @@
-package main
+package user
 
 import (
 	"database/sql"
@@ -7,12 +7,12 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"strings"
 
+	"github.com/foxpy/send-me-the-data/cmd/server/handler"
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 )
 
-func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
+func (s *UserServer) upload(w http.ResponseWriter, r *http.Request) error {
 	// TODO: idea: can I send the file within a body?
 	// FIXME: call to FormFile() actually creates a temporary file and blocks until everything is downloaded
 	file, header, err := r.FormFile("file")
@@ -21,7 +21,7 @@ func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	defer file.Close()
-	fileName, err := sanitizeFileName(header.Filename)
+	fileName, err := handler.SanitizeFileName(header.Filename)
 	if err != nil {
 		return err
 	}
@@ -29,7 +29,7 @@ func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
 	lock, err := s.db.AcquireLinkRLock(id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return respond404(w)
+		return handler.Respond404(w)
 	} else if err != nil {
 		return fmt.Errorf("failed to acquire read lock on link %s: %w", id, err)
 	}
@@ -84,16 +84,4 @@ func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
 	})
 	http.Redirect(w, r, fmt.Sprintf("/u/%s", id), http.StatusSeeOther)
 	return nil
-}
-
-func sanitizeFileName(fileName string) (string, error) {
-	// TODO: limit file name length somehow:
-	//  - decide whether file name limit should be hardcoded or configurable
-	//  - maybe I can validate file name length limit from HTML??????????
-	//  - decide whether I should return an error or strip file name
-	if strings.ContainsAny(fileName, "/\\") {
-		return "", fmt.Errorf("Forbidden characters found in file name %s", fileName)
-	}
-
-	return fileName, nil
 }

@@ -1,13 +1,15 @@
-package main
+package admin
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/foxpy/send-me-the-data/cmd/server/handler"
 )
 
-func (s *State) handleAdminDeleteLink(w http.ResponseWriter, r *http.Request) error {
+func (s *AdminServer) deleteLink(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
 
 	// FIXME: since we do not attempt to terminate all active uploads,
@@ -21,7 +23,7 @@ func (s *State) handleAdminDeleteLink(w http.ResponseWriter, r *http.Request) er
 	// finished downloading. Still not perfect, but much better.
 	lock, err := s.db.AcquireLinkWLock(id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return respond404(w)
+		return handler.Respond404(w)
 	} else if err != nil {
 		return fmt.Errorf("failed to acquire write lock for link %s: %w", id, err)
 	}

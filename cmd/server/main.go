@@ -2,16 +2,22 @@ package main
 
 import (
 	"cmp"
-	"embed"
+	"database/sql"
+	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-)
 
-//go:embed static/*
-var static embed.FS
+	"github.com/foxpy/send-me-the-data/cmd/server/handler/admin"
+	"github.com/foxpy/send-me-the-data/cmd/server/handler/user"
+	"github.com/foxpy/send-me-the-data/cmd/server/idb"
+	"github.com/foxpy/send-me-the-data/cmd/server/idb/postgres"
+	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
+	"github.com/foxpy/send-me-the-data/cmd/server/ifs/vfs"
+)
 
 func main() {
 	postgresURL := os.Getenv("POSTGRES_URL")
@@ -29,26 +35,32 @@ func main() {
 	userListenAddress := cmp.Or(os.Getenv("USER_LISTEN_ADDRESS"), ":6969")
 	adminListenAddress := cmp.Or(os.Getenv("ADMIN_LISTEN_ADDRESS"), ":6767")
 
-	state, err := NewState(postgresURL, prefix)
+	db, err := postgres.NewPostgres(postgresURL)
 	if err != nil {
-		slog.Error("failed to initialize the app", "error", err)
+		slog.Error("failed to initialize database", "error", err)
 		os.Exit(1)
 	}
 
-	err = state.Cleanup()
+	fs, err := vfs.NewVFS(prefix)
+	if err != nil {
+		slog.Error("failed to initalize filesystem", "error", err)
+		os.Exit(1)
+	}
+
+	err = cleanup(db, fs)
 	if err != nil {
 		slog.Error("failed to cleanup file journal", "error", err)
 		os.Exit(1)
 	}
 
 	go func() {
-		m := AdminServer(state)
+		m := admin.NewAdminServer(db, fs)
 		slog.Info("Starting admin HTTP server", "address", adminListenAddress)
 		err := http.ListenAndServe(adminListenAddress, m)
 		slog.Error("admin ListenAndServe failed", "error", err)
 	}()
 	go func() {
-		m := UserServer(state)
+		m := user.NewUserServer(db, fs)
 		slog.Info("Starting user HTTP server", "address", userListenAddress)
 		err := http.ListenAndServe(userListenAddress, m)
 		slog.Error("user ListenAndServe failed", "error", err)
@@ -60,27 +72,28 @@ func main() {
 	<-c
 }
 
-func UserServer(state *State) *http.ServeMux {
-	m := http.NewServeMux()
-	// TODO: I want user links to be as short as possible. Ideally, each link should look like this:
-	//       Link: /{id}
-	//       File: /{id}/{name}
-	m.HandleFunc("GET /u/{id}", handleWith500OnError(state.handleUserViewLinkPage))
-	m.HandleFunc("POST /u/{id}", handleWith500OnError(state.handleUserUpload))
-	m.HandleFunc("GET /link/{id}/file/{name}", handleWith500OnError(state.handleUserDownloadFile))
-	m.Handle("GET /static/", http.FileServerFS(static))
-	return m
-}
+func cleanup(db idb.Database, fs ifs.Filesystem) error {
+	for {
+		entry, err := db.GetFileJournalEntry()
+		if errors.Is(err, sql.ErrNoRows) {
+			break
+		} else if err != nil {
+			return fmt.Errorf("failed to obtain a file journal entry: %w", err)
+		}
 
-func AdminServer(state *State) *http.ServeMux {
-	m := http.NewServeMux()
-	m.HandleFunc("GET /{$}", handleWith500OnError(state.handleAdminViewLinksPage))
-	m.HandleFunc("GET /link/{id}", handleWith500OnError(state.handleAdminViewLinkPage))
-	m.HandleFunc("GET /link/{id}/file/{name}", handleWith500OnError(state.handleAdminDownloadFile))
-	// TODO: relace POST with DELETE for delete methods
-	m.HandleFunc("POST /link/{id}/file/{name}/delete", handleWith500OnError(state.handleAdminDeleteFile))
-	m.HandleFunc("POST /link/{id}/delete", handleWith500OnError(state.handleAdminDeleteLink))
-	m.HandleFunc("POST /link", handleWith500OnError(state.handleAdminCreateLink))
-	m.Handle("GET /static/", http.FileServerFS(static))
-	return m
+		err = fs.RemoveLinkFile(entry.LinkExternalKey, entry.FileName)
+		if err != nil && !os.IsNotExist(err) {
+			return fmt.Errorf(
+				"failed to delete file %s from link %s referenced by the file journal: %w",
+				entry.FileName, entry.LinkExternalKey, err,
+			)
+		}
+
+		err = db.DeleteFileJournalEntry(entry)
+		if err != nil {
+			return fmt.Errorf("failed to delete a file journal entry: %w", err)
+		}
+	}
+
+	return nil
 }

@@ -1,4 +1,4 @@
-package main
+package admin
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/view"
 )
 
-func (s *State) handleAdminViewLinksPage(w http.ResponseWriter, r *http.Request) error {
+func (s *AdminServer) viewLinksPage(w http.ResponseWriter, r *http.Request) error {
 	links, err := view.Links(s.db, s.fs)
 	if err != nil {
 		return fmt.Errorf("failed to get links view: %w", err)

@@ -1,17 +1,19 @@
-package main
+package admin
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/foxpy/send-me-the-data/cmd/server/handler"
 )
 
-func (s *State) handleAdminDeleteFile(w http.ResponseWriter, r *http.Request) error {
+func (s *AdminServer) deleteFile(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
 	lock, err := s.db.AcquireLinkRLock(id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return respond404(w)
+		return handler.Respond404(w)
 	} else if err != nil {
 		return fmt.Errorf("failed to acquire read lock for link %s: %w", id, err)
 	}

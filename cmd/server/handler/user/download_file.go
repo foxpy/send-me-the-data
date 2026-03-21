@@ -1,4 +1,4 @@
-package main
+package user
 
 import (
 	"database/sql"
@@ -7,18 +7,20 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/foxpy/send-me-the-data/cmd/server/handler"
 )
 
-func (s *State) handleAdminDownloadFile(w http.ResponseWriter, r *http.Request) error {
+func (s *UserServer) downloadFile(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
-	name, err := sanitizeFileName(r.PathValue("name"))
+	name, err := handler.SanitizeFileName(r.PathValue("name"))
 	if err != nil {
 		return err
 	}
 
-	file, err := s.prepareAdminDownloadFile(id, name)
+	file, err := s.prepareDownloadFile(id, name)
 	if errors.Is(err, sql.ErrNoRows) {
-		return respond404(w)
+		return handler.Respond404(w)
 	} else if err != nil {
 		return fmt.Errorf("failed to prepare file %s in link %s for serving: %w", name, id, err)
 	}
@@ -31,7 +33,7 @@ func (s *State) handleAdminDownloadFile(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
-func (s *State) prepareAdminDownloadFile(id, name string) (io.ReadSeekCloser, error) {
+func (s *UserServer) prepareDownloadFile(id, name string) (io.ReadSeekCloser, error) {
 	lock, err := s.db.AcquireLinkRLock(id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, err
@@ -42,6 +44,10 @@ func (s *State) prepareAdminDownloadFile(id, name string) (io.ReadSeekCloser, er
 	defer func() {
 		_ = lock.Close()
 	}()
+
+	if !lock.UserDownloadable() {
+		return nil, errors.New("user cannot download files from this link")
+	}
 
 	fs, err := s.fs.FS(id)
 	if err != nil {

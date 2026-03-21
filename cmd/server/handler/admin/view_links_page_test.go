@@ -1,4 +1,4 @@
-package main
+package admin
 
 import (
 	"net/http"
@@ -39,8 +39,7 @@ func findAllFlashes(doc *html.Node, flashClass string) (flashes []*html.Node) {
 func TestHandleAdminViewLinksPage(t *testing.T) {
 	db := mockdb.NewMockDB()
 	fs := mockfs.NewMockFS()
-	s := &State{db, fs}
-	h := AdminServer(s)
+	h := NewAdminServer(db, fs)
 
 	db.SetAllLinksResponse([]idb.Link{{
 		Name:        "link1",

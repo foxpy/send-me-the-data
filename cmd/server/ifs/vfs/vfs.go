@@ -55,7 +55,7 @@ func (f *VFS) ListLinkFiles(linkID string) ([]ifs.File, error) {
 		files = append(files, ifs.File{
 			Name:    entry.Name(),
 			Size:    info.Size(),
-			ModTime: info.ModTime(),
+			ModTime: info.ModTime().UTC(),
 		})
 	}
 

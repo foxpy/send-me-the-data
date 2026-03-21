@@ -1,4 +1,4 @@
-package main
+package admin
 
 import (
 	"bufio"
@@ -31,7 +31,7 @@ func init() {
 	alphabetSize = *big.NewInt(int64(len(alphabet)))
 }
 
-func (s *State) handleAdminCreateLink(w http.ResponseWriter, r *http.Request) error {
+func (s *AdminServer) createLink(w http.ResponseWriter, r *http.Request) error {
 	name := r.FormValue("name")
 	externalKey, err := generateRandomExternalKey()
 	if err != nil {
