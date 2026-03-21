@@ -1,4 +1,4 @@
-package main_test
+package main
 
 import (
 	"net/http"
@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	main "github.com/foxpy/send-me-the-data/cmd/server"
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 	"github.com/foxpy/send-me-the-data/cmd/server/idb/mockdb"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
@@ -40,8 +39,8 @@ func findAllFlashes(doc *html.Node, flashClass string) (flashes []*html.Node) {
 func TestHandleAdminViewLinksPage(t *testing.T) {
 	db := mockdb.NewMockDB()
 	fs := mockfs.NewMockFS()
-	s := main.NewStateFromParts(db, fs)
-	h := main.AdminServer(s)
+	s := &State{db, fs}
+	h := AdminServer(s)
 
 	db.SetAllLinksResponse([]idb.Link{{
 		Name:        "link1",
@@ -74,7 +73,7 @@ func TestHandleAdminViewLinksPage(t *testing.T) {
 
 	doc, err := html.Parse(resp.Body)
 	if err != nil {
-		t.Fatalf("%s", err)
+		t.Error(err)
 	}
 
 	tables := findAllTables(doc)

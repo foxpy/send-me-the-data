@@ -35,10 +35,6 @@ func NewState(postgresURL, prefix string) (*State, error) {
 	return &State{db, fs}, nil
 }
 
-func NewStateFromParts(db idb.Database, fs ifs.Filesystem) *State {
-	return &State{db, fs}
-}
-
 func (s *State) Cleanup() error {
 	for {
 		entry, err := s.db.GetFileJournalEntry()

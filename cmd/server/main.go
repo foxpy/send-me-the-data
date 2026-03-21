@@ -54,6 +54,7 @@ func main() {
 		slog.Error("user ListenAndServe failed", "error", err)
 	}()
 
+	// TODO: graceful shutdown?
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 	<-c
@@ -61,6 +62,9 @@ func main() {
 
 func UserServer(state *State) *http.ServeMux {
 	m := http.NewServeMux()
+	// TODO: I want user links to be as short as possible. Ideally, each link should look like this:
+	//       Link: /{id}
+	//       File: /{id}/{name}
 	m.HandleFunc("GET /u/{id}", handleWith500OnError(state.handleUserViewLinkPage))
 	m.HandleFunc("POST /u/{id}", handleWith500OnError(state.handleUserUpload))
 	m.HandleFunc("GET /link/{id}/file/{name}", handleWith500OnError(state.handleUserDownloadFile))
@@ -73,6 +77,7 @@ func AdminServer(state *State) *http.ServeMux {
 	m.HandleFunc("GET /{$}", handleWith500OnError(state.handleAdminViewLinksPage))
 	m.HandleFunc("GET /link/{id}", handleWith500OnError(state.handleAdminViewLinkPage))
 	m.HandleFunc("GET /link/{id}/file/{name}", handleWith500OnError(state.handleAdminDownloadFile))
+	// TODO: should I use DELETE instead of POST?
 	m.HandleFunc("POST /link/{id}/file/{name}/delete", handleWith500OnError(state.handleAdminDeleteFile))
 	m.HandleFunc("POST /link/{id}/delete", handleWith500OnError(state.handleAdminDeleteLink))
 	m.HandleFunc("POST /link", handleWith500OnError(state.handleAdminCreateLink))

@@ -13,6 +13,19 @@ import (
 )
 
 func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
+	// TODO: idea: can I send the file within a body?
+	// FIXME: call to FormFile() actually creates a temporary file and blocks until everything is downloaded
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		return fmt.Errorf("failed to get file from form data: %w", err)
+	}
+
+	defer file.Close()
+	fileName, err := sanitizeFileName(header.Filename)
+	if err != nil {
+		return err
+	}
+
 	id := r.PathValue("id")
 	lock, err := s.db.AcquireLinkRLock(id)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -24,16 +37,6 @@ func (s *State) handleUserUpload(w http.ResponseWriter, r *http.Request) error {
 	defer func() {
 		_ = lock.Close()
 	}()
-
-	file, header, err := r.FormFile("file")
-	if err != nil {
-		return fmt.Errorf("failed to get file from form data: %w", err)
-	}
-
-	fileName, err := sanitizeFileName(header.Filename)
-	if err != nil {
-		return err
-	}
 
 	fileJournalEntry := &idb.FileJournalEntry{
 		LinkExternalKey: id,

@@ -1,11 +1,10 @@
-package main_test
+package main
 
 import (
 	"reflect"
 	"testing"
 	"time"
 
-	main "github.com/foxpy/send-me-the-data/cmd/server"
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 	"github.com/foxpy/send-me-the-data/cmd/server/idb/mockdb"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
@@ -148,7 +147,7 @@ func TestGetLinksView(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			db := mockdb.NewMockDB()
 			fs := mockfs.NewMockFS()
-			s := main.NewStateFromParts(db, fs)
+			s := &State{db, fs}
 
 			db.SetAllLinksResponse(tc.links)
 			for _, f := range tc.files {
