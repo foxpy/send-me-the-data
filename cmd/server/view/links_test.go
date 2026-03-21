@@ -9,13 +9,14 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs/mockfs"
 	"github.com/foxpy/send-me-the-data/cmd/server/template"
+	"github.com/foxpy/send-me-the-data/cmd/server/testutil"
 )
 
 func TestLinks(t *testing.T) {
 	for _, tc := range []struct {
 		desc  string
 		links []idb.Link
-		files []linkFiles
+		files []testutil.LinkFiles
 		res   []template.LinkView
 	}{
 		{
@@ -31,10 +32,10 @@ func TestLinks(t *testing.T) {
 				ExternalKey: "abcd",
 				CreatedAt:   zeroTime,
 			}},
-			files: []linkFiles{
+			files: []testutil.LinkFiles{
 				{
-					name:  "abcd",
-					files: []ifs.File{},
+					Name:  "abcd",
+					Files: []ifs.File{},
 				},
 			},
 			res: []template.LinkView{
@@ -55,10 +56,10 @@ func TestLinks(t *testing.T) {
 				ExternalKey: "abcd",
 				CreatedAt:   zeroTime,
 			}},
-			files: []linkFiles{
+			files: []testutil.LinkFiles{
 				{
-					name: "abcd",
-					files: []ifs.File{
+					Name: "abcd",
+					Files: []ifs.File{
 						{
 							Name:    "file 1",
 							Size:    100,
@@ -97,10 +98,10 @@ func TestLinks(t *testing.T) {
 					CreatedAt:   zeroTime,
 				},
 			},
-			files: []linkFiles{
+			files: []testutil.LinkFiles{
 				{
-					name: "abcd",
-					files: []ifs.File{
+					Name: "abcd",
+					Files: []ifs.File{
 						{
 							Name:    "file 1",
 							Size:    100,
@@ -114,8 +115,8 @@ func TestLinks(t *testing.T) {
 					},
 				},
 				{
-					name:  "bcde",
-					files: []ifs.File{},
+					Name:  "bcde",
+					Files: []ifs.File{},
 				},
 			},
 			res: []template.LinkView{
@@ -144,7 +145,7 @@ func TestLinks(t *testing.T) {
 
 			db.SetAllLinksResponse(tc.links)
 			for _, f := range tc.files {
-				fs.SetListLinkFilesResponse(f.name, f.files)
+				fs.SetListLinkFilesResponse(f.Name, f.Files)
 			}
 
 			linkViews, err := Links(db, fs)

@@ -7,6 +7,7 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs/mockfs"
 	"github.com/foxpy/send-me-the-data/cmd/server/template"
+	"github.com/foxpy/send-me-the-data/cmd/server/testutil"
 )
 
 func TestFiles(t *testing.T) {
@@ -14,16 +15,16 @@ func TestFiles(t *testing.T) {
 		desc                string
 		linkID              string
 		renderDownloadLinks bool
-		files               []linkFiles
+		files               []testutil.LinkFiles
 		res                 []template.FileView
 	}{
 		{
 			desc:                "no files",
 			linkID:              "abcd",
 			renderDownloadLinks: false,
-			files: []linkFiles{{
-				name:  "abcd",
-				files: []ifs.File{},
+			files: []testutil.LinkFiles{{
+				Name:  "abcd",
+				Files: []ifs.File{},
 			}},
 			res: []template.FileView{},
 		},
@@ -31,9 +32,9 @@ func TestFiles(t *testing.T) {
 			desc:                "one file",
 			linkID:              "abcd",
 			renderDownloadLinks: false,
-			files: []linkFiles{{
-				name: "abcd",
-				files: []ifs.File{{
+			files: []testutil.LinkFiles{{
+				Name: "abcd",
+				Files: []ifs.File{{
 					Name:    "file 1",
 					Size:    1024,
 					ModTime: zeroTime,
@@ -51,9 +52,9 @@ func TestFiles(t *testing.T) {
 			desc:                "render download link",
 			linkID:              "abcd",
 			renderDownloadLinks: true,
-			files: []linkFiles{{
-				name: "abcd",
-				files: []ifs.File{{
+			files: []testutil.LinkFiles{{
+				Name: "abcd",
+				Files: []ifs.File{{
 					Name:    "file 1",
 					Size:    1024,
 					ModTime: zeroTime,
@@ -71,9 +72,9 @@ func TestFiles(t *testing.T) {
 			desc:                "many files",
 			linkID:              "abcd",
 			renderDownloadLinks: false,
-			files: []linkFiles{{
-				name: "abcd",
-				files: []ifs.File{
+			files: []testutil.LinkFiles{{
+				Name: "abcd",
+				Files: []ifs.File{
 					{
 						Name:    "file 1",
 						Size:    1024,
@@ -120,7 +121,7 @@ func TestFiles(t *testing.T) {
 			fs := mockfs.NewMockFS()
 
 			for _, f := range tc.files {
-				fs.SetListLinkFilesResponse(f.name, f.files)
+				fs.SetListLinkFilesResponse(f.Name, f.Files)
 			}
 
 			fileViews, err := Files(fs, tc.linkID, tc.renderDownloadLinks)
