@@ -27,7 +27,7 @@ func (f *MockFS) RemoveLinkFile(linkID, fileName string) error {
 	panic("TODO")
 }
 
-func (f *MockFS) FS(linkID string) (fs.FS, error) {
+func (f *MockFS) LinkFS(linkID string) (fs.FS, error) {
 	panic("TODO")
 }
 

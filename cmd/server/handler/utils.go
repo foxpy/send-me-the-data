@@ -1,18 +1,13 @@
 package handler
 
 import (
-	"database/sql"
 	"embed"
-	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"strings"
 
-	"github.com/foxpy/send-me-the-data/cmd/server/idb"
-	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 	"github.com/foxpy/send-me-the-data/cmd/server/template"
-	"github.com/foxpy/send-me-the-data/cmd/server/view"
 )
 
 //go:embed static/*
@@ -53,25 +48,4 @@ func SanitizeFileName(fileName string) (string, error) {
 	}
 
 	return fileName, nil
-}
-
-func PrepareFilesView(db idb.Database, fs ifs.Filesystem, id string, forAdmin bool) (string, []template.FileView, error) {
-	lock, err := db.AcquireLinkRLock(id)
-	if errors.Is(err, sql.ErrNoRows) {
-		return "", nil, err
-	} else if err != nil {
-		return "", nil, fmt.Errorf("failed to acquire read lock on link %s: %w", id, err)
-	}
-
-	defer func() {
-		_ = lock.Close()
-	}()
-
-	renderDownloadLinks := forAdmin || lock.UserDownloadable()
-	files, err := view.Files(fs, id, renderDownloadLinks)
-	if err != nil {
-		return "", nil, fmt.Errorf("failed to get files view for link %s: %w", id, err)
-	}
-
-	return lock.Name(), files, nil
 }

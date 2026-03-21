@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/handler"
+	"github.com/foxpy/send-me-the-data/cmd/server/idb"
+	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 )
 
 func (s *UserServer) downloadFile(w http.ResponseWriter, r *http.Request) error {
@@ -18,7 +20,7 @@ func (s *UserServer) downloadFile(w http.ResponseWriter, r *http.Request) error 
 		return err
 	}
 
-	file, err := s.prepareDownloadFile(id, name)
+	file, err := prepareDownloadFile(s.db, s.fs, id, name)
 	if errors.Is(err, sql.ErrNoRows) {
 		return handler.Respond404(w)
 	} else if err != nil {
@@ -33,8 +35,8 @@ func (s *UserServer) downloadFile(w http.ResponseWriter, r *http.Request) error 
 	return nil
 }
 
-func (s *UserServer) prepareDownloadFile(id, name string) (io.ReadSeekCloser, error) {
-	lock, err := s.db.AcquireLinkRLock(id)
+func prepareDownloadFile(db idb.Database, fs ifs.Filesystem, id, name string) (io.ReadSeekCloser, error) {
+	lock, err := db.AcquireLinkRLock(id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, err
 	} else if err != nil {
@@ -49,12 +51,12 @@ func (s *UserServer) prepareDownloadFile(id, name string) (io.ReadSeekCloser, er
 		return nil, errors.New("user cannot download files from this link")
 	}
 
-	fs, err := s.fs.FS(id)
+	linkFS, err := fs.LinkFS(id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open filesystem to serve file: %w", err)
 	}
 
-	file, err := fs.Open(name)
+	file, err := linkFS.Open(name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file %s from link %s for reading: %w", name, id, err)
 	}

@@ -3,15 +3,19 @@ package user
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/handler"
+	"github.com/foxpy/send-me-the-data/cmd/server/idb"
+	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 	"github.com/foxpy/send-me-the-data/cmd/server/template"
+	"github.com/foxpy/send-me-the-data/cmd/server/view"
 )
 
 func (s *UserServer) viewLinkPage(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
-	title, files, err := handler.PrepareFilesView(s.db, s.fs, id, false)
+	title, files, err := prepareFilesView(s.db, s.fs, id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return handler.Respond404(w)
 	} else if err != nil {
@@ -33,4 +37,24 @@ func (s *UserServer) viewLinkPage(w http.ResponseWriter, r *http.Request) error 
 	})
 
 	return template.RenderUserViewLink(w, params)
+}
+
+func prepareFilesView(db idb.Database, fs ifs.Filesystem, id string) (string, []template.FileView, error) {
+	lock, err := db.AcquireLinkRLock(id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", nil, err
+	} else if err != nil {
+		return "", nil, fmt.Errorf("failed to acquire read lock on link %s: %w", id, err)
+	}
+
+	defer func() {
+		_ = lock.Close()
+	}()
+
+	files, err := view.Files(fs, id, lock.UserDownloadable())
+	if err != nil {
+		return "", nil, fmt.Errorf("failed to get files view for link %s: %w", id, err)
+	}
+
+	return lock.Name(), files, nil
 }

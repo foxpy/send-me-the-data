@@ -75,7 +75,7 @@ func (f *VFS) RemoveLinkFile(linkID, fileName string) error {
 	return f.root.Remove(f.getPath(linkID, fileName))
 }
 
-func (f *VFS) FS(linkID string) (fs.FS, error) {
+func (f *VFS) LinkFS(linkID string) (fs.FS, error) {
 	linkRoot, err := f.root.OpenRoot(linkID)
 	if err != nil {
 		return nil, err
