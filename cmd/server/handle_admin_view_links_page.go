@@ -5,10 +5,11 @@ import (
 	"net/http"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/templates"
+	"github.com/foxpy/send-me-the-data/cmd/server/view"
 )
 
 func (s *State) handleAdminViewLinksPage(w http.ResponseWriter, r *http.Request) error {
-	links, err := s.GetLinksView()
+	links, err := view.Links(s.db, s.fs)
 	if err != nil {
 		return fmt.Errorf("failed to get links view: %w", err)
 	}

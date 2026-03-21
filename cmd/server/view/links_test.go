@@ -1,4 +1,4 @@
-package main
+package view
 
 import (
 	"reflect"
@@ -12,12 +12,7 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/templates"
 )
 
-type linkFiles struct {
-	name  string
-	files []ifs.File
-}
-
-func TestGetLinksView(t *testing.T) {
+func TestLinks(t *testing.T) {
 	for _, tc := range []struct {
 		desc  string
 		links []idb.Link
@@ -147,14 +142,13 @@ func TestGetLinksView(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			db := mockdb.NewMockDB()
 			fs := mockfs.NewMockFS()
-			s := &State{db, fs}
 
 			db.SetAllLinksResponse(tc.links)
 			for _, f := range tc.files {
 				fs.SetListLinkFilesResponse(f.name, f.files)
 			}
 
-			linkViews, err := s.GetLinksView()
+			linkViews, err := Links(db, fs)
 			if err != nil {
 				t.Fatalf("%s", err)
 			}

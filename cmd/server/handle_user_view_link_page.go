@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/templates"
+	"github.com/foxpy/send-me-the-data/cmd/server/view"
 )
 
 func (s *State) handleUserViewLinkPage(w http.ResponseWriter, r *http.Request) error {
@@ -48,7 +49,7 @@ func (s *State) prepareFilesView(id string, forAdmin bool) (string, []templates.
 	}()
 
 	renderDownloadLinks := forAdmin || lock.UserDownloadable()
-	files, err := s.GetFilesView(id, renderDownloadLinks)
+	files, err := view.Files(s.fs, id, renderDownloadLinks)
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to get files view for link %s: %w", id, err)
 	}

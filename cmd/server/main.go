@@ -77,7 +77,7 @@ func AdminServer(state *State) *http.ServeMux {
 	m.HandleFunc("GET /{$}", handleWith500OnError(state.handleAdminViewLinksPage))
 	m.HandleFunc("GET /link/{id}", handleWith500OnError(state.handleAdminViewLinkPage))
 	m.HandleFunc("GET /link/{id}/file/{name}", handleWith500OnError(state.handleAdminDownloadFile))
-	// TODO: should I use DELETE instead of POST?
+	// TODO: relace POST with DELETE for delete methods
 	m.HandleFunc("POST /link/{id}/file/{name}/delete", handleWith500OnError(state.handleAdminDeleteFile))
 	m.HandleFunc("POST /link/{id}/delete", handleWith500OnError(state.handleAdminDeleteLink))
 	m.HandleFunc("POST /link", handleWith500OnError(state.handleAdminCreateLink))

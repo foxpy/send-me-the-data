@@ -36,9 +36,10 @@ type AdminViewLinksParams struct {
 }
 
 type FileView struct {
-	Name         string
-	UploadedAt   string
-	Size         string
+	Name       string
+	UploadedAt string
+	Size       string
+	// TODO: actually, let's make separate 'AdminDownloadLink' and 'UserDownloadLink'
 	DownloadLink string
 	DeleteLink   string
 }

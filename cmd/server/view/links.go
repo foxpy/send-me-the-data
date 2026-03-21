@@ -1,0 +1,42 @@
+package view
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/foxpy/send-me-the-data/cmd/server/idb"
+	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
+	"github.com/foxpy/send-me-the-data/cmd/server/templates"
+)
+
+func Links(db idb.Database, fs ifs.Filesystem) ([]templates.LinkView, error) {
+	links, err := db.AllLinks()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read all links from database: %w", err)
+	}
+
+	linkViews := make([]templates.LinkView, 0, len(links))
+	for _, link := range links {
+		files, err := fs.ListLinkFiles(link.ExternalKey)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get all files for link %s: %w", link.ExternalKey, err)
+		}
+
+		var totalSize int64
+		for _, file := range files {
+			totalSize += file.Size
+		}
+
+		linkViews = append(linkViews, templates.LinkView{
+			Name: link.Name,
+			// FIXME: using time.Stamp does not include the year
+			CreatedAt:  link.CreatedAt.Format(time.Stamp),
+			TotalFiles: len(files),
+			TotalSize:  bytesToHuman(totalSize),
+			ViewLink:   fmt.Sprintf("/link/%s", link.ExternalKey),
+			DeleteLink: fmt.Sprintf("/link/%s/delete", link.ExternalKey),
+		})
+	}
+
+	return linkViews, nil
+}
