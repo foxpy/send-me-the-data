@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/foxpy/send-me-the-data/cmd/server/templates"
+	"github.com/foxpy/send-me-the-data/cmd/server/template"
 	"github.com/foxpy/send-me-the-data/cmd/server/view"
 )
 
@@ -14,7 +14,7 @@ func (s *State) handleAdminViewLinksPage(w http.ResponseWriter, r *http.Request)
 		return fmt.Errorf("failed to get links view: %w", err)
 	}
 
-	var params templates.Params[templates.AdminViewLinksParams]
+	var params template.Params[template.AdminViewLinksParams]
 	params.Title = "Send me the Data"
 	params.Data.Links = links
 
@@ -38,5 +38,5 @@ func (s *State) handleAdminViewLinksPage(w http.ResponseWriter, r *http.Request)
 		MaxAge: -1,
 	})
 
-	return templates.RenderAdminViewLinks(w, params)
+	return template.RenderAdminViewLinks(w, params)
 }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs/mockfs"
-	"github.com/foxpy/send-me-the-data/cmd/server/templates"
+	"github.com/foxpy/send-me-the-data/cmd/server/template"
 )
 
 func TestFiles(t *testing.T) {
@@ -15,7 +15,7 @@ func TestFiles(t *testing.T) {
 		linkID              string
 		renderDownloadLinks bool
 		files               []linkFiles
-		res                 []templates.FileView
+		res                 []template.FileView
 	}{
 		{
 			desc:                "no files",
@@ -25,7 +25,7 @@ func TestFiles(t *testing.T) {
 				name:  "abcd",
 				files: []ifs.File{},
 			}},
-			res: []templates.FileView{},
+			res: []template.FileView{},
 		},
 		{
 			desc:                "one file",
@@ -39,7 +39,7 @@ func TestFiles(t *testing.T) {
 					ModTime: zeroTime,
 				}},
 			}},
-			res: []templates.FileView{{
+			res: []template.FileView{{
 				Name:         "file 1",
 				UploadedAt:   "Jan 1 00:00:00 UTC 1970",
 				Size:         "1.00 KiB",
@@ -59,7 +59,7 @@ func TestFiles(t *testing.T) {
 					ModTime: zeroTime,
 				}},
 			}},
-			res: []templates.FileView{{
+			res: []template.FileView{{
 				Name:         "file 1",
 				UploadedAt:   "Jan 1 00:00:00 UTC 1970",
 				Size:         "1.00 KiB",
@@ -91,7 +91,7 @@ func TestFiles(t *testing.T) {
 					},
 				},
 			}},
-			res: []templates.FileView{
+			res: []template.FileView{
 				{
 					Name:         "file 1",
 					UploadedAt:   "Jan 1 00:00:00 UTC 1970",

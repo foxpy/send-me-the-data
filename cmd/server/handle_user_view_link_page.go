@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/foxpy/send-me-the-data/cmd/server/templates"
+	"github.com/foxpy/send-me-the-data/cmd/server/template"
 	"github.com/foxpy/send-me-the-data/cmd/server/view"
 )
 
@@ -19,7 +19,7 @@ func (s *State) handleUserViewLinkPage(w http.ResponseWriter, r *http.Request) e
 		return err
 	}
 
-	var params templates.Params[templates.UserViewLinkParams]
+	var params template.Params[template.UserViewLinkParams]
 	params.Title = title
 	params.Data.Files = files
 
@@ -33,10 +33,10 @@ func (s *State) handleUserViewLinkPage(w http.ResponseWriter, r *http.Request) e
 		MaxAge: -1,
 	})
 
-	return templates.RenderUserViewLink(w, params)
+	return template.RenderUserViewLink(w, params)
 }
 
-func (s *State) prepareFilesView(id string, forAdmin bool) (string, []templates.FileView, error) {
+func (s *State) prepareFilesView(id string, forAdmin bool) (string, []template.FileView, error) {
 	lock, err := s.db.AcquireLinkRLock(id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return "", nil, err

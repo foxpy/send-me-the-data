@@ -5,16 +5,16 @@ import (
 
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
-	"github.com/foxpy/send-me-the-data/cmd/server/templates"
+	"github.com/foxpy/send-me-the-data/cmd/server/template"
 )
 
-func Links(db idb.Database, fs ifs.Filesystem) ([]templates.LinkView, error) {
+func Links(db idb.Database, fs ifs.Filesystem) ([]template.LinkView, error) {
 	links, err := db.AllLinks()
 	if err != nil {
 		return nil, fmt.Errorf("failed to read all links from database: %w", err)
 	}
 
-	linkViews := make([]templates.LinkView, 0, len(links))
+	linkViews := make([]template.LinkView, 0, len(links))
 	for _, link := range links {
 		files, err := fs.ListLinkFiles(link.ExternalKey)
 		if err != nil {
@@ -26,7 +26,7 @@ func Links(db idb.Database, fs ifs.Filesystem) ([]templates.LinkView, error) {
 			totalSize += file.Size
 		}
 
-		linkViews = append(linkViews, templates.LinkView{
+		linkViews = append(linkViews, template.LinkView{
 			Name:       link.Name,
 			CreatedAt:  link.CreatedAt.Format(DateTimeFormat),
 			TotalFiles: len(files),

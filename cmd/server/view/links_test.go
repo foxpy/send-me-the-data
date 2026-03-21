@@ -8,7 +8,7 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/idb/mockdb"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs/mockfs"
-	"github.com/foxpy/send-me-the-data/cmd/server/templates"
+	"github.com/foxpy/send-me-the-data/cmd/server/template"
 )
 
 func TestLinks(t *testing.T) {
@@ -16,7 +16,7 @@ func TestLinks(t *testing.T) {
 		desc  string
 		links []idb.Link
 		files []linkFiles
-		res   []templates.LinkView
+		res   []template.LinkView
 	}{
 		{
 			desc:  "zero links",
@@ -37,7 +37,7 @@ func TestLinks(t *testing.T) {
 					files: []ifs.File{},
 				},
 			},
-			res: []templates.LinkView{
+			res: []template.LinkView{
 				{
 					Name:       "test 1",
 					CreatedAt:  "Jan 1 00:00:00 UTC 1970",
@@ -72,7 +72,7 @@ func TestLinks(t *testing.T) {
 					},
 				},
 			},
-			res: []templates.LinkView{
+			res: []template.LinkView{
 				{
 					Name:       "test 1",
 					CreatedAt:  "Jan 1 00:00:00 UTC 1970",
@@ -118,7 +118,7 @@ func TestLinks(t *testing.T) {
 					files: []ifs.File{},
 				},
 			},
-			res: []templates.LinkView{
+			res: []template.LinkView{
 				{
 					Name:       "test 1",
 					CreatedAt:  "Jan 1 00:00:00 UTC 1970",

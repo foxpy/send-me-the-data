@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/foxpy/send-me-the-data/cmd/server/templates"
+	"github.com/foxpy/send-me-the-data/cmd/server/template"
 )
 
 func (s *State) handleAdminViewLinkPage(w http.ResponseWriter, r *http.Request) error {
@@ -17,9 +17,9 @@ func (s *State) handleAdminViewLinkPage(w http.ResponseWriter, r *http.Request) 
 		return err
 	}
 
-	var params templates.Params[templates.AdminViewLinkParams]
+	var params template.Params[template.AdminViewLinkParams]
 	params.Title = title
 	params.Data.Files = files
 
-	return templates.RenderAdminViewLink(w, params)
+	return template.RenderAdminViewLink(w, params)
 }
