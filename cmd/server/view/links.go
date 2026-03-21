@@ -2,7 +2,6 @@ package view
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
@@ -28,9 +27,8 @@ func Links(db idb.Database, fs ifs.Filesystem) ([]templates.LinkView, error) {
 		}
 
 		linkViews = append(linkViews, templates.LinkView{
-			Name: link.Name,
-			// FIXME: using time.Stamp does not include the year
-			CreatedAt:  link.CreatedAt.Format(time.Stamp),
+			Name:       link.Name,
+			CreatedAt:  link.CreatedAt.Format(DateTimeFormat),
 			TotalFiles: len(files),
 			TotalSize:  bytesToHuman(totalSize),
 			ViewLink:   fmt.Sprintf("/link/%s", link.ExternalKey),

@@ -3,7 +3,6 @@ package view
 import (
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 	"github.com/foxpy/send-me-the-data/cmd/server/idb/mockdb"
@@ -30,7 +29,7 @@ func TestLinks(t *testing.T) {
 			links: []idb.Link{{
 				Name:        "test 1",
 				ExternalKey: "abcd",
-				CreatedAt:   time.UnixMicro(0).UTC(),
+				CreatedAt:   zeroTime,
 			}},
 			files: []linkFiles{
 				{
@@ -41,7 +40,7 @@ func TestLinks(t *testing.T) {
 			res: []templates.LinkView{
 				{
 					Name:       "test 1",
-					CreatedAt:  "Jan  1 00:00:00",
+					CreatedAt:  "Jan 1 00:00:00 UTC 1970",
 					TotalFiles: 0,
 					TotalSize:  "0 bytes",
 					ViewLink:   "/link/abcd",
@@ -54,7 +53,7 @@ func TestLinks(t *testing.T) {
 			links: []idb.Link{{
 				Name:        "test 1",
 				ExternalKey: "abcd",
-				CreatedAt:   time.UnixMicro(0).UTC(),
+				CreatedAt:   zeroTime,
 			}},
 			files: []linkFiles{
 				{
@@ -63,12 +62,12 @@ func TestLinks(t *testing.T) {
 						{
 							Name:    "file 1",
 							Size:    100,
-							ModTime: time.UnixMicro(0).UTC(),
+							ModTime: zeroTime,
 						},
 						{
 							Name:    "file 2",
 							Size:    500,
-							ModTime: time.UnixMicro(0).UTC(),
+							ModTime: zeroTime,
 						},
 					},
 				},
@@ -76,7 +75,7 @@ func TestLinks(t *testing.T) {
 			res: []templates.LinkView{
 				{
 					Name:       "test 1",
-					CreatedAt:  "Jan  1 00:00:00",
+					CreatedAt:  "Jan 1 00:00:00 UTC 1970",
 					TotalFiles: 2,
 					TotalSize:  "600 bytes",
 					ViewLink:   "/link/abcd",
@@ -90,12 +89,12 @@ func TestLinks(t *testing.T) {
 				{
 					Name:        "test 1",
 					ExternalKey: "abcd",
-					CreatedAt:   time.UnixMicro(0).UTC(),
+					CreatedAt:   zeroTime,
 				},
 				{
 					Name:        "test 2",
 					ExternalKey: "bcde",
-					CreatedAt:   time.UnixMicro(0).UTC(),
+					CreatedAt:   zeroTime,
 				},
 			},
 			files: []linkFiles{
@@ -105,12 +104,12 @@ func TestLinks(t *testing.T) {
 						{
 							Name:    "file 1",
 							Size:    100,
-							ModTime: time.UnixMicro(0).UTC(),
+							ModTime: zeroTime,
 						},
 						{
 							Name:    "file 2",
 							Size:    500,
-							ModTime: time.UnixMicro(0).UTC(),
+							ModTime: zeroTime,
 						},
 					},
 				},
@@ -122,7 +121,7 @@ func TestLinks(t *testing.T) {
 			res: []templates.LinkView{
 				{
 					Name:       "test 1",
-					CreatedAt:  "Jan  1 00:00:00",
+					CreatedAt:  "Jan 1 00:00:00 UTC 1970",
 					TotalFiles: 2,
 					TotalSize:  "600 bytes",
 					ViewLink:   "/link/abcd",
@@ -130,7 +129,7 @@ func TestLinks(t *testing.T) {
 				},
 				{
 					Name:       "test 2",
-					CreatedAt:  "Jan  1 00:00:00",
+					CreatedAt:  "Jan 1 00:00:00 UTC 1970",
 					TotalFiles: 0,
 					TotalSize:  "0 bytes",
 					ViewLink:   "/link/bcde",

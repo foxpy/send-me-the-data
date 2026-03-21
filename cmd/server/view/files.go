@@ -2,7 +2,6 @@ package view
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 	"github.com/foxpy/send-me-the-data/cmd/server/templates"
@@ -23,7 +22,7 @@ func Files(fs ifs.Filesystem, linkID string, renderDownloadLinks bool) ([]templa
 
 		fileViews = append(fileViews, templates.FileView{
 			Name:         file.Name,
-			UploadedAt:   file.ModTime.Format(time.Stamp),
+			UploadedAt:   file.ModTime.Format(DateTimeFormat),
 			Size:         bytesToHuman(file.Size),
 			DownloadLink: downloadLink,
 			DeleteLink:   fmt.Sprintf("/link/%s/file/%s/delete", linkID, file.Name),

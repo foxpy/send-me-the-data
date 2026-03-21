@@ -2,9 +2,12 @@ package view
 
 import (
 	"testing"
+	"time"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 )
+
+var zeroTime = time.UnixMicro(0).UTC()
 
 type linkFiles struct {
 	name  string

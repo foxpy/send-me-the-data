@@ -3,7 +3,6 @@ package view
 import (
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs/mockfs"
@@ -37,12 +36,12 @@ func TestFiles(t *testing.T) {
 				files: []ifs.File{{
 					Name:    "file 1",
 					Size:    1024,
-					ModTime: time.UnixMicro(0).UTC(),
+					ModTime: zeroTime,
 				}},
 			}},
 			res: []templates.FileView{{
 				Name:         "file 1",
-				UploadedAt:   "Jan  1 00:00:00",
+				UploadedAt:   "Jan 1 00:00:00 UTC 1970",
 				Size:         "1.00 KiB",
 				DownloadLink: "",
 				DeleteLink:   "/link/abcd/file/file 1/delete",
@@ -57,12 +56,12 @@ func TestFiles(t *testing.T) {
 				files: []ifs.File{{
 					Name:    "file 1",
 					Size:    1024,
-					ModTime: time.UnixMicro(0).UTC(),
+					ModTime: zeroTime,
 				}},
 			}},
 			res: []templates.FileView{{
 				Name:         "file 1",
-				UploadedAt:   "Jan  1 00:00:00",
+				UploadedAt:   "Jan 1 00:00:00 UTC 1970",
 				Size:         "1.00 KiB",
 				DownloadLink: "/link/abcd/file/file 1",
 				DeleteLink:   "/link/abcd/file/file 1/delete",
@@ -78,38 +77,38 @@ func TestFiles(t *testing.T) {
 					{
 						Name:    "file 1",
 						Size:    1024,
-						ModTime: time.UnixMicro(0).UTC(),
+						ModTime: zeroTime,
 					},
 					{
 						Name:    "file 2",
 						Size:    512,
-						ModTime: time.UnixMicro(0).UTC(),
+						ModTime: zeroTime,
 					},
 					{
 						Name:    "file 3",
 						Size:    512,
-						ModTime: time.UnixMicro(0).UTC(),
+						ModTime: zeroTime,
 					},
 				},
 			}},
 			res: []templates.FileView{
 				{
 					Name:         "file 1",
-					UploadedAt:   "Jan  1 00:00:00",
+					UploadedAt:   "Jan 1 00:00:00 UTC 1970",
 					Size:         "1.00 KiB",
 					DownloadLink: "",
 					DeleteLink:   "/link/abcd/file/file 1/delete",
 				},
 				{
 					Name:         "file 2",
-					UploadedAt:   "Jan  1 00:00:00",
+					UploadedAt:   "Jan 1 00:00:00 UTC 1970",
 					Size:         "512 bytes",
 					DownloadLink: "",
 					DeleteLink:   "/link/abcd/file/file 2/delete",
 				},
 				{
 					Name:         "file 3",
-					UploadedAt:   "Jan  1 00:00:00",
+					UploadedAt:   "Jan 1 00:00:00 UTC 1970",
 					Size:         "512 bytes",
 					DownloadLink: "",
 					DeleteLink:   "/link/abcd/file/file 3/delete",
