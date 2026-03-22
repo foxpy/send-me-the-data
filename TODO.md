@@ -19,7 +19,7 @@
       - [x] create
         - [ ] set maximum file size
         - [ ] DIFFICULT: set maximum total file size
-      - [ ] edit
+      - [x] edit
       - [x] delete
   - [x] Link view page (allows downloading files)
     - [x] Download file endpoint

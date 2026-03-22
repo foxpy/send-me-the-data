@@ -17,6 +17,10 @@ th, td {
     border: 1px solid black;
 }
 
+form {
+    display: inline-block;
+}
+
 .success_flash {
     padding: 0.25rem;
     background-color: darkseagreen;

@@ -35,7 +35,7 @@ func (s *UserServer) upload(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	defer func() {
-		_ = lock.Close()
+		_ = lock.Release()
 	}()
 
 	fileJournalEntry := &idb.FileJournalEntry{

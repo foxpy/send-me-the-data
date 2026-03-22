@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html>
+
+<!--TODO: figure out how to collapse whitespace in templates (using minus syntax?)-->
+{{ template "head.gohtml" . }}
+
+{{with .Data.Link}}
+<body>
+    <h1><a href="/">Send me the Data</a></h1>
+
+    <h2>{{ .Name }}</h2>
+
+    <div>
+        <form action="{{ .EditLink }}" method="post">
+            <div>
+                <label for="link_name">Link name:</label>
+                <input type="text" name="name" id="link_name" value="{{ .Name }}" required />
+            </div>
+            <div>
+                <input type="checkbox" name="user_downloadable" id="user_downloadable"
+                    {{ if .UserDownloadable }}
+                        checked
+                    {{ end }}
+                />
+                <label>Users can download files</label>
+            </div>
+            <div>
+                <input type="submit" value="Save" />
+            </div>
+        </form>
+        <form action="{{ .ViewLink }}" method="get">
+            <input type="submit" value="Cancel">
+        </form>
+    </div>
+</body>
+{{end}}
+
+</html>

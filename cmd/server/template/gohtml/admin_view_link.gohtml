@@ -5,7 +5,23 @@
 {{ template "head.gohtml" . }}
 
 <body>
+    <h1><a href="/">Send me the Data</a></h1>
+
     {{ template "flash.gohtml" . }}
+
+    <h2>Link: {{ .Data.Link.Name }}</h2>
+
+    <div>
+        <form action="{{ .Data.Link.EditLink }}" method="get">
+            <input type="submit" value="Edit" />
+        </form>
+        <form action="{{ .Data.Link.DeleteLink }}" method="post">
+            <input type="submit" value="Delete" />
+        </form>
+    </div>
+
+    <!--TODO: admin should be able to see whether users can download files from each link-->
+    <!--TODO: and maybe in general this page should show a bit more information than just a list of files-->
 
     <h2>List of files</h2>
 

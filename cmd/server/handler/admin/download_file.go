@@ -44,7 +44,7 @@ func prepareDownloadFile(db idb.Database, fs ifs.Filesystem, id, name string) (i
 	}
 
 	defer func() {
-		_ = lock.Close()
+		_ = lock.Release()
 	}()
 
 	linkFS, err := fs.LinkFS(id)

@@ -29,7 +29,7 @@ func (s *AdminServer) deleteLink(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	defer func() {
-		_ = lock.Close()
+		_ = lock.Release()
 	}()
 
 	err = s.fs.RemoveLinkFiles(id)

@@ -5,6 +5,8 @@
 {{ template "head.gohtml" . }}
 
 <body>
+    <h1><a href="/">Send me the Data</a></h1>
+
     {{ template "flash.gohtml" . }}
 
     <h2>Create new link</h2>
@@ -36,6 +38,7 @@
                     <th>Total files</th>
                     <th>Total size</th>
                     <th>Actions</th>
+                    <!--TODO: admin should be able to see whether users can download files from each link-->
                 </tr>
             </thead>
             <tbody>
@@ -46,6 +49,9 @@
                     <td>{{ .TotalFiles }}</td>
                     <td>{{ .TotalSize }}</td>
                     <td>
+                        <form action="{{ .EditLink }}" method="get">
+                            <input type="submit" value="Edit" />
+                        </form>
                         <form action="{{ .DeleteLink }}" method="post">
                             <input type="submit" value="Delete" />
                         </form>

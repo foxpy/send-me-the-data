@@ -3,14 +3,16 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 )
 
 type linkRLock struct {
-	name             string
-	userDownloadable bool
-	tx               *sql.Tx
+	name, externalKey string
+	userDownloadable  bool
+	createdAt         time.Time
+	tx                *sql.Tx
 }
 
 func (l linkRLock) UserDownloadable() bool {
@@ -21,7 +23,15 @@ func (l linkRLock) Name() string {
 	return l.name
 }
 
-func (l linkRLock) Close() error {
+func (l linkRLock) ExternalKey() string {
+	return l.externalKey
+}
+
+func (l linkRLock) CreatedAt() time.Time {
+	return l.createdAt
+}
+
+func (l linkRLock) Release() error {
 	return l.tx.Rollback()
 }
 
@@ -30,7 +40,7 @@ type linkWLock struct {
 	tx          *sql.Tx
 }
 
-func (l linkWLock) Close() error {
+func (l linkWLock) Release() error {
 	return l.tx.Commit()
 }
 
@@ -43,8 +53,22 @@ func (l linkWLock) DeleteLink() error {
 	return nil
 }
 
+func (l linkWLock) UpdateLink(name string, userDownloadable bool) error {
+	_, err := l.tx.Exec(
+		"UPDATE smtd.links SET name=$1, user_downloadable=$3 WHERE external_key = $2",
+		name,
+		l.externalKey,
+		userDownloadable,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to update link %s: %w", l.externalKey, err)
+	}
+
+	return nil
+}
+
 func (d *Postgres) AllLinks() ([]idb.Link, error) {
-	rows, err := d.db.Query("SELECT name, external_key, created_at FROM smtd.links")
+	rows, err := d.db.Query("SELECT name, external_key, created_at, user_downloadable FROM smtd.links")
 	if err != nil {
 		return nil, fmt.Errorf("failed to query links from the database: %w", err)
 	}
@@ -53,7 +77,7 @@ func (d *Postgres) AllLinks() ([]idb.Link, error) {
 	links := make([]idb.Link, 0)
 	for rows.Next() {
 		var link idb.Link
-		err = rows.Scan(&link.Name, &link.ExternalKey, &link.CreatedAt)
+		err = rows.Scan(&link.Name, &link.ExternalKey, &link.CreatedAt, &link.UserDownloadable)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan link from the database: %w", err)
 		}
@@ -89,22 +113,20 @@ func (d *Postgres) AcquireLinkRLock(externalKey string) (idb.LinkRLock, error) {
 		return nil, fmt.Errorf("failed to begin transaction: %w", err)
 	}
 
-	var userDownloadable bool
-	var name string
+	var lock linkRLock
+	lock.tx = tx
+	lock.externalKey = externalKey
+
 	err = tx.QueryRow(
-		"SELECT name, user_downloadable FROM smtd.links WHERE external_key = $1 FOR SHARE",
+		"SELECT name, user_downloadable, created_at FROM smtd.links WHERE external_key = $1 FOR SHARE",
 		externalKey,
-	).Scan(&name, &userDownloadable)
+	).Scan(&lock.name, &lock.userDownloadable, &lock.createdAt)
 	if err != nil {
 		_ = tx.Rollback()
 		return nil, fmt.Errorf("failed to acquire read lock on link %s: %w", externalKey, err)
 	}
 
-	return &linkRLock{
-		name,
-		userDownloadable,
-		tx,
-	}, nil
+	return &lock, nil
 }
 
 func (d *Postgres) AcquireLinkWLock(externalKey string) (idb.LinkWLock, error) {

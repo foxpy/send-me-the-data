@@ -48,7 +48,7 @@ func prepareFilesView(db idb.Database, fs ifs.Filesystem, id string) (string, []
 	}
 
 	defer func() {
-		_ = lock.Close()
+		_ = lock.Release()
 	}()
 
 	files, err := view.Files(fs, id, lock.UserDownloadable())
@@ -56,5 +56,5 @@ func prepareFilesView(db idb.Database, fs ifs.Filesystem, id string) (string, []
 		return "", nil, fmt.Errorf("failed to get files view for link %s: %w", id, err)
 	}
 
-	return lock.Name(), files, nil
+	return fmt.Sprintf("Upload files: %s", lock.Name()), files, nil
 }

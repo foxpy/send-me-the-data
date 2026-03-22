@@ -23,15 +23,19 @@ type FileJournalEntry struct {
 type Link struct {
 	Name, ExternalKey string
 	CreatedAt         time.Time
+	UserDownloadable  bool
 }
 
 type LinkRLock interface {
 	UserDownloadable() bool
 	Name() string
-	Close() error
+	CreatedAt() time.Time
+	ExternalKey() string
+	Release() error
 }
 
 type LinkWLock interface {
-	Close() error
+	UpdateLink(name string, userDownloadable bool) error
 	DeleteLink() error
+	Release() error
 }

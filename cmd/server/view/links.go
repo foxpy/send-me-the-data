@@ -27,14 +27,40 @@ func Links(db idb.Database, fs ifs.Filesystem) ([]template.LinkView, error) {
 		}
 
 		linkViews = append(linkViews, template.LinkView{
-			Name:       link.Name,
-			CreatedAt:  link.CreatedAt.Format(DateTimeFormat),
-			TotalFiles: len(files),
-			TotalSize:  bytesToHuman(totalSize),
-			ViewLink:   fmt.Sprintf("/link/%s", link.ExternalKey),
-			DeleteLink: fmt.Sprintf("/link/%s/delete", link.ExternalKey),
+			Name:             link.Name,
+			CreatedAt:        link.CreatedAt.Format(DateTimeFormat),
+			TotalFiles:       len(files),
+			TotalSize:        bytesToHuman(totalSize),
+			ViewLink:         fmt.Sprintf("/link/%s", link.ExternalKey),
+			DeleteLink:       fmt.Sprintf("/link/%s/delete", link.ExternalKey),
+			EditLink:         fmt.Sprintf("/link/%s/edit", link.ExternalKey),
+			UserDownloadable: link.UserDownloadable,
 		})
 	}
 
 	return linkViews, nil
+}
+
+func Link(linkLock idb.LinkRLock, fs ifs.Filesystem) (*template.LinkView, error) {
+	id := linkLock.ExternalKey()
+	files, err := fs.ListLinkFiles(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get all files for link %s: %w", id, err)
+	}
+
+	var totalSize int64
+	for _, file := range files {
+		totalSize += file.Size
+	}
+
+	return &template.LinkView{
+		Name:             linkLock.Name(),
+		CreatedAt:        linkLock.CreatedAt().Format(DateTimeFormat),
+		TotalFiles:       len(files),
+		TotalSize:        bytesToHuman(totalSize),
+		ViewLink:         fmt.Sprintf("/link/%s", id),
+		DeleteLink:       fmt.Sprintf("/link/%s/delete", id),
+		EditLink:         fmt.Sprintf("/link/%s/edit", id),
+		UserDownloadable: linkLock.UserDownloadable(),
+	}, nil
 }

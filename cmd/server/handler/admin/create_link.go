@@ -32,6 +32,7 @@ func init() {
 }
 
 func (s *AdminServer) createLink(w http.ResponseWriter, r *http.Request) error {
+	// TODO: check that name is at least not of length 0
 	name := r.FormValue("name")
 	externalKey, err := generateRandomExternalKey()
 	if err != nil {
@@ -56,6 +57,7 @@ func (s *AdminServer) createLink(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("failed to create link: %w", err)
 	}
 
+	// TODO: set flash text in cookie value EVERYWHERE
 	http.SetCookie(w, &http.Cookie{
 		Name:   "success_flash",
 		MaxAge: 60,

@@ -19,7 +19,7 @@ func (s *AdminServer) deleteFile(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	defer func() {
-		_ = lock.Close()
+		_ = lock.Release()
 	}()
 
 	name := r.PathValue("name")
