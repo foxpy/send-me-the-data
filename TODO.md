@@ -27,7 +27,7 @@
 
 
 - [ ] Tests
-
+- [x] favicon
 
 File storage:
 - [x] $PREFIX is configurable and tells the server where to dump files to
