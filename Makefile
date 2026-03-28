@@ -11,6 +11,9 @@ start-server:
 test:
 	go test ./...
 
+bench:
+	go test -bench . ./...
+
 goose-status:
 	GOOSE_DRIVER=postgres \
 	GOOSE_DBSTRING=$(DB_URL) \

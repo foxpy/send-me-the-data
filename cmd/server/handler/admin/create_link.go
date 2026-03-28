@@ -1,20 +1,16 @@
 package admin
 
 import (
-	"bufio"
-	"crypto/rand"
 	"errors"
 	"fmt"
-	"math/big"
+	"math/rand/v2"
 	"net/http"
-	"strings"
 
 	"github.com/lib/pq"
 )
 
 var (
-	alphabet     []byte
-	alphabetSize big.Int
+	alphabet []byte
 )
 
 func init() {
@@ -27,24 +23,19 @@ func init() {
 	for i := byte('0'); i <= byte('9'); i++ {
 		alphabet = append(alphabet, i)
 	}
-
-	alphabetSize = *big.NewInt(int64(len(alphabet)))
 }
 
 func (s *AdminServer) createLink(w http.ResponseWriter, r *http.Request) error {
 	// TODO: check that name is at least not of length 0
 	name := r.FormValue("name")
-	externalKey, err := generateRandomExternalKey()
-	if err != nil {
-		return fmt.Errorf("failed to generate a random external key: %w", err)
-	}
+	externalKey := generateRandomExternalKey()
 
 	userDownloadable := false
 	if r.FormValue("user_downloadable") == "on" {
 		userDownloadable = true
 	}
 
-	err = s.db.CreateLink(name, externalKey, userDownloadable)
+	err := s.db.CreateLink(name, externalKey, userDownloadable)
 	var pqErr *pq.Error
 	if errors.As(err, &pqErr) && pqErr.Code.Name() == "unique_violation" {
 		http.SetCookie(w, &http.Cookie{
@@ -66,21 +57,11 @@ func (s *AdminServer) createLink(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func generateRandomExternalKey() (string, error) {
-	// Usually we only need one byte per character, but there is a probability
-	// we will need more. Assuming an already unlikely case of each call to crypto/rand.Int
-	// requiring 2 random bytes instead of 1, buffering 24 bytes in advance guarantees
-	// that on Linux we will almost never need more than a single call to getrandom(2).
-	r := bufio.NewReaderSize(rand.Reader, 24)
-
-	var result strings.Builder
-	for range 12 {
-		n, err := rand.Int(r, &alphabetSize)
-		if err != nil {
-			return "", fmt.Errorf("failed to generate random integer: %w", err)
-		}
-
-		result.WriteByte(alphabet[n.Int64()])
+func generateRandomExternalKey() string {
+	var result [12]byte
+	for i := range 12 {
+		n := rand.IntN(len(alphabet))
+		result[i] = alphabet[n]
 	}
-	return result.String(), nil
+	return string(result[:])
 }
