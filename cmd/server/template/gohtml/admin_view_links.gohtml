@@ -15,11 +15,11 @@
         <form action="/link" method="post">
             <div>
                 <label for="link_name">New link name: </label>
-                <input type="text" name="name" id="link_name" required />
+                <input type="text" name="name" id="link_name" required maxlength="255" />
             </div>
             <div>
-                <input type="checkbox" name="user_downloadable" id="link_user_downloadable" />
-                <label for="link_user_downloadable">Users can download files</label>
+                <input type="checkbox" name="user_downloadable" id="user_downloadable" />
+                <label for="user_downloadable">Users can download files</label>
             </div>
             <div>
                 <input type="submit" value="Create link" />

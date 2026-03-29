@@ -1,15 +1,33 @@
 package mockdb
 
-import "github.com/foxpy/send-me-the-data/cmd/server/idb"
+import (
+	"fmt"
+
+	"github.com/foxpy/send-me-the-data/cmd/server/idb"
+)
 
 type MockDB struct {
-	allLinksResponse []idb.Link
+	allLinksResponse           []idb.Link
+	randomExternalKeyResponses []string
+	expectedCreateLinkCalls    []CreateLinkCall
+}
+
+type CreateLinkCall struct {
+	link       idb.Link
+	resultFunc func() error
 }
 
 var _ idb.Database = &MockDB{}
 
 func NewMockDB() *MockDB {
 	return &MockDB{}
+}
+
+func (d *MockDB) CheckAllExpects() {
+	if len(d.expectedCreateLinkCalls) > 0 {
+		firstExpectedCall := d.expectedCreateLinkCalls[0]
+		panic(fmt.Sprintf("expected CreateLink(%v) call, which never happened", firstExpectedCall))
+	}
 }
 
 func (d *MockDB) GetFileJournalEntry() (*idb.FileJournalEntry, error) {
@@ -21,10 +39,6 @@ func (d *MockDB) DeleteFileJournalEntry(*idb.FileJournalEntry) error {
 }
 
 func (d *MockDB) CreateFileJournalEntry(*idb.FileJournalEntry) error {
-	panic("TODO")
-}
-
-func (d *MockDB) CreateLink(name, externalKey string, userDownloadable bool) error {
 	panic("TODO")
 }
 

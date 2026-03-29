@@ -10,6 +10,6 @@ func (d *MockDB) AllLinks() ([]idb.Link, error) {
 	return d.allLinksResponse, nil
 }
 
-func (d *MockDB) SetAllLinksResponse(response []idb.Link) {
+func (d *MockDB) MockAllLinksResponse(response []idb.Link) {
 	d.allLinksResponse = response
 }

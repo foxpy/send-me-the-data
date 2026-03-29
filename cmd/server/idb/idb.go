@@ -13,6 +13,8 @@ type Database interface {
 	CreateLink(name, externalKey string, userDownloadable bool) error
 	AcquireLinkRLock(externalKey string) (LinkRLock, error)
 	AcquireLinkWLock(externalKey string) (LinkWLock, error)
+	// TODO: this function doesn't really belong here
+	GenerateRandomExternalKey() string
 }
 
 type FileJournalEntry struct {

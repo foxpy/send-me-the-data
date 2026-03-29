@@ -153,9 +153,10 @@ func TestLinks(t *testing.T) {
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
 			db := mockdb.NewMockDB()
+			defer db.CheckAllExpects()
 			fs := mockfs.NewMockFS()
 
-			db.SetAllLinksResponse(tc.links)
+			db.MockAllLinksResponse(tc.links)
 			for _, f := range tc.files {
 				fs.SetListLinkFilesResponse(f.Name, f.Files)
 			}

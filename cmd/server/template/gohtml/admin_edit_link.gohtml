@@ -15,7 +15,7 @@
         <form action="{{ .EditLink }}" method="post">
             <div>
                 <label for="link_name">Link name:</label>
-                <input type="text" name="name" id="link_name" value="{{ .Name }}" required />
+                <input type="text" name="name" id="link_name" value="{{ .Name }}" required maxlength="255" />
             </div>
             <div>
                 <input type="checkbox" name="user_downloadable" id="user_downloadable"
@@ -23,7 +23,7 @@
                         checked
                     {{ end }}
                 />
-                <label>Users can download files</label>
+                <label for="user_downloadable">Users can download files</label>
             </div>
             <div>
                 <input type="submit" value="Save" />

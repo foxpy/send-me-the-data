@@ -26,7 +26,6 @@ func (s *AdminServer) editLink(w http.ResponseWriter, r *http.Request) error {
 		userDownloadable = true
 	}
 
-	// TODO: check that name is at least not of length 0
 	err = lock.UpdateLink(name, userDownloadable)
 	if err != nil {
 		return fmt.Errorf("failed to update link %s: %w", id, err)

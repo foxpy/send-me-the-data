@@ -238,10 +238,11 @@ func TestViewLinksPage(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			db := mockdb.NewMockDB()
+			defer db.CheckAllExpects()
 			fs := mockfs.NewMockFS()
 			h := NewAdminServer(db, fs)
 
-			db.SetAllLinksResponse(tc.links)
+			db.MockAllLinksResponse(tc.links)
 			for _, f := range tc.files {
 				fs.SetListLinkFilesResponse(f.Name, f.Files)
 			}
