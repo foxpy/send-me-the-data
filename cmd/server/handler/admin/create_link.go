@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/foxpy/send-me-the-data/cmd/server/flash"
 	"github.com/lib/pq"
 )
 
@@ -19,21 +20,15 @@ func (s *AdminServer) createLink(w http.ResponseWriter, r *http.Request) error {
 	err := s.db.CreateLink(name, externalKey, userDownloadable)
 	var pqErr *pq.Error
 	if errors.As(err, &pqErr) && pqErr.Code.Name() == "unique_violation" {
-		http.SetCookie(w, &http.Cookie{
-			Name:   "error_flash",
-			MaxAge: 60,
-		})
+		// hopefully should never happen because externalKey collision chance is very low
+		flash.AddFlash(w, flash.ErrorFlash, "Failed to create link, try again")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return nil
 	} else if err != nil {
 		return fmt.Errorf("failed to create link: %w", err)
 	}
 
-	// TODO: set flash text in cookie value EVERYWHERE
-	http.SetCookie(w, &http.Cookie{
-		Name:   "success_flash",
-		MaxAge: 60,
-	})
+	flash.AddFlash(w, flash.SuccessFlash, "Link created successfully")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	return nil
 }

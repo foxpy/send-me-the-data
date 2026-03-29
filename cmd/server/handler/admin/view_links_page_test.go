@@ -4,10 +4,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	"strings"
 	"testing"
 	"time"
 
+	"github.com/foxpy/send-me-the-data/cmd/server/flash"
+	"github.com/foxpy/send-me-the-data/cmd/server/flash/flashtest"
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 	"github.com/foxpy/send-me-the-data/cmd/server/idb/mockdb"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
@@ -19,11 +20,6 @@ import (
 
 type table struct {
 	numrows int
-}
-
-type flash struct {
-	kind string
-	text string
 }
 
 func tableRows(table *html.Node) int {
@@ -56,26 +52,6 @@ func findAllTables(doc *html.Node) (tables []*html.Node) {
 	return
 }
 
-func findAllFlashes(doc *html.Node) (flashes []flash) {
-	for n := range doc.Descendants() {
-		if n.Type == html.ElementNode {
-			for _, a := range n.Attr {
-				if a.Key == "class" {
-					kind := a.Val
-					if kind != "success_flash" && kind != "error_flash" {
-						continue
-					}
-					flashes = append(flashes, flash{
-						kind: kind,
-						text: strings.TrimSpace(n.FirstChild.Data),
-					})
-				}
-			}
-		}
-	}
-	return
-}
-
 func TestViewLinksPage(t *testing.T) {
 	for _, tc := range []struct {
 		name            string
@@ -84,7 +60,7 @@ func TestViewLinksPage(t *testing.T) {
 		cookies         []*http.Cookie
 		expectedCode    int
 		expectedTables  []table
-		expectedFlashes []flash
+		expectedFlashes []flashtest.Flash
 	}{
 		{
 			name:            "no links, no flashes",
@@ -145,11 +121,12 @@ func TestViewLinksPage(t *testing.T) {
 				},
 			}},
 			cookies: []*http.Cookie{{
-				Name: "success_flash",
+				Name:  "success_flash",
+				Value: "Link created successfully",
 			}},
 			expectedCode:    http.StatusOK,
 			expectedTables:  []table{{1}},
-			expectedFlashes: []flash{{"success_flash", "Link created successfully"}},
+			expectedFlashes: []flashtest.Flash{{Kind: flash.SuccessFlash, Text: "Link created successfully"}},
 		},
 		{
 			name: "one link, error flash",
@@ -174,11 +151,12 @@ func TestViewLinksPage(t *testing.T) {
 				},
 			}},
 			cookies: []*http.Cookie{{
-				Name: "error_flash",
+				Name:  "error_flash",
+				Value: "Failed to create link",
 			}},
 			expectedCode:    http.StatusOK,
 			expectedTables:  []table{{1}},
-			expectedFlashes: []flash{{"error_flash", "Failed to create link"}},
+			expectedFlashes: []flashtest.Flash{{Kind: flash.ErrorFlash, Text: "Failed to create link"}},
 		},
 		{
 			name: "multile links, no flashes",
@@ -282,7 +260,7 @@ func TestViewLinksPage(t *testing.T) {
 				}
 			}
 
-			flashes := findAllFlashes(doc)
+			flashes := flashtest.FindAllFlashes(doc)
 			if len(flashes) != len(tc.expectedFlashes) {
 				t.Fatalf("expected %d flashes, got %d", len(tc.expectedFlashes), len(flashes))
 			}

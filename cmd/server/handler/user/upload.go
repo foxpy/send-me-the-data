@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/foxpy/send-me-the-data/cmd/server/flash"
 	"github.com/foxpy/send-me-the-data/cmd/server/handler"
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 )
@@ -78,10 +79,7 @@ func (s *UserServer) upload(w http.ResponseWriter, r *http.Request) error {
 
 	dirty = false
 
-	http.SetCookie(w, &http.Cookie{
-		Name:   "success_flash",
-		MaxAge: 60,
-	})
+	flash.AddFlash(w, flash.SuccessFlash, "File uploaded successfully")
 	http.Redirect(w, r, fmt.Sprintf("/u/%s", id), http.StatusSeeOther)
 	return nil
 }

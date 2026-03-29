@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/foxpy/send-me-the-data/cmd/server/flash"
 	"github.com/foxpy/send-me-the-data/cmd/server/handler"
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
@@ -26,15 +27,9 @@ func (s *UserServer) viewLinkPage(w http.ResponseWriter, r *http.Request) error 
 	params.Title = title
 	params.Data.Files = files
 
-	_, err = r.Cookie("success_flash")
-	if err == nil {
-		params.SuccessFlash = "File uploaded successfully"
-	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:   "success_flash",
-		MaxAge: -1,
-	})
+	flashes := flash.GetFlashes(w, r)
+	params.SuccessFlash = flashes[flash.SuccessFlash]
+	params.ErrorFlash = flashes[flash.ErrorFlash]
 
 	return template.RenderUserViewLink(w, params)
 }

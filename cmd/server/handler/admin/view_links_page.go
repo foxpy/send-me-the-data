@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/foxpy/send-me-the-data/cmd/server/flash"
 	"github.com/foxpy/send-me-the-data/cmd/server/template"
 	"github.com/foxpy/send-me-the-data/cmd/server/view"
 )
@@ -18,25 +19,9 @@ func (s *AdminServer) viewLinksPage(w http.ResponseWriter, r *http.Request) erro
 	params.Title = "Send me the Data"
 	params.Data.Links = links
 
-	_, err = r.Cookie("success_flash")
-	if err == nil {
-		params.SuccessFlash = "Link created successfully"
-	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:   "success_flash",
-		MaxAge: -1,
-	})
-
-	_, err = r.Cookie("error_flash")
-	if err == nil {
-		params.ErrorFlash = "Failed to create link"
-	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:   "error_flash",
-		MaxAge: -1,
-	})
+	flashes := flash.GetFlashes(w, r)
+	params.SuccessFlash = flashes[flash.SuccessFlash]
+	params.ErrorFlash = flashes[flash.ErrorFlash]
 
 	return template.RenderAdminViewLinks(w, params)
 }

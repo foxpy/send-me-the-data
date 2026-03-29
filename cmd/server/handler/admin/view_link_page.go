@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/foxpy/send-me-the-data/cmd/server/flash"
 	"github.com/foxpy/send-me-the-data/cmd/server/handler"
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
@@ -27,27 +28,9 @@ func (s *AdminServer) viewLinkPage(w http.ResponseWriter, r *http.Request) error
 	params.Data.Files = files
 	params.Data.Link = *link
 
-	_, err = r.Cookie("success_flash")
-	if err == nil {
-		params.SuccessFlash = "Link updated successfully"
-	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:   "success_flash",
-		Path:   "/",
-		MaxAge: -1,
-	})
-
-	_, err = r.Cookie("error_flash")
-	if err == nil {
-		params.ErrorFlash = "Failed to update link"
-	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:   "error_flash",
-		Path:   "/",
-		MaxAge: -1,
-	})
+	flashes := flash.GetFlashes(w, r)
+	params.SuccessFlash = flashes[flash.SuccessFlash]
+	params.ErrorFlash = flashes[flash.ErrorFlash]
 
 	return template.RenderAdminViewLink(w, params)
 }

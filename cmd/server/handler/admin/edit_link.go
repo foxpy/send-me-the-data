@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/foxpy/send-me-the-data/cmd/server/flash"
 	"github.com/foxpy/send-me-the-data/cmd/server/handler"
 )
 
@@ -31,12 +32,7 @@ func (s *AdminServer) editLink(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("failed to update link %s: %w", id, err)
 	}
 
-	// TODO: figure out how to handle cookies more nicely
-	http.SetCookie(w, &http.Cookie{
-		Name:   "success_flash",
-		Path:   "/",
-		MaxAge: 60,
-	})
+	flash.AddFlash(w, flash.SuccessFlash, "Link updated successfully")
 	http.Redirect(w, r, fmt.Sprintf("/link/%s", id), http.StatusSeeOther)
 	return nil
 }
