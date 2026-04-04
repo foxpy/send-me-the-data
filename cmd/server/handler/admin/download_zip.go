@@ -11,6 +11,8 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/handler"
 )
 
+// TODO: allow downloading uncompressed ZIP
+
 func (s *AdminServer) downloadZIP(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
 	lock, err := s.db.AcquireLinkRLock(id)
@@ -34,12 +36,15 @@ func (s *AdminServer) downloadZIP(w http.ResponseWriter, r *http.Request) error 
 	)
 	w.WriteHeader(http.StatusOK)
 
-	// TODO: maybe I can achieve better speeds registering DEFLATE with lower compression level
 	zw := zip.NewWriter(w)
-	zw.AddFS(linkFS)
-	err = zw.Close()
+	err = zw.AddFS(linkFS)
 	if err != nil {
 		return fmt.Errorf("failed to create ZIP archive for link %s: %w", lock.ExternalKey(), err)
+	}
+
+	err = zw.Close()
+	if err != nil {
+		return fmt.Errorf("failed to finalize ZIP archive for link %s: %w", lock.ExternalKey(), err)
 	}
 
 	return nil
