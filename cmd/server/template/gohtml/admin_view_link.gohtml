@@ -9,19 +9,26 @@
 
     {{ template "flash.gohtml" . }}
 
-    <h2>Link: {{ .Data.Link.Name }}</h2>
+    {{ with .Data.Link }}
+    <h2>Link: {{ .Name }}</h2>
+
+    <!--TODO: maybe I don't need a separate edit page and can just put edit form here-->
+    <p>
+        Created at {{ .CreatedAt }}<br />
+        Uploaded files: {{ .TotalFiles }} ({{ .TotalSize }} total)<br />
+        Maximum file size: {{ .MaxFileSize }}<br />
+        Users can download files: {{ if .UserDownloadable }}yes{{ else }}no{{ end }}
+    </p>
 
     <div>
-        <form action="{{ .Data.Link.EditLink }}" method="get">
+        <form action="{{ .EditLink }}" method="get">
             <input type="submit" value="Edit" />
         </form>
-        <form action="{{ .Data.Link.DeleteLink }}" method="post">
+        <form action="{{ .DeleteLink }}" method="post">
             <input type="submit" value="Delete" />
         </form>
     </div>
-
-    <!--TODO: admin should be able to see whether users can download files from each link-->
-    <!--TODO: and maybe in general this page should show a bit more information than just a list of files-->
+    {{ end }}
 
     <h2>List of files</h2>
 
