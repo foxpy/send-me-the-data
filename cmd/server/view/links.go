@@ -37,6 +37,7 @@ func Links(db idb.Database, fs ifs.Filesystem) ([]template.LinkView, error) {
 			ViewLink:         fmt.Sprintf("/link/%s", link.ExternalKey),
 			DeleteLink:       fmt.Sprintf("/link/%s/delete", link.ExternalKey),
 			EditLink:         fmt.Sprintf("/link/%s/edit", link.ExternalKey),
+			DownloadZIP:      fmt.Sprintf("/link/%s/zip", link.ExternalKey),
 			UserDownloadable: link.UserDownloadable,
 		})
 	}
@@ -66,6 +67,7 @@ func Link(linkLock idb.LinkRLock, fs ifs.Filesystem) (*template.LinkView, error)
 		ViewLink:         fmt.Sprintf("/link/%s", id),
 		DeleteLink:       fmt.Sprintf("/link/%s/delete", id),
 		EditLink:         fmt.Sprintf("/link/%s/edit", id),
+		DownloadZIP:      fmt.Sprintf("/link/%s/zip", id),
 		UserDownloadable: linkLock.UserDownloadable(),
 	}, nil
 }

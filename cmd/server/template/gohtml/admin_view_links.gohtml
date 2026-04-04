@@ -53,6 +53,9 @@
                     <td>{{ .TotalSize }}</td>
                     <td>{{ .MaxFileSize }}</td>
                     <td>
+                        <form action="{{ .DownloadZIP }}" method="get">
+                            <input type="submit" value="Download ZIP" />
+                        </form>
                         <form action="{{ .EditLink }}" method="get">
                             <input type="submit" value="Edit" />
                         </form>

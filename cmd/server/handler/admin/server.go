@@ -26,6 +26,8 @@ func NewAdminServer(db idb.Database, fs ifs.Filesystem) *http.ServeMux {
 	m.HandleFunc("POST /link/{id}/edit", handler.HandleWith500OnError(s.editLink))
 	m.HandleFunc("POST /link", handler.HandleWith500OnError(s.createLink))
 
+	m.HandleFunc("GET /link/{id}/zip", handler.HandleWith500OnError(s.downloadZIP))
+
 	m.HandleFunc("GET /link/{id}/file/{name}", handler.HandleWith500OnError(s.downloadFile))
 	m.HandleFunc("POST /link/{id}/file/{name}/delete", handler.HandleWith500OnError(s.deleteFile))
 

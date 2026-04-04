@@ -60,6 +60,7 @@ type LinkView struct {
 	ViewLink         string
 	DeleteLink       string
 	EditLink         string
+	DownloadZIP      string
 	UserDownloadable bool
 }
 
