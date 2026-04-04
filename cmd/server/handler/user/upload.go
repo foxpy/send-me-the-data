@@ -7,6 +7,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/flash"
 	"github.com/foxpy/send-me-the-data/cmd/server/handler"
@@ -62,7 +63,11 @@ func (s *UserServer) upload(w http.ResponseWriter, r *http.Request) error {
 
 	dirty := true
 	localFile, err := s.fs.CreateNewFile(id, fileName)
-	if err != nil {
+	if errors.Is(err, os.ErrExist) {
+		flash.AddFlash(w, flash.ErrorFlash, "This file already exists")
+		http.Redirect(w, r, fmt.Sprintf("/u/%s", id), http.StatusSeeOther)
+		return nil
+	} else if err != nil {
 		return fmt.Errorf("failed to create file %s for link %s: %w", fileName, id, err)
 	}
 
