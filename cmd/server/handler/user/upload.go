@@ -39,6 +39,11 @@ func (s *UserServer) upload(w http.ResponseWriter, r *http.Request) error {
 		_ = lock.Release()
 	}()
 
+	if uint64(header.Size) > lock.MaxFileSize() {
+		w.WriteHeader(http.StatusBadRequest)
+		return nil
+	}
+
 	fileJournalEntry := &idb.FileJournalEntry{
 		LinkExternalKey: id,
 		FileName:        fileName,

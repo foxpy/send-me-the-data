@@ -21,11 +21,13 @@
                 <input type="checkbox" name="user_downloadable" id="user_downloadable" />
                 <label for="user_downloadable">Users can download files</label>
             </div>
+            {{ template "file_size_picker.gohtml" "4294967296" }}
             <div>
                 <input type="submit" value="Create link" />
             </div>
         </form>
     </div>
+    <script src="/static/logarithmic_file_size_picker.js"></script>
 
     <h2>List of links</h2>
 
@@ -37,6 +39,7 @@
                     <th>Created at</th>
                     <th>Total files</th>
                     <th>Total size</th>
+                    <th>Maximum file size</th>
                     <th>Actions</th>
                     <!--TODO: admin should be able to see whether users can download files from each link-->
                 </tr>
@@ -48,6 +51,7 @@
                     <td>{{ .CreatedAt }}</td>
                     <td>{{ .TotalFiles }}</td>
                     <td>{{ .TotalSize }}</td>
+                    <td>{{ .MaxFileSize }}</td>
                     <td>
                         <form action="{{ .EditLink }}" method="get">
                             <input type="submit" value="Edit" />

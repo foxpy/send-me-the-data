@@ -22,11 +22,14 @@ func TestCreateLinkEmptyName(t *testing.T) {
 
 	// the application doesn't validate link name length, that's the job of the database.
 	// in real deployment, postgres would reject such a transaction.
-	db.MockExpectedCreateLinkCall("", "abcd", false, func() error {
+	db.MockExpectedCreateLinkCall("", "abcd", false, 0, func() error {
 		return errors.New("mocked postgresql error: link name length constraint validation failure")
 	})
 
-	req := httptest.NewRequest("POST", "/link", nil)
+	postValues := make(url.Values)
+	postValues.Add("max_file_size", "0")
+	req := httptest.NewRequest("POST", "/link", bytes.NewReader([]byte(postValues.Encode())))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	w := httptest.NewRecorder()
 
 	h.ServeHTTP(w, req)
@@ -49,10 +52,11 @@ func TestCreateLink(t *testing.T) {
 	h := NewAdminServer(db, fs)
 
 	db.MockGenerateRandomExternalKeyResponse("abcd")
-	db.MockExpectedCreateLinkCall("My Link", "abcd", false, nil)
+	db.MockExpectedCreateLinkCall("My Link", "abcd", false, 9000, nil)
 
 	postValues := make(url.Values)
 	postValues.Add("name", "My Link")
+	postValues.Add("max_file_size", "9000")
 	req := httptest.NewRequest("POST", "/link", bytes.NewReader([]byte(postValues.Encode())))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	w := httptest.NewRecorder()

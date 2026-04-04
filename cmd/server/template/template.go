@@ -24,6 +24,7 @@ type Params[T any] struct {
 }
 
 type UserViewLinkParams struct {
+	Link  LinkView
 	Files []FileView
 }
 
@@ -54,6 +55,8 @@ type LinkView struct {
 	CreatedAt        string
 	TotalFiles       int
 	TotalSize        string
+	MaxFileSize      string
+	MaxFileSizeBytes string
 	ViewLink         string
 	DeleteLink       string
 	EditLink         string

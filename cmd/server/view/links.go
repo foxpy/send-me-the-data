@@ -2,6 +2,7 @@ package view
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
@@ -21,9 +22,9 @@ func Links(db idb.Database, fs ifs.Filesystem) ([]template.LinkView, error) {
 			return nil, fmt.Errorf("failed to get all files for link %s: %w", link.ExternalKey, err)
 		}
 
-		var totalSize int64
+		var totalSize uint64
 		for _, file := range files {
-			totalSize += file.Size
+			totalSize += uint64(file.Size)
 		}
 
 		linkViews = append(linkViews, template.LinkView{
@@ -31,6 +32,8 @@ func Links(db idb.Database, fs ifs.Filesystem) ([]template.LinkView, error) {
 			CreatedAt:        link.CreatedAt.Format(DateTimeFormat),
 			TotalFiles:       len(files),
 			TotalSize:        bytesToHuman(totalSize),
+			MaxFileSize:      bytesToHuman(link.MaxFileSize),
+			MaxFileSizeBytes: strconv.Itoa(int(link.MaxFileSize)),
 			ViewLink:         fmt.Sprintf("/link/%s", link.ExternalKey),
 			DeleteLink:       fmt.Sprintf("/link/%s/delete", link.ExternalKey),
 			EditLink:         fmt.Sprintf("/link/%s/edit", link.ExternalKey),
@@ -48,9 +51,9 @@ func Link(linkLock idb.LinkRLock, fs ifs.Filesystem) (*template.LinkView, error)
 		return nil, fmt.Errorf("failed to get all files for link %s: %w", id, err)
 	}
 
-	var totalSize int64
+	var totalSize uint64
 	for _, file := range files {
-		totalSize += file.Size
+		totalSize += uint64(file.Size)
 	}
 
 	return &template.LinkView{
@@ -58,6 +61,8 @@ func Link(linkLock idb.LinkRLock, fs ifs.Filesystem) (*template.LinkView, error)
 		CreatedAt:        linkLock.CreatedAt().Format(DateTimeFormat),
 		TotalFiles:       len(files),
 		TotalSize:        bytesToHuman(totalSize),
+		MaxFileSize:      bytesToHuman(linkLock.MaxFileSize()),
+		MaxFileSizeBytes: strconv.Itoa(int(linkLock.MaxFileSize())),
 		ViewLink:         fmt.Sprintf("/link/%s", id),
 		DeleteLink:       fmt.Sprintf("/link/%s/delete", id),
 		EditLink:         fmt.Sprintf("/link/%s/edit", id),

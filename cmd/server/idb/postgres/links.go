@@ -12,6 +12,7 @@ type linkRLock struct {
 	name, externalKey string
 	userDownloadable  bool
 	createdAt         time.Time
+	maxFileSize       uint64
 	tx                *sql.Tx
 }
 
@@ -29,6 +30,10 @@ func (l linkRLock) ExternalKey() string {
 
 func (l linkRLock) CreatedAt() time.Time {
 	return l.createdAt
+}
+
+func (l linkRLock) MaxFileSize() uint64 {
+	return l.maxFileSize
 }
 
 func (l linkRLock) Release() error {
@@ -53,12 +58,13 @@ func (l linkWLock) DeleteLink() error {
 	return nil
 }
 
-func (l linkWLock) UpdateLink(name string, userDownloadable bool) error {
+func (l linkWLock) UpdateLink(name string, userDownloadable bool, maxFileSize uint64) error {
 	_, err := l.tx.Exec(
-		"UPDATE smtd.links SET name=$1, user_downloadable=$3 WHERE external_key = $2",
-		name,
+		"UPDATE smtd.links SET name=$2, user_downloadable=$3, max_file_size=$4 WHERE external_key = $1",
 		l.externalKey,
+		name,
 		userDownloadable,
+		maxFileSize,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to update link %s: %w", l.externalKey, err)
@@ -68,7 +74,7 @@ func (l linkWLock) UpdateLink(name string, userDownloadable bool) error {
 }
 
 func (d *Postgres) AllLinks() ([]idb.Link, error) {
-	rows, err := d.db.Query("SELECT name, external_key, created_at, user_downloadable FROM smtd.links")
+	rows, err := d.db.Query("SELECT name, external_key, created_at, user_downloadable, max_file_size FROM smtd.links")
 	if err != nil {
 		return nil, fmt.Errorf("failed to query links from the database: %w", err)
 	}
@@ -77,7 +83,7 @@ func (d *Postgres) AllLinks() ([]idb.Link, error) {
 	links := make([]idb.Link, 0)
 	for rows.Next() {
 		var link idb.Link
-		err = rows.Scan(&link.Name, &link.ExternalKey, &link.CreatedAt, &link.UserDownloadable)
+		err = rows.Scan(&link.Name, &link.ExternalKey, &link.CreatedAt, &link.UserDownloadable, &link.MaxFileSize)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan link from the database: %w", err)
 		}
@@ -93,12 +99,13 @@ func (d *Postgres) AllLinks() ([]idb.Link, error) {
 	return links, nil
 }
 
-func (d *Postgres) CreateLink(name, externalKey string, userDownloadable bool) error {
+func (d *Postgres) CreateLink(name, externalKey string, userDownloadable bool, maxFileSize uint64) error {
 	_, err := d.db.Exec(
-		"INSERT INTO smtd.links (name, external_key, user_downloadable) VALUES ($1, $2, $3)",
+		"INSERT INTO smtd.links (name, external_key, user_downloadable, max_file_size) VALUES ($1, $2, $3, $4)",
 		name,
 		externalKey,
 		userDownloadable,
+		maxFileSize,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create new link %s: %w", externalKey, err)
@@ -118,9 +125,9 @@ func (d *Postgres) AcquireLinkRLock(externalKey string) (idb.LinkRLock, error) {
 	lock.externalKey = externalKey
 
 	err = tx.QueryRow(
-		"SELECT name, user_downloadable, created_at FROM smtd.links WHERE external_key = $1 FOR SHARE",
+		"SELECT name, user_downloadable, created_at, max_file_size FROM smtd.links WHERE external_key = $1 FOR SHARE",
 		externalKey,
-	).Scan(&lock.name, &lock.userDownloadable, &lock.createdAt)
+	).Scan(&lock.name, &lock.userDownloadable, &lock.createdAt, &lock.maxFileSize)
 	if err != nil {
 		_ = tx.Rollback()
 		return nil, fmt.Errorf("failed to acquire read lock on link %s: %w", externalKey, err)

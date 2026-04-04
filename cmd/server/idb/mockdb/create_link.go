@@ -7,7 +7,7 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 )
 
-func (d *MockDB) CreateLink(name, externalKey string, userDownloadable bool) error {
+func (d *MockDB) CreateLink(name, externalKey string, userDownloadable bool, maxFileSize uint64) error {
 	if len(d.expectedCreateLinkCalls) == 0 {
 		panic("must mock expected CreateLink() call")
 	}
@@ -19,6 +19,7 @@ func (d *MockDB) CreateLink(name, externalKey string, userDownloadable bool) err
 		Name:             name,
 		ExternalKey:      externalKey,
 		UserDownloadable: userDownloadable,
+		MaxFileSize:      maxFileSize,
 	}
 
 	if !reflect.DeepEqual(mockedCall.link, actual) {
@@ -32,11 +33,12 @@ func (d *MockDB) CreateLink(name, externalKey string, userDownloadable bool) err
 	return mockedCall.resultFunc()
 }
 
-func (d *MockDB) MockExpectedCreateLinkCall(name, externalKey string, userDownloadable bool, mockedResult func() error) {
+func (d *MockDB) MockExpectedCreateLinkCall(name, externalKey string, userDownloadable bool, maxFileSize uint64, mockedResult func() error) {
 	link := idb.Link{
 		Name:             name,
 		ExternalKey:      externalKey,
 		UserDownloadable: userDownloadable,
+		MaxFileSize:      maxFileSize,
 	}
 	d.expectedCreateLinkCalls = append(d.expectedCreateLinkCalls, CreateLinkCall{
 		link:       link,

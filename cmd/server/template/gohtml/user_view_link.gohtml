@@ -14,14 +14,15 @@
     <div>
         <form enctype="multipart/form-data" action="" method="post">
             <div>
-                <label for="file">Select file to upload: </label>
-                <input type="file" name="file" id="file" required />
+                <label for="file">Select file to upload (size limit {{ .Data.Link.MaxFileSize }}): </label>
+                <input type="file" name="file" id="file" data-maxsize="{{ .Data.Link.MaxFileSizeBytes }}" required />
             </div>
             <div>
                 <input type="submit" value="Upload" />
             </div>
         </form>
     </div>
+    <script src="/static/file_size_validation.js"></script>
 
     <h2>List of files</h2>
 

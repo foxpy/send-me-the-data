@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/flash"
 	"github.com/lib/pq"
@@ -11,13 +12,19 @@ import (
 
 func (s *AdminServer) createLink(w http.ResponseWriter, r *http.Request) error {
 	name := r.FormValue("name")
+	maxFileSize, err := strconv.ParseUint(r.FormValue("max_file_size"), 10, 64)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return nil
+	}
+
 	externalKey := s.db.GenerateRandomExternalKey()
 	userDownloadable := false
 	if r.FormValue("user_downloadable") == "on" {
 		userDownloadable = true
 	}
 
-	err := s.db.CreateLink(name, externalKey, userDownloadable)
+	err = s.db.CreateLink(name, externalKey, userDownloadable, maxFileSize)
 	var pqErr *pq.Error
 	if errors.As(err, &pqErr) && pqErr.Code.Name() == "unique_violation" {
 		// hopefully should never happen because externalKey collision chance is very low

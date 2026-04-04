@@ -24,6 +24,7 @@
                 />
                 <label for="user_downloadable">Users can download files</label>
             </div>
+            {{ template "file_size_picker.gohtml" .MaxFileSizeBytes }}
             <div>
                 <input type="submit" value="Save" />
             </div>
@@ -32,6 +33,7 @@
             <input type="submit" value="Cancel">
         </form>
     </div>
+    <script src="/static/logarithmic_file_size_picker.js"></script>
 </body>
 {{end}}
 

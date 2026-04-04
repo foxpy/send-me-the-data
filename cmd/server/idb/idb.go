@@ -10,7 +10,7 @@ type Database interface {
 	CreateFileJournalEntry(*FileJournalEntry) error
 	// FIXME: do not read all links from database, use pagination instead
 	AllLinks() ([]Link, error)
-	CreateLink(name, externalKey string, userDownloadable bool) error
+	CreateLink(name, externalKey string, userDownloadable bool, maxFileSize uint64) error
 	AcquireLinkRLock(externalKey string) (LinkRLock, error)
 	AcquireLinkWLock(externalKey string) (LinkWLock, error)
 	// TODO: this function doesn't really belong here
@@ -26,6 +26,7 @@ type Link struct {
 	Name, ExternalKey string
 	CreatedAt         time.Time
 	UserDownloadable  bool
+	MaxFileSize       uint64
 }
 
 type LinkRLock interface {
@@ -33,11 +34,12 @@ type LinkRLock interface {
 	Name() string
 	CreatedAt() time.Time
 	ExternalKey() string
+	MaxFileSize() uint64
 	Release() error
 }
 
 type LinkWLock interface {
-	UpdateLink(name string, userDownloadable bool) error
+	UpdateLink(name string, userDownloadable bool, maxFileSize uint64) error
 	DeleteLink() error
 	Release() error
 }

@@ -5,13 +5,13 @@ import "fmt"
 // TODO: maybe I will switch to CSR for timestamps, showing time in user's local time zone
 const DateTimeFormat = "Jan 2 15:04:05 MST 2006"
 
-func bytesToHuman(bytes int64) string {
+func bytesToHuman(bytes uint64) string {
 	b := float64(bytes)
 	sizes := []struct {
 		name, format string
 	}{
 		{"bytes", "%.0f %s"},
-		{"KiB", "%.2f %s"},
+		{"KiB", "%.2f %s"}, // TODO: I would like to omit .00 if the value is an integer
 		{"MiB", "%.2f %s"},
 		{"GiB", "%.2f %s"},
 		{"TiB", "%.2f %s"},

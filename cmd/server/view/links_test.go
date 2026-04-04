@@ -32,6 +32,7 @@ func TestLinks(t *testing.T) {
 				ExternalKey:      "abcd",
 				CreatedAt:        zeroTime,
 				UserDownloadable: false,
+				MaxFileSize:      100,
 			}},
 			files: []testutil.LinkFiles{
 				{
@@ -45,6 +46,8 @@ func TestLinks(t *testing.T) {
 					CreatedAt:        "Jan 1 00:00:00 UTC 1970",
 					TotalFiles:       0,
 					TotalSize:        "0 bytes",
+					MaxFileSize:      "100 bytes",
+					MaxFileSizeBytes: "100",
 					ViewLink:         "/link/abcd",
 					DeleteLink:       "/link/abcd/delete",
 					EditLink:         "/link/abcd/edit",
@@ -59,6 +62,7 @@ func TestLinks(t *testing.T) {
 				ExternalKey:      "abcd",
 				CreatedAt:        zeroTime,
 				UserDownloadable: true,
+				MaxFileSize:      10240,
 			}},
 			files: []testutil.LinkFiles{
 				{
@@ -83,6 +87,8 @@ func TestLinks(t *testing.T) {
 					CreatedAt:        "Jan 1 00:00:00 UTC 1970",
 					TotalFiles:       2,
 					TotalSize:        "600 bytes",
+					MaxFileSize:      "10.00 KiB",
+					MaxFileSizeBytes: "10240",
 					ViewLink:         "/link/abcd",
 					DeleteLink:       "/link/abcd/delete",
 					EditLink:         "/link/abcd/edit",
@@ -98,12 +104,14 @@ func TestLinks(t *testing.T) {
 					ExternalKey:      "abcd",
 					CreatedAt:        zeroTime,
 					UserDownloadable: false,
+					MaxFileSize:      10240,
 				},
 				{
 					Name:             "test 2",
 					ExternalKey:      "bcde",
 					CreatedAt:        zeroTime,
 					UserDownloadable: false,
+					MaxFileSize:      100,
 				},
 			},
 			files: []testutil.LinkFiles{
@@ -133,6 +141,8 @@ func TestLinks(t *testing.T) {
 					CreatedAt:        "Jan 1 00:00:00 UTC 1970",
 					TotalFiles:       2,
 					TotalSize:        "600 bytes",
+					MaxFileSize:      "10.00 KiB",
+					MaxFileSizeBytes: "10240",
 					ViewLink:         "/link/abcd",
 					DeleteLink:       "/link/abcd/delete",
 					EditLink:         "/link/abcd/edit",
@@ -143,6 +153,8 @@ func TestLinks(t *testing.T) {
 					CreatedAt:        "Jan 1 00:00:00 UTC 1970",
 					TotalFiles:       0,
 					TotalSize:        "0 bytes",
+					MaxFileSize:      "100 bytes",
+					MaxFileSizeBytes: "100",
 					ViewLink:         "/link/bcde",
 					DeleteLink:       "/link/bcde/delete",
 					EditLink:         "/link/bcde/edit",

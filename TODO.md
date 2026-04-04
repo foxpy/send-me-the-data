@@ -17,7 +17,7 @@
   - [x] Link management page
     - [ ] with link management endpoints:
       - [x] create
-        - [ ] set maximum file size
+        - [x] set maximum file size
         - [ ] DIFFICULT: set maximum total file size
       - [x] edit
       - [x] delete

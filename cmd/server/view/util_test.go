@@ -10,7 +10,7 @@ var zeroTime = time.UnixMicro(0).UTC()
 func TestBytesToHuman(t *testing.T) {
 	for _, tc := range []struct {
 		name  string
-		bytes int64
+		bytes uint64
 		human string
 	}{
 
