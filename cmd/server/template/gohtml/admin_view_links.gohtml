@@ -40,8 +40,8 @@
                     <th>Total files</th>
                     <th>Total size</th>
                     <th>Maximum file size</th>
+                    <th>Users can download files</th>
                     <th>Actions</th>
-                    <!--TODO: admin should be able to see whether users can download files from each link-->
                 </tr>
             </thead>
             <tbody>
@@ -52,6 +52,7 @@
                     <td>{{ .TotalFiles }}</td>
                     <td>{{ .TotalSize }}</td>
                     <td>{{ .MaxFileSize }}</td>
+                    <td>{{ if .UserDownloadable }}yes{{ else }}no{{ end }}</td>
                     <td>
                         <form action="{{ .DownloadZIP }}" method="get">
                             <input type="submit" value="ZIP" />
