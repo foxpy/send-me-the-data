@@ -19,6 +19,16 @@ th, td {
     word-break: break-all;
 }
 
+th div {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+th div p {
+    margin: 0;
+}
+
 form {
     display: inline-block;
 }

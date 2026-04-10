@@ -28,7 +28,7 @@
 
 - [ ] Tests
 - [x] favicon
-- [ ] use tooltips to make UI tables not as wide
+- [x] use tooltips to make UI tables not as wide
 
 File storage:
 - [x] $PREFIX is configurable and tells the server where to dump files to
