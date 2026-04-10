@@ -48,7 +48,7 @@
                 {{ range .Data.Links }}
                 <tr>
                     <td><a href="{{ .ViewLink }}">{{ .Name }}</a></td>
-                    <td>{{ .CreatedAt }}</td>
+                    <td><span class="timestamp">{{ .CreatedAt }}</span></td>
                     <td>{{ .TotalFiles }}</td>
                     <td>{{ .TotalSize }}</td>
                     <td>{{ .MaxFileSize }}</td>
@@ -73,6 +73,7 @@
             </tbody>
         </table>
     </div>
+    <script src="/static/format_timestamps.js"></script>
 </body>
 
 </html>

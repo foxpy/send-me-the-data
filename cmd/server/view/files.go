@@ -22,7 +22,7 @@ func Files(fs ifs.Filesystem, linkID string, renderDownloadLinks bool) ([]templa
 
 		fileViews = append(fileViews, template.FileView{
 			Name:         file.Name,
-			UploadedAt:   file.ModTime.Format(DateTimeFormat),
+			UploadedAt:   uint64(file.ModTime.UnixMilli()),
 			Size:         bytesToHuman(uint64(file.Size)),
 			DownloadLink: downloadLink,
 			DeleteLink:   fmt.Sprintf("/link/%s/file/%s/delete", linkID, file.Name),

@@ -43,7 +43,7 @@ type AdminViewLinksParams struct {
 
 type FileView struct {
 	Name       string
-	UploadedAt string
+	UploadedAt uint64
 	Size       string
 	// TODO: actually, let's make separate 'AdminDownloadLink' and 'UserDownloadLink'
 	DownloadLink string
@@ -52,7 +52,7 @@ type FileView struct {
 
 type LinkView struct {
 	Name             string
-	CreatedAt        string
+	CreatedAt        uint64
 	TotalFiles       int
 	TotalSize        string
 	MaxFileSize      string

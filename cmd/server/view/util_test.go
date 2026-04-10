@@ -5,7 +5,8 @@ import (
 	"time"
 )
 
-var zeroTime = time.UnixMicro(0).UTC()
+var mockTime = time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
+var mockTimeMilli = uint64(mockTime.UTC().UnixMilli())
 
 func TestBytesToHuman(t *testing.T) {
 	for _, tc := range []struct {

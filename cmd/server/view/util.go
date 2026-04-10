@@ -2,9 +2,6 @@ package view
 
 import "fmt"
 
-// TODO: maybe I will switch to CSR for timestamps, showing time in user's local time zone
-const DateTimeFormat = "Jan 2 15:04:05 MST 2006"
-
 func bytesToHuman(bytes uint64) string {
 	b := float64(bytes)
 	sizes := []struct {

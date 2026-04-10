@@ -45,13 +45,14 @@
                         {{ .Name }}
                         {{ end }}
                     </td>
-                    <td>{{ .UploadedAt }}</td>
+                    <td><span class="timestamp">{{ .UploadedAt }}</span></td>
                     <td>{{ .Size }}</td>
                 </tr>
                 {{ end }}
             </tbody>
         </table>
     </div>
+    <script src="/static/format_timestamps.js"></script>
 </body>
 
 </html>

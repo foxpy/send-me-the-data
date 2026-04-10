@@ -30,7 +30,7 @@ func TestLinks(t *testing.T) {
 			links: []idb.Link{{
 				Name:             "test 1",
 				ExternalKey:      "abcd",
-				CreatedAt:        zeroTime,
+				CreatedAt:        mockTime,
 				UserDownloadable: false,
 				MaxFileSize:      100,
 			}},
@@ -43,7 +43,7 @@ func TestLinks(t *testing.T) {
 			res: []template.LinkView{
 				{
 					Name:             "test 1",
-					CreatedAt:        "Jan 1 00:00:00 UTC 1970",
+					CreatedAt:        mockTimeMilli,
 					TotalFiles:       0,
 					TotalSize:        "0 bytes",
 					MaxFileSize:      "100 bytes",
@@ -51,6 +51,7 @@ func TestLinks(t *testing.T) {
 					ViewLink:         "/link/abcd",
 					DeleteLink:       "/link/abcd/delete",
 					EditLink:         "/link/abcd/edit",
+					DownloadZIP:      "/link/abcd/zip",
 					UserDownloadable: false,
 				},
 			},
@@ -60,7 +61,7 @@ func TestLinks(t *testing.T) {
 			links: []idb.Link{{
 				Name:             "test 1",
 				ExternalKey:      "abcd",
-				CreatedAt:        zeroTime,
+				CreatedAt:        mockTime,
 				UserDownloadable: true,
 				MaxFileSize:      10240,
 			}},
@@ -71,12 +72,12 @@ func TestLinks(t *testing.T) {
 						{
 							Name:    "file 1",
 							Size:    100,
-							ModTime: zeroTime,
+							ModTime: mockTime,
 						},
 						{
 							Name:    "file 2",
 							Size:    500,
-							ModTime: zeroTime,
+							ModTime: mockTime,
 						},
 					},
 				},
@@ -84,7 +85,7 @@ func TestLinks(t *testing.T) {
 			res: []template.LinkView{
 				{
 					Name:             "test 1",
-					CreatedAt:        "Jan 1 00:00:00 UTC 1970",
+					CreatedAt:        mockTimeMilli,
 					TotalFiles:       2,
 					TotalSize:        "600 bytes",
 					MaxFileSize:      "10.00 KiB",
@@ -92,6 +93,7 @@ func TestLinks(t *testing.T) {
 					ViewLink:         "/link/abcd",
 					DeleteLink:       "/link/abcd/delete",
 					EditLink:         "/link/abcd/edit",
+					DownloadZIP:      "/link/abcd/zip",
 					UserDownloadable: true,
 				},
 			},
@@ -102,14 +104,14 @@ func TestLinks(t *testing.T) {
 				{
 					Name:             "test 1",
 					ExternalKey:      "abcd",
-					CreatedAt:        zeroTime,
+					CreatedAt:        mockTime,
 					UserDownloadable: false,
 					MaxFileSize:      10240,
 				},
 				{
 					Name:             "test 2",
 					ExternalKey:      "bcde",
-					CreatedAt:        zeroTime,
+					CreatedAt:        mockTime,
 					UserDownloadable: false,
 					MaxFileSize:      100,
 				},
@@ -121,12 +123,12 @@ func TestLinks(t *testing.T) {
 						{
 							Name:    "file 1",
 							Size:    100,
-							ModTime: zeroTime,
+							ModTime: mockTime,
 						},
 						{
 							Name:    "file 2",
 							Size:    500,
-							ModTime: zeroTime,
+							ModTime: mockTime,
 						},
 					},
 				},
@@ -138,7 +140,7 @@ func TestLinks(t *testing.T) {
 			res: []template.LinkView{
 				{
 					Name:             "test 1",
-					CreatedAt:        "Jan 1 00:00:00 UTC 1970",
+					CreatedAt:        mockTimeMilli,
 					TotalFiles:       2,
 					TotalSize:        "600 bytes",
 					MaxFileSize:      "10.00 KiB",
@@ -146,11 +148,12 @@ func TestLinks(t *testing.T) {
 					ViewLink:         "/link/abcd",
 					DeleteLink:       "/link/abcd/delete",
 					EditLink:         "/link/abcd/edit",
+					DownloadZIP:      "/link/abcd/zip",
 					UserDownloadable: false,
 				},
 				{
 					Name:             "test 2",
-					CreatedAt:        "Jan 1 00:00:00 UTC 1970",
+					CreatedAt:        mockTimeMilli,
 					TotalFiles:       0,
 					TotalSize:        "0 bytes",
 					MaxFileSize:      "100 bytes",
@@ -158,6 +161,7 @@ func TestLinks(t *testing.T) {
 					ViewLink:         "/link/bcde",
 					DeleteLink:       "/link/bcde/delete",
 					EditLink:         "/link/bcde/edit",
+					DownloadZIP:      "/link/bcde/zip",
 					UserDownloadable: false,
 				},
 			},

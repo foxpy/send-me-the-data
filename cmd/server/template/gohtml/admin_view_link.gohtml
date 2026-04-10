@@ -14,7 +14,7 @@
 
     <!--TODO: maybe I don't need a separate edit page and can just put edit form here-->
     <p>
-        Created at {{ .CreatedAt }}<br />
+        Created at <span class="timestamp">{{ .CreatedAt }}</span><br />
         Uploaded files: {{ .TotalFiles }} ({{ .TotalSize }} total)<br />
         Maximum file size: {{ .MaxFileSize }}<br />
         Users can download files: {{ if .UserDownloadable }}yes{{ else }}no{{ end }}
@@ -46,7 +46,7 @@
                 {{ range .Data.Files }}
                 <tr>
                     <td><a href="{{ .DownloadLink }}">{{ .Name }}</a></td>
-                    <td>{{ .UploadedAt }}</td>
+                    <td><span class="timestamp">{{ .UploadedAt }}</span></td>
                     <td>{{ .Size }}</td>
                     <td>
                         <form action="{{ .DeleteLink }}" method="post">
@@ -58,6 +58,7 @@
             </tbody>
         </table>
     </div>
+    <script src="/static/format_timestamps.js"></script>
 </body>
 
 </html>

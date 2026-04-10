@@ -29,7 +29,7 @@ func Links(db idb.Database, fs ifs.Filesystem) ([]template.LinkView, error) {
 
 		linkViews = append(linkViews, template.LinkView{
 			Name:             link.Name,
-			CreatedAt:        link.CreatedAt.Format(DateTimeFormat),
+			CreatedAt:        uint64(link.CreatedAt.UnixMilli()),
 			TotalFiles:       len(files),
 			TotalSize:        bytesToHuman(totalSize),
 			MaxFileSize:      bytesToHuman(link.MaxFileSize),
@@ -59,7 +59,7 @@ func Link(linkLock idb.LinkRLock, fs ifs.Filesystem) (*template.LinkView, error)
 
 	return &template.LinkView{
 		Name:             linkLock.Name(),
-		CreatedAt:        linkLock.CreatedAt().Format(DateTimeFormat),
+		CreatedAt:        uint64(linkLock.CreatedAt().UnixMilli()),
 		TotalFiles:       len(files),
 		TotalSize:        bytesToHuman(totalSize),
 		MaxFileSize:      bytesToHuman(linkLock.MaxFileSize()),
