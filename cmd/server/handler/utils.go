@@ -10,8 +10,6 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/template"
 )
 
-// TODO: implement logging middleware for user and admin servers
-
 //go:embed static/*
 var Static embed.FS
 

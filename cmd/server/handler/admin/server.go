@@ -13,7 +13,7 @@ type AdminServer struct {
 	fs ifs.Filesystem
 }
 
-func NewAdminServer(db idb.Database, fs ifs.Filesystem) *http.ServeMux {
+func NewAdminServer(db idb.Database, fs ifs.Filesystem) http.Handler {
 	s := AdminServer{db, fs}
 	m := http.NewServeMux()
 
@@ -32,5 +32,5 @@ func NewAdminServer(db idb.Database, fs ifs.Filesystem) *http.ServeMux {
 	m.HandleFunc("POST /link/{id}/file/{name}/delete", handler.HandleWith500OnError(s.deleteFile))
 
 	m.Handle("GET /static/", http.FileServerFS(handler.Static))
-	return m
+	return handler.WithLogger(m, "admin")
 }
