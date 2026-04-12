@@ -10,22 +10,21 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/template"
 )
 
+// TODO: implement logging middleware for user and admin servers
+
 //go:embed static/*
 var Static embed.FS
 
 type Handler func(http.ResponseWriter, *http.Request) error
 
-func Respond404(w http.ResponseWriter) error {
-	w.WriteHeader(http.StatusNotFound)
-	return template.Render404(w)
-}
-
-func Respond500(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusInternalServerError)
-	err := template.Render500(w)
+func RespondError(w http.ResponseWriter, code int) error {
+	w.WriteHeader(code)
+	err := template.RenderError(w, code)
 	if err != nil {
-		slog.Error("failed to write 500 response", "error", err)
+		slog.Error("failed to write error response", "code", code, "error", err)
 	}
+
+	return nil
 }
 
 func HandleWith500OnError(h Handler) http.HandlerFunc {
@@ -33,7 +32,7 @@ func HandleWith500OnError(h Handler) http.HandlerFunc {
 		err := h(w, r)
 		if err != nil {
 			slog.Error("handler failed", "error", err)
-			Respond500(w)
+			_ = RespondError(w, http.StatusInternalServerError)
 		}
 	}
 }

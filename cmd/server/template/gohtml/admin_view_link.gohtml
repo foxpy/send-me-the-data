@@ -45,7 +45,7 @@
             <tbody>
                 {{ range .Data.Files }}
                 <tr>
-                    <td><a href="{{ .DownloadLink }}">{{ .Name }}</a></td>
+                    <td><a href="{{ .AdminDownloadLink }}">{{ .Name }}</a></td>
                     <td><span class="timestamp">{{ .UploadedAt }}</span></td>
                     <td>{{ .Size }}</td>
                     <td>

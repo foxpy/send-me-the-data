@@ -15,7 +15,7 @@ func (s *AdminServer) editLinkPage(w http.ResponseWriter, r *http.Request) error
 	id := r.PathValue("id")
 	lock, err := s.db.AcquireLinkRLock(id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return handler.Respond404(w)
+		return handler.RespondError(w, http.StatusNotFound)
 	} else if err != nil {
 		return fmt.Errorf("failed to acquire read lock on link %s: %w", id, err)
 	}

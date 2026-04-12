@@ -39,8 +39,8 @@
                 {{ range .Data.Files }}
                 <tr>
                     <td>
-                        {{ if .DownloadLink }}
-                        <a href="{{ .DownloadLink }}">{{ .Name }}</a>
+                        {{ if .UserDownloadLink }}
+                        <a href="{{ .UserDownloadLink }}">{{ .Name }}</a>
                         {{ else }}
                         {{ .Name }}
                         {{ end }}

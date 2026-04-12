@@ -16,12 +16,11 @@ type UserServer struct {
 func NewUserServer(db idb.Database, fs ifs.Filesystem) *http.ServeMux {
 	s := UserServer{db, fs}
 	m := http.NewServeMux()
-	// TODO: I want user links to be as short as possible. Ideally, each link should look like this:
-	//       Link: /{id}
-	//       File: /{id}/{name}
+	// TODO: I want to make user links even shorter, and for that I will have to implement my own mux,
+	//       which matches /static/ and /{id} and selects a corresponding handler
 	m.HandleFunc("GET /u/{id}", handler.HandleWith500OnError(s.viewLinkPage))
 	m.HandleFunc("POST /u/{id}", handler.HandleWith500OnError(s.upload))
-	m.HandleFunc("GET /link/{id}/file/{name}", handler.HandleWith500OnError(s.downloadFile))
+	m.HandleFunc("GET /u/{id}/{name}", handler.HandleWith500OnError(s.downloadFile))
 	m.Handle("GET /static/", http.FileServerFS(handler.Static))
 	return m
 }

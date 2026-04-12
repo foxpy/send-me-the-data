@@ -22,7 +22,7 @@ func (s *AdminServer) downloadFile(w http.ResponseWriter, r *http.Request) error
 
 	file, err := prepareDownloadFile(s.db, s.fs, id, name)
 	if errors.Is(err, sql.ErrNoRows) {
-		return handler.Respond404(w)
+		return handler.RespondError(w, http.StatusNotFound)
 	} else if err != nil {
 		return fmt.Errorf("failed to prepare file %s in link %s for serving: %w", name, id, err)
 	}

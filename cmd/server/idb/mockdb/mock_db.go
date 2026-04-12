@@ -10,6 +10,7 @@ type MockDB struct {
 	allLinksResponse           []idb.Link
 	randomExternalKeyResponses []string
 	expectedCreateLinkCalls    []CreateLinkCall
+	acquireLinkRLockResponses  map[string]idb.LinkRLock
 }
 
 type CreateLinkCall struct {
@@ -20,7 +21,9 @@ type CreateLinkCall struct {
 var _ idb.Database = &MockDB{}
 
 func NewMockDB() *MockDB {
-	return &MockDB{}
+	return &MockDB{
+		acquireLinkRLockResponses: make(map[string]idb.LinkRLock),
+	}
 }
 
 func (d *MockDB) CheckAllExpects() {
@@ -39,10 +42,6 @@ func (d *MockDB) DeleteFileJournalEntry(*idb.FileJournalEntry) error {
 }
 
 func (d *MockDB) CreateFileJournalEntry(*idb.FileJournalEntry) error {
-	panic("TODO")
-}
-
-func (d *MockDB) AcquireLinkRLock(externalKey string) (idb.LinkRLock, error) {
 	panic("TODO")
 }
 

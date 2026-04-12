@@ -23,7 +23,7 @@ func (s *AdminServer) deleteLink(w http.ResponseWriter, r *http.Request) error {
 	// finished downloading. Still not perfect, but much better.
 	lock, err := s.db.AcquireLinkWLock(id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return handler.Respond404(w)
+		return handler.RespondError(w, http.StatusNotFound)
 	} else if err != nil {
 		return fmt.Errorf("failed to acquire write lock for link %s: %w", id, err)
 	}

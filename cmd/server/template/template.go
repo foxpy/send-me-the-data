@@ -42,12 +42,12 @@ type AdminViewLinksParams struct {
 }
 
 type FileView struct {
-	Name       string
-	UploadedAt uint64
-	Size       string
-	// TODO: actually, let's make separate 'AdminDownloadLink' and 'UserDownloadLink'
-	DownloadLink string
-	DeleteLink   string
+	Name              string
+	UploadedAt        uint64
+	Size              string
+	AdminDownloadLink string
+	UserDownloadLink  string
+	DeleteLink        string
 }
 
 type LinkView struct {
@@ -79,12 +79,8 @@ func renderHelper(w http.ResponseWriter, templateName string, data any) error {
 	return nil
 }
 
-func Render404(w http.ResponseWriter) error {
-	return renderHelper(w, "404.gohtml", nil)
-}
-
-func Render500(w http.ResponseWriter) error {
-	return renderHelper(w, "500.gohtml", nil)
+func RenderError(w http.ResponseWriter, code int) error {
+	return renderHelper(w, "error.gohtml", fmt.Sprintf("%d %s", code, http.StatusText(code)))
 }
 
 func RenderUserViewLink(w http.ResponseWriter, params Params[UserViewLinkParams]) error {

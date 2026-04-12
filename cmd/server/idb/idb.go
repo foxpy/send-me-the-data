@@ -22,6 +22,9 @@ type FileJournalEntry struct {
 	FileName        string
 }
 
+// TODO: I think it is better to make Link an interface, too,
+//       as it will allow me to erase a lot of repeating boilerplate
+
 type Link struct {
 	Name, ExternalKey string
 	CreatedAt         time.Time

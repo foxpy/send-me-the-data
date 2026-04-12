@@ -18,7 +18,7 @@ func (s *AdminServer) viewLinkPage(w http.ResponseWriter, r *http.Request) error
 	id := r.PathValue("id")
 	title, files, link, err := prepareFilesView(s.db, s.fs, id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return handler.Respond404(w)
+		return handler.RespondError(w, http.StatusNotFound)
 	} else if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func prepareFilesView(db idb.Database, fs ifs.Filesystem, id string) (string, []
 		_ = lock.Release()
 	}()
 
-	files, err := view.Files(fs, id, true)
+	files, err := view.Files(fs, lock)
 	if err != nil {
 		return "", nil, nil, fmt.Errorf("failed to get files view for link %s: %w", id, err)
 	}

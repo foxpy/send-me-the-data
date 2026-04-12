@@ -13,6 +13,8 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 )
 
+var errForbidden = errors.New("user cannot download files from this link")
+
 func (s *UserServer) downloadFile(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
 	name, err := handler.SanitizeFileName(r.PathValue("name"))
@@ -22,7 +24,9 @@ func (s *UserServer) downloadFile(w http.ResponseWriter, r *http.Request) error 
 
 	file, err := prepareDownloadFile(s.db, s.fs, id, name)
 	if errors.Is(err, sql.ErrNoRows) {
-		return handler.Respond404(w)
+		return handler.RespondError(w, http.StatusNotFound)
+	} else if errors.Is(err, errForbidden) {
+		return handler.RespondError(w, http.StatusForbidden)
 	} else if err != nil {
 		return fmt.Errorf("failed to prepare file %s in link %s for serving: %w", name, id, err)
 	}
@@ -48,7 +52,7 @@ func prepareDownloadFile(db idb.Database, fs ifs.Filesystem, id, name string) (i
 	}()
 
 	if !lock.UserDownloadable() {
-		return nil, errors.New("user cannot download files from this link")
+		return nil, errForbidden
 	}
 
 	linkFS, err := fs.LinkFS(id)

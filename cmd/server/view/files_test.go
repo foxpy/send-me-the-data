@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/foxpy/send-me-the-data/cmd/server/idb/mockdb"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs/mockfs"
 	"github.com/foxpy/send-me-the-data/cmd/server/template"
@@ -12,16 +13,20 @@ import (
 
 func TestFiles(t *testing.T) {
 	for _, tc := range []struct {
-		desc                string
-		linkID              string
-		renderDownloadLinks bool
-		files               []testutil.LinkFiles
-		res                 []template.FileView
+		desc             string
+		linkID           string
+		linkName         string
+		userDownloadable bool
+		maxFileSize      uint64
+		files            []testutil.LinkFiles
+		res              []template.FileView
 	}{
 		{
-			desc:                "no files",
-			linkID:              "abcd",
-			renderDownloadLinks: false,
+			desc:             "no files",
+			linkID:           "abcd",
+			linkName:         "My Link",
+			userDownloadable: false,
+			maxFileSize:      4096,
 			files: []testutil.LinkFiles{{
 				Name:  "abcd",
 				Files: []ifs.File{},
@@ -29,9 +34,11 @@ func TestFiles(t *testing.T) {
 			res: []template.FileView{},
 		},
 		{
-			desc:                "one file",
-			linkID:              "abcd",
-			renderDownloadLinks: false,
+			desc:             "one file",
+			linkID:           "abcd",
+			linkName:         "My Link",
+			userDownloadable: false,
+			maxFileSize:      4096,
 			files: []testutil.LinkFiles{{
 				Name: "abcd",
 				Files: []ifs.File{{
@@ -41,17 +48,20 @@ func TestFiles(t *testing.T) {
 				}},
 			}},
 			res: []template.FileView{{
-				Name:         "file 1",
-				UploadedAt:   mockTimeMilli,
-				Size:         "1.00 KiB",
-				DownloadLink: "",
-				DeleteLink:   "/link/abcd/file/file 1/delete",
+				Name:              "file 1",
+				UploadedAt:        mockTimeMilli,
+				Size:              "1.00 KiB",
+				AdminDownloadLink: "/link/abcd/file/file 1",
+				UserDownloadLink:  "",
+				DeleteLink:        "/link/abcd/file/file 1/delete",
 			}},
 		},
 		{
-			desc:                "render download link",
-			linkID:              "abcd",
-			renderDownloadLinks: true,
+			desc:             "user downloadable",
+			linkID:           "abcd",
+			linkName:         "My Link",
+			userDownloadable: true,
+			maxFileSize:      4096,
 			files: []testutil.LinkFiles{{
 				Name: "abcd",
 				Files: []ifs.File{{
@@ -61,17 +71,20 @@ func TestFiles(t *testing.T) {
 				}},
 			}},
 			res: []template.FileView{{
-				Name:         "file 1",
-				UploadedAt:   mockTimeMilli,
-				Size:         "1.00 KiB",
-				DownloadLink: "/link/abcd/file/file 1",
-				DeleteLink:   "/link/abcd/file/file 1/delete",
+				Name:              "file 1",
+				UploadedAt:        mockTimeMilli,
+				Size:              "1.00 KiB",
+				AdminDownloadLink: "/link/abcd/file/file 1",
+				UserDownloadLink:  "/u/abcd/file 1",
+				DeleteLink:        "/link/abcd/file/file 1/delete",
 			}},
 		},
 		{
-			desc:                "many files",
-			linkID:              "abcd",
-			renderDownloadLinks: false,
+			desc:             "many files",
+			linkID:           "abcd",
+			linkName:         "My Link",
+			userDownloadable: false,
+			maxFileSize:      4096,
 			files: []testutil.LinkFiles{{
 				Name: "abcd",
 				Files: []ifs.File{
@@ -94,37 +107,47 @@ func TestFiles(t *testing.T) {
 			}},
 			res: []template.FileView{
 				{
-					Name:         "file 1",
-					UploadedAt:   mockTimeMilli,
-					Size:         "1.00 KiB",
-					DownloadLink: "",
-					DeleteLink:   "/link/abcd/file/file 1/delete",
+					Name:              "file 1",
+					UploadedAt:        mockTimeMilli,
+					Size:              "1.00 KiB",
+					AdminDownloadLink: "/link/abcd/file/file 1",
+					UserDownloadLink:  "",
+					DeleteLink:        "/link/abcd/file/file 1/delete",
 				},
 				{
-					Name:         "file 2",
-					UploadedAt:   mockTimeMilli,
-					Size:         "512 bytes",
-					DownloadLink: "",
-					DeleteLink:   "/link/abcd/file/file 2/delete",
+					Name:              "file 2",
+					UploadedAt:        mockTimeMilli,
+					Size:              "512 bytes",
+					AdminDownloadLink: "/link/abcd/file/file 2",
+					UserDownloadLink:  "",
+					DeleteLink:        "/link/abcd/file/file 2/delete",
 				},
 				{
-					Name:         "file 3",
-					UploadedAt:   mockTimeMilli,
-					Size:         "512 bytes",
-					DownloadLink: "",
-					DeleteLink:   "/link/abcd/file/file 3/delete",
+					Name:              "file 3",
+					UploadedAt:        mockTimeMilli,
+					Size:              "512 bytes",
+					AdminDownloadLink: "/link/abcd/file/file 3",
+					UserDownloadLink:  "",
+					DeleteLink:        "/link/abcd/file/file 3/delete",
 				},
 			},
 		},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
+			db := mockdb.NewMockDB()
 			fs := mockfs.NewMockFS()
+
+			db.SetAcquireLinkRLockResponse(tc.linkID, tc.linkName, mockTime, tc.userDownloadable, tc.maxFileSize)
+			lock, err := db.AcquireLinkRLock(tc.linkID)
+			if err != nil {
+				t.Fatal(err)
+			}
 
 			for _, f := range tc.files {
 				fs.SetListLinkFilesResponse(f.Name, f.Files)
 			}
 
-			fileViews, err := Files(fs, tc.linkID, tc.renderDownloadLinks)
+			fileViews, err := Files(fs, lock)
 			if err != nil {
 				t.Fatalf("%s", err)
 			}
