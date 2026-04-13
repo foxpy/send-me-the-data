@@ -5,7 +5,7 @@ MIGRATIONS = "cmd/server/idb/postgres/migrations/"
 
 start-server:
 	POSTGRES_URL="$(DB_URL)" \
-	PREFIX="/home/foxpy/send-me-the-data/dump" \
+	PREFIX="./dump" \
 	go run ./cmd/server
 
 test:
