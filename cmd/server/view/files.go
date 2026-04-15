@@ -19,7 +19,7 @@ func Files(fs ifs.Filesystem, lock idb.LinkRLock) ([]template.FileView, error) {
 	for _, file := range files {
 		userDownloadLink := ""
 		if lock.UserDownloadable() {
-			userDownloadLink = fmt.Sprintf("/u/%s/%s", linkID, file.Name)
+			userDownloadLink = fmt.Sprintf("/%s/%s", linkID, file.Name)
 		}
 
 		fileViews = append(fileViews, template.FileView{

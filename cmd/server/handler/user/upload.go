@@ -90,6 +90,6 @@ func (s *UserServer) upload(w http.ResponseWriter, r *http.Request) error {
 	dirty = false
 
 	flash.AddFlash(w, flash.SuccessFlash, "File uploaded successfully")
-	http.Redirect(w, r, fmt.Sprintf("/u/%s", id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/%s", id), http.StatusSeeOther)
 	return nil
 }
