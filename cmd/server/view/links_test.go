@@ -196,5 +196,128 @@ func TestLinks(t *testing.T) {
 }
 
 func TestLink(t *testing.T) {
-	// TODO
+	for _, tc := range []struct {
+		name             string
+		linkID           string
+		linkName         string
+		userDownloadable bool
+		maxFileSize      uint64
+		files            testutil.LinkFiles
+		res              *template.LinkView
+	}{
+		{
+			name:             "no files",
+			linkID:           "abcd",
+			linkName:         "My Link",
+			userDownloadable: false,
+			maxFileSize:      4096,
+			files: testutil.LinkFiles{
+				Name:  "abcd",
+				Files: []ifs.File{},
+			},
+			res: &template.LinkView{
+				Name:             "My Link",
+				CreatedAt:        mockTimeMilli,
+				TotalFiles:       0,
+				TotalSize:        "0 bytes",
+				MaxFileSize:      "4.00 KiB",
+				MaxFileSizeBytes: "4096",
+				ViewLink:         "/link/abcd",
+				DeleteLink:       "/link/abcd/delete",
+				EditLink:         "/link/abcd/edit",
+				DownloadZIP:      "/link/abcd/zip",
+				UserDownloadable: false,
+			},
+		},
+		{
+			name:             "one file",
+			linkID:           "abcd",
+			linkName:         "My Link",
+			userDownloadable: false,
+			maxFileSize:      4096,
+			files: testutil.LinkFiles{
+				Name: "abcd",
+				Files: []ifs.File{{
+					Name:    "file 1",
+					Size:    1024,
+					ModTime: mockTime,
+				}},
+			},
+			res: &template.LinkView{
+				Name:             "My Link",
+				CreatedAt:        mockTimeMilli,
+				TotalFiles:       1,
+				TotalSize:        "1.00 KiB",
+				MaxFileSize:      "4.00 KiB",
+				MaxFileSizeBytes: "4096",
+				ViewLink:         "/link/abcd",
+				DeleteLink:       "/link/abcd/delete",
+				EditLink:         "/link/abcd/edit",
+				DownloadZIP:      "/link/abcd/zip",
+				UserDownloadable: false,
+			},
+		},
+		{
+			name:             "many files, user downloadable",
+			linkID:           "abcd",
+			linkName:         "My Link",
+			userDownloadable: true,
+			maxFileSize:      4096,
+			files: testutil.LinkFiles{
+				Name: "abcd",
+				Files: []ifs.File{
+					{
+						Name:    "file 1",
+						Size:    1024,
+						ModTime: mockTime,
+					},
+					{
+						Name:    "file 2",
+						Size:    1024 * 3,
+						ModTime: mockTime,
+					},
+				},
+			},
+			res: &template.LinkView{
+				Name:             "My Link",
+				CreatedAt:        mockTimeMilli,
+				TotalFiles:       2,
+				TotalSize:        "4.00 KiB",
+				MaxFileSize:      "4.00 KiB",
+				MaxFileSizeBytes: "4096",
+				ViewLink:         "/link/abcd",
+				DeleteLink:       "/link/abcd/delete",
+				EditLink:         "/link/abcd/edit",
+				DownloadZIP:      "/link/abcd/zip",
+				UserDownloadable: true,
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			db := mockdb.NewMockDB()
+			fs := mockfs.NewMockFS()
+
+			db.SetAcquireLinkRLockResponse(
+				tc.linkID,
+				tc.linkName,
+				mockTime,
+				tc.userDownloadable,
+				tc.maxFileSize,
+			)
+			fs.SetListLinkFilesResponse(tc.files.Name, tc.files.Files)
+			lock, err := db.AcquireLinkRLock(tc.linkID)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			linkView, err := Link(lock, fs)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if !reflect.DeepEqual(linkView, tc.res) {
+				t.Fatalf("expected %v, got %v", tc.res, linkView)
+			}
+		})
+	}
 }
