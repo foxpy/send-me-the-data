@@ -21,6 +21,10 @@
                 <input type="checkbox" name="user_downloadable" id="user_downloadable" />
                 <label for="user_downloadable">Users can download files</label>
             </div>
+            <div>
+                <input type="checkbox" name="upload_enabled" id="upload_enabled" checked />
+                <label for="upload_enabled">Users can upload files</label>
+            </div>
             {{ template "file_size_picker.gohtml" "4294967296" }}
             <div>
                 <input type="submit" value="Create link" />
@@ -51,6 +55,12 @@
                             <img src="/static/help.svg" title="Users can also download files from this link">
                         </div>
                     </th>
+                    <th>
+                        <div>
+                            <p>Upload</p>
+                            <img src="/static/help.svg" title="Users can upload files to this link">
+                        </div>
+                    </th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -63,6 +73,7 @@
                     <td>{{ .TotalSize }}</td>
                     <td>{{ .MaxFileSize }}</td>
                     <td>{{ if .UserDownloadable }}yes{{ else }}no{{ end }}</td>
+                    <td>{{ if .UploadEnabled }}yes{{ else }}no{{ end }}</td>
                     <td>
                         <form action="{{ .DownloadZIP }}" method="get">
                             <input type="submit" value="ZIP" />

@@ -9,6 +9,7 @@
 
     {{ template "flash.gohtml" . }}
 
+    {{ if .Data.Link.UploadEnabled }}
     <h2>Upload file</h2>
 
     <div>
@@ -23,6 +24,7 @@
         </form>
     </div>
     <script src="/static/file_size_validation.js"></script>
+    {{ end }}
 
     <h2>List of files</h2>
 

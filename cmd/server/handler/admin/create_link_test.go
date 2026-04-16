@@ -22,7 +22,7 @@ func TestCreateLinkEmptyName(t *testing.T) {
 
 	// the application doesn't validate link name length, that's the job of the database.
 	// in real deployment, postgres would reject such a transaction.
-	db.MockExpectedCreateLinkCall("", "abcd", false, 0, func() error {
+	db.MockExpectedCreateLinkCall("", "abcd", false, false, 0, func() error {
 		return errors.New("mocked postgresql error: link name length constraint validation failure")
 	})
 
@@ -52,7 +52,7 @@ func TestCreateLink(t *testing.T) {
 	h := NewAdminServer(db, fs)
 
 	db.MockGenerateRandomExternalKeyResponse("abcd")
-	db.MockExpectedCreateLinkCall("My Link", "abcd", false, 9000, nil)
+	db.MockExpectedCreateLinkCall("My Link", "abcd", false, false, 9000, nil)
 
 	postValues := make(url.Values)
 	postValues.Add("name", "My Link")

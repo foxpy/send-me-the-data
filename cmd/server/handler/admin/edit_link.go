@@ -26,15 +26,19 @@ func (s *AdminServer) editLink(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("failed to acquire write lock for link %s: %w", id, err)
 	}
 
-	defer lock.Release()
+	defer lock.Commit()
 
 	name := r.FormValue("name")
 	userDownloadable := false
 	if r.FormValue("user_downloadable") == "on" {
 		userDownloadable = true
 	}
+	uploadEnabled := false
+	if r.FormValue("upload_enabled") == "on" {
+		uploadEnabled = true
+	}
 
-	err = lock.UpdateLink(name, userDownloadable, maxFileSize)
+	err = lock.Update(name, userDownloadable, uploadEnabled, maxFileSize)
 	if err != nil {
 		return fmt.Errorf("failed to update link %s: %w", id, err)
 	}

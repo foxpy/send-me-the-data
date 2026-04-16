@@ -14,7 +14,7 @@ type MockDB struct {
 }
 
 type CreateLinkCall struct {
-	link       idb.Link
+	link       link
 	resultFunc func() error
 }
 

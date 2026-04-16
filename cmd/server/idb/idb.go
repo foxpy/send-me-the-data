@@ -10,7 +10,7 @@ type Database interface {
 	CreateFileJournalEntry(*FileJournalEntry) error
 	// FIXME: do not read all links from database, use pagination instead
 	AllLinks() ([]Link, error)
-	CreateLink(name, externalKey string, userDownloadable bool, maxFileSize uint64) error
+	CreateLink(name, externalKey string, userDownloadable, uploadEnabled bool, maxFileSize uint64) error
 	AcquireLinkRLock(externalKey string) (LinkRLock, error)
 	AcquireLinkWLock(externalKey string) (LinkWLock, error)
 	// TODO: this function doesn't really belong here
@@ -22,27 +22,24 @@ type FileJournalEntry struct {
 	FileName        string
 }
 
-// TODO: I think it is better to make Link an interface, too,
-//       as it will allow me to erase a lot of repeating boilerplate
-
-type Link struct {
-	Name, ExternalKey string
-	CreatedAt         time.Time
-	UserDownloadable  bool
-	MaxFileSize       uint64
+type Link interface {
+	Name() string
+	ExternalKey() string
+	CreatedAt() time.Time
+	UserDownloadable() bool
+	UploadEnabled() bool
+	MaxFileSize() uint64
 }
 
 type LinkRLock interface {
-	UserDownloadable() bool
-	Name() string
-	CreatedAt() time.Time
-	ExternalKey() string
-	MaxFileSize() uint64
+	Link
 	Release() error
 }
 
 type LinkWLock interface {
-	UpdateLink(name string, userDownloadable bool, maxFileSize uint64) error
-	DeleteLink() error
-	Release() error
+	Link
+	Update(name string, userDownloadable, uploadEnabled bool, maxFileSize uint64) error
+	Delete() error
+	Commit() error
+	Rollback() error
 }

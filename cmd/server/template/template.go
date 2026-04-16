@@ -56,12 +56,13 @@ type LinkView struct {
 	TotalFiles       int
 	TotalSize        string
 	MaxFileSize      string
-	MaxFileSizeBytes string
+	MaxFileSizeBytes uint64
 	ViewLink         string
 	DeleteLink       string
 	EditLink         string
 	DownloadZIP      string
 	UserDownloadable bool
+	UploadEnabled    bool
 }
 
 func renderHelper(w http.ResponseWriter, templateName string, data any) error {

@@ -45,6 +45,11 @@ func (s *UserServer) upload(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
+	if !lock.UploadEnabled() {
+		w.WriteHeader(http.StatusForbidden)
+		return nil
+	}
+
 	fileJournalEntry := &idb.FileJournalEntry{
 		LinkExternalKey: id,
 		FileName:        fileName,

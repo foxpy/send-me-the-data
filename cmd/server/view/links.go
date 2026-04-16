@@ -2,7 +2,6 @@ package view
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
@@ -17,9 +16,9 @@ func Links(db idb.Database, fs ifs.Filesystem) ([]template.LinkView, error) {
 
 	linkViews := make([]template.LinkView, 0, len(links))
 	for _, link := range links {
-		files, err := fs.ListLinkFiles(link.ExternalKey)
+		files, err := fs.ListLinkFiles(link.ExternalKey())
 		if err != nil {
-			return nil, fmt.Errorf("failed to get all files for link %s: %w", link.ExternalKey, err)
+			return nil, fmt.Errorf("failed to get all files for link %s: %w", link.ExternalKey(), err)
 		}
 
 		var totalSize uint64
@@ -28,25 +27,26 @@ func Links(db idb.Database, fs ifs.Filesystem) ([]template.LinkView, error) {
 		}
 
 		linkViews = append(linkViews, template.LinkView{
-			Name:             link.Name,
-			CreatedAt:        uint64(link.CreatedAt.UnixMilli()),
+			Name:             link.Name(),
+			CreatedAt:        uint64(link.CreatedAt().UnixMilli()),
 			TotalFiles:       len(files),
 			TotalSize:        bytesToHuman(totalSize),
-			MaxFileSize:      bytesToHuman(link.MaxFileSize),
-			MaxFileSizeBytes: strconv.Itoa(int(link.MaxFileSize)),
-			ViewLink:         fmt.Sprintf("/link/%s", link.ExternalKey),
-			DeleteLink:       fmt.Sprintf("/link/%s/delete", link.ExternalKey),
-			EditLink:         fmt.Sprintf("/link/%s/edit", link.ExternalKey),
-			DownloadZIP:      fmt.Sprintf("/link/%s/zip", link.ExternalKey),
-			UserDownloadable: link.UserDownloadable,
+			MaxFileSize:      bytesToHuman(link.MaxFileSize()),
+			MaxFileSizeBytes: link.MaxFileSize(),
+			ViewLink:         fmt.Sprintf("/link/%s", link.ExternalKey()),
+			DeleteLink:       fmt.Sprintf("/link/%s/delete", link.ExternalKey()),
+			EditLink:         fmt.Sprintf("/link/%s/edit", link.ExternalKey()),
+			DownloadZIP:      fmt.Sprintf("/link/%s/zip", link.ExternalKey()),
+			UserDownloadable: link.UserDownloadable(),
+			UploadEnabled:    link.UploadEnabled(),
 		})
 	}
 
 	return linkViews, nil
 }
 
-func Link(linkLock idb.LinkRLock, fs ifs.Filesystem) (*template.LinkView, error) {
-	id := linkLock.ExternalKey()
+func Link(lock idb.LinkRLock, fs ifs.Filesystem) (*template.LinkView, error) {
+	id := lock.ExternalKey()
 	files, err := fs.ListLinkFiles(id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get all files for link %s: %w", id, err)
@@ -58,16 +58,17 @@ func Link(linkLock idb.LinkRLock, fs ifs.Filesystem) (*template.LinkView, error)
 	}
 
 	return &template.LinkView{
-		Name:             linkLock.Name(),
-		CreatedAt:        uint64(linkLock.CreatedAt().UnixMilli()),
+		Name:             lock.Name(),
+		CreatedAt:        uint64(lock.CreatedAt().UnixMilli()),
 		TotalFiles:       len(files),
 		TotalSize:        bytesToHuman(totalSize),
-		MaxFileSize:      bytesToHuman(linkLock.MaxFileSize()),
-		MaxFileSizeBytes: strconv.Itoa(int(linkLock.MaxFileSize())),
+		MaxFileSize:      bytesToHuman(lock.MaxFileSize()),
+		MaxFileSizeBytes: lock.MaxFileSize(),
 		ViewLink:         fmt.Sprintf("/link/%s", id),
 		DeleteLink:       fmt.Sprintf("/link/%s/delete", id),
 		EditLink:         fmt.Sprintf("/link/%s/edit", id),
 		DownloadZIP:      fmt.Sprintf("/link/%s/zip", id),
-		UserDownloadable: linkLock.UserDownloadable(),
+		UserDownloadable: lock.UserDownloadable(),
+		UploadEnabled:    lock.UploadEnabled(),
 	}, nil
 }

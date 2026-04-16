@@ -7,30 +7,7 @@ import (
 )
 
 type mockLinkRLock struct {
-	name, externalKey string
-	createdAt         time.Time
-	userDowbnloadable bool
-	maxFileSize       uint64
-}
-
-func (l *mockLinkRLock) UserDownloadable() bool {
-	return l.userDowbnloadable
-}
-
-func (l *mockLinkRLock) Name() string {
-	return l.name
-}
-
-func (l *mockLinkRLock) CreatedAt() time.Time {
-	return l.createdAt
-}
-
-func (l *mockLinkRLock) ExternalKey() string {
-	return l.externalKey
-}
-
-func (l *mockLinkRLock) MaxFileSize() uint64 {
-	return l.maxFileSize
+	link
 }
 
 func (l *mockLinkRLock) Release() error {
@@ -51,9 +28,9 @@ func (d *MockDB) SetAcquireLinkRLockResponse(
 	name string,
 	createdAt time.Time,
 	userDownloadable bool,
+	uploadEnabled bool,
 	maxFileSize uint64,
 ) {
-	d.acquireLinkRLockResponses[externalKey] = &mockLinkRLock{
-		name, externalKey, createdAt, userDownloadable, maxFileSize,
-	}
+	l := link{name, externalKey, createdAt, userDownloadable, uploadEnabled, maxFileSize}
+	d.acquireLinkRLockResponses[externalKey] = &mockLinkRLock{l}
 }

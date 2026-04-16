@@ -75,7 +75,7 @@ func TestFiles(t *testing.T) {
 				UploadedAt:        mockTimeMilli,
 				Size:              "1.00 KiB",
 				AdminDownloadLink: "/link/abcd/file/file 1",
-				UserDownloadLink:  "/u/abcd/file 1",
+				UserDownloadLink:  "/abcd/file 1",
 				DeleteLink:        "/link/abcd/file/file 1/delete",
 			}},
 		},
@@ -137,7 +137,7 @@ func TestFiles(t *testing.T) {
 			db := mockdb.NewMockDB()
 			fs := mockfs.NewMockFS()
 
-			db.SetAcquireLinkRLockResponse(tc.linkID, tc.linkName, mockTime, tc.userDownloadable, tc.maxFileSize)
+			db.SetAcquireLinkRLockResponse(tc.linkID, tc.linkName, mockTime, tc.userDownloadable, false, tc.maxFileSize)
 			lock, err := db.AcquireLinkRLock(tc.linkID)
 			if err != nil {
 				t.Fatal(err)

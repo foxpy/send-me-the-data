@@ -23,8 +23,12 @@ func (s *AdminServer) createLink(w http.ResponseWriter, r *http.Request) error {
 	if r.FormValue("user_downloadable") == "on" {
 		userDownloadable = true
 	}
+	uploadEnabled := false
+	if r.FormValue("upload_enabled") == "on" {
+		uploadEnabled = true
+	}
 
-	err = s.db.CreateLink(name, externalKey, userDownloadable, maxFileSize)
+	err = s.db.CreateLink(name, externalKey, userDownloadable, uploadEnabled, maxFileSize)
 	var pqErr *pq.Error
 	if errors.As(err, &pqErr) && pqErr.Code.Name() == "unique_violation" {
 		// hopefully should never happen because externalKey collision chance is very low

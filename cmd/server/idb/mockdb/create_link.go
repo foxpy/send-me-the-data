@@ -3,11 +3,9 @@ package mockdb
 import (
 	"fmt"
 	"reflect"
-
-	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 )
 
-func (d *MockDB) CreateLink(name, externalKey string, userDownloadable bool, maxFileSize uint64) error {
+func (d *MockDB) CreateLink(name, externalKey string, userDownloadable, uploadEnabled bool, maxFileSize uint64) error {
 	if len(d.expectedCreateLinkCalls) == 0 {
 		panic("must mock expected CreateLink() call")
 	}
@@ -15,11 +13,12 @@ func (d *MockDB) CreateLink(name, externalKey string, userDownloadable bool, max
 	mockedCall := d.expectedCreateLinkCalls[0]
 	d.expectedCreateLinkCalls = d.expectedCreateLinkCalls[1:]
 
-	actual := idb.Link{
-		Name:             name,
-		ExternalKey:      externalKey,
-		UserDownloadable: userDownloadable,
-		MaxFileSize:      maxFileSize,
+	actual := link{
+		name:             name,
+		externalKey:      externalKey,
+		userDownloadable: userDownloadable,
+		uploadEnabled:    uploadEnabled,
+		maxFileSize:      maxFileSize,
 	}
 
 	if !reflect.DeepEqual(mockedCall.link, actual) {
@@ -33,12 +32,13 @@ func (d *MockDB) CreateLink(name, externalKey string, userDownloadable bool, max
 	return mockedCall.resultFunc()
 }
 
-func (d *MockDB) MockExpectedCreateLinkCall(name, externalKey string, userDownloadable bool, maxFileSize uint64, mockedResult func() error) {
-	link := idb.Link{
-		Name:             name,
-		ExternalKey:      externalKey,
-		UserDownloadable: userDownloadable,
-		MaxFileSize:      maxFileSize,
+func (d *MockDB) MockExpectedCreateLinkCall(name, externalKey string, userDownloadable, uploadEnabled bool, maxFileSize uint64, mockedResult func() error) {
+	link := link{
+		name:             name,
+		externalKey:      externalKey,
+		userDownloadable: userDownloadable,
+		uploadEnabled:    uploadEnabled,
+		maxFileSize:      maxFileSize,
 	}
 	d.expectedCreateLinkCalls = append(d.expectedCreateLinkCalls, CreateLinkCall{
 		link:       link,

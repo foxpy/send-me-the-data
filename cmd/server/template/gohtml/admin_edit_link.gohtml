@@ -24,6 +24,14 @@
                 />
                 <label for="user_downloadable">Users can download files</label>
             </div>
+            <div>
+                <input type="checkbox" name="upload_enabled" id="upload_enabled"
+                    {{ if .UploadEnabled }}
+                        checked
+                    {{ end }}
+                />
+                <label for="upload_enabled">Users can upload files</label>
+            </div>
             {{ template "file_size_picker.gohtml" .MaxFileSizeBytes }}
             <div>
                 <input type="submit" value="Save" />

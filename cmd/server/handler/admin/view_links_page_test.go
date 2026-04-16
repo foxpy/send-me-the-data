@@ -72,12 +72,8 @@ func TestViewLinksPage(t *testing.T) {
 			expectedFlashes: nil,
 		},
 		{
-			name: "one link, no flashes",
-			links: []idb.Link{{
-				Name:        "link1",
-				ExternalKey: "abcdef",
-				CreatedAt:   time.UnixMicro(0).UTC(),
-			}},
+			name:  "one link, no flashes",
+			links: []idb.Link{mockdb.NewLink("abcdef", "link1", time.UnixMicro(0).UTC(), false, false, 0)},
 			files: []testutil.LinkFiles{{
 				Name: "abcdef",
 				Files: []ifs.File{
@@ -99,12 +95,8 @@ func TestViewLinksPage(t *testing.T) {
 			expectedFlashes: nil,
 		},
 		{
-			name: "one link, success flash",
-			links: []idb.Link{{
-				Name:        "link1",
-				ExternalKey: "abcdef",
-				CreatedAt:   time.UnixMicro(0).UTC(),
-			}},
+			name:  "one link, success flash",
+			links: []idb.Link{mockdb.NewLink("abcdef", "link1", time.UnixMicro(0).UTC(), false, false, 0)},
 			files: []testutil.LinkFiles{{
 				Name: "abcdef",
 				Files: []ifs.File{
@@ -129,12 +121,8 @@ func TestViewLinksPage(t *testing.T) {
 			expectedFlashes: []flashtest.Flash{{Kind: flash.SuccessFlash, Text: "Link created successfully"}},
 		},
 		{
-			name: "one link, error flash",
-			links: []idb.Link{{
-				Name:        "link1",
-				ExternalKey: "abcdef",
-				CreatedAt:   time.UnixMicro(0).UTC(),
-			}},
+			name:  "one link, error flash",
+			links: []idb.Link{mockdb.NewLink("abcdef", "link1", time.UnixMicro(0).UTC(), false, false, 0)},
 			files: []testutil.LinkFiles{{
 				Name: "abcdef",
 				Files: []ifs.File{
@@ -161,21 +149,9 @@ func TestViewLinksPage(t *testing.T) {
 		{
 			name: "multile links, no flashes",
 			links: []idb.Link{
-				{
-					Name:        "link1",
-					ExternalKey: "abcdef",
-					CreatedAt:   time.UnixMicro(0).UTC(),
-				},
-				{
-					Name:        "link2",
-					ExternalKey: "bcdef",
-					CreatedAt:   time.UnixMicro(0).UTC(),
-				},
-				{
-					Name:        "link3",
-					ExternalKey: "cdef",
-					CreatedAt:   time.UnixMicro(0).UTC(),
-				},
+				mockdb.NewLink("abcdef", "link1", time.UnixMicro(0).UTC(), false, false, 0),
+				mockdb.NewLink("bcdef", "link2", time.UnixMicro(0).UTC(), false, false, 0),
+				mockdb.NewLink("cdef", "link3", time.UnixMicro(0).UTC(), false, false, 0),
 			},
 			files: []testutil.LinkFiles{
 				{

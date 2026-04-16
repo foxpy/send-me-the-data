@@ -17,7 +17,8 @@
         Created at <span class="timestamp">{{ .CreatedAt }}</span><br />
         Uploaded files: {{ .TotalFiles }} ({{ .TotalSize }} total)<br />
         Maximum file size: {{ .MaxFileSize }}<br />
-        Users can download files: {{ if .UserDownloadable }}yes{{ else }}no{{ end }}
+        Users can download files: {{ if .UserDownloadable }}yes{{ else }}no{{ end }}<br />
+        Users can upload files: {{ if .UploadEnabled }}yes{{ else }}no{{ end }}
     </p>
 
     <div>

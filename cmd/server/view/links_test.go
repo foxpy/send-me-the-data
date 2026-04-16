@@ -26,14 +26,8 @@ func TestLinks(t *testing.T) {
 			res:   nil,
 		},
 		{
-			desc: "one link without files",
-			links: []idb.Link{{
-				Name:             "test 1",
-				ExternalKey:      "abcd",
-				CreatedAt:        mockTime,
-				UserDownloadable: false,
-				MaxFileSize:      100,
-			}},
+			desc:  "one link without files",
+			links: []idb.Link{mockdb.NewLink("abcd", "test 1", mockTime, false, false, 100)},
 			files: []testutil.LinkFiles{
 				{
 					Name:  "abcd",
@@ -47,24 +41,19 @@ func TestLinks(t *testing.T) {
 					TotalFiles:       0,
 					TotalSize:        "0 bytes",
 					MaxFileSize:      "100 bytes",
-					MaxFileSizeBytes: "100",
+					MaxFileSizeBytes: 100,
 					ViewLink:         "/link/abcd",
 					DeleteLink:       "/link/abcd/delete",
 					EditLink:         "/link/abcd/edit",
 					DownloadZIP:      "/link/abcd/zip",
 					UserDownloadable: false,
+					UploadEnabled:    false,
 				},
 			},
 		},
 		{
-			desc: "one link with files",
-			links: []idb.Link{{
-				Name:             "test 1",
-				ExternalKey:      "abcd",
-				CreatedAt:        mockTime,
-				UserDownloadable: true,
-				MaxFileSize:      10240,
-			}},
+			desc:  "one link with files",
+			links: []idb.Link{mockdb.NewLink("abcd", "test 1", mockTime, true, true, 10240)},
 			files: []testutil.LinkFiles{
 				{
 					Name: "abcd",
@@ -89,32 +78,21 @@ func TestLinks(t *testing.T) {
 					TotalFiles:       2,
 					TotalSize:        "600 bytes",
 					MaxFileSize:      "10.00 KiB",
-					MaxFileSizeBytes: "10240",
+					MaxFileSizeBytes: 10240,
 					ViewLink:         "/link/abcd",
 					DeleteLink:       "/link/abcd/delete",
 					EditLink:         "/link/abcd/edit",
 					DownloadZIP:      "/link/abcd/zip",
 					UserDownloadable: true,
+					UploadEnabled:    true,
 				},
 			},
 		},
 		{
 			desc: "one link with files, one link without",
 			links: []idb.Link{
-				{
-					Name:             "test 1",
-					ExternalKey:      "abcd",
-					CreatedAt:        mockTime,
-					UserDownloadable: false,
-					MaxFileSize:      10240,
-				},
-				{
-					Name:             "test 2",
-					ExternalKey:      "bcde",
-					CreatedAt:        mockTime,
-					UserDownloadable: false,
-					MaxFileSize:      100,
-				},
+				mockdb.NewLink("abcd", "test 1", mockTime, true, false, 10240),
+				mockdb.NewLink("bcde", "test 2", mockTime, false, true, 100),
 			},
 			files: []testutil.LinkFiles{
 				{
@@ -144,12 +122,13 @@ func TestLinks(t *testing.T) {
 					TotalFiles:       2,
 					TotalSize:        "600 bytes",
 					MaxFileSize:      "10.00 KiB",
-					MaxFileSizeBytes: "10240",
+					MaxFileSizeBytes: 10240,
 					ViewLink:         "/link/abcd",
 					DeleteLink:       "/link/abcd/delete",
 					EditLink:         "/link/abcd/edit",
 					DownloadZIP:      "/link/abcd/zip",
-					UserDownloadable: false,
+					UserDownloadable: true,
+					UploadEnabled:    false,
 				},
 				{
 					Name:             "test 2",
@@ -157,12 +136,13 @@ func TestLinks(t *testing.T) {
 					TotalFiles:       0,
 					TotalSize:        "0 bytes",
 					MaxFileSize:      "100 bytes",
-					MaxFileSizeBytes: "100",
+					MaxFileSizeBytes: 100,
 					ViewLink:         "/link/bcde",
 					DeleteLink:       "/link/bcde/delete",
 					EditLink:         "/link/bcde/edit",
 					DownloadZIP:      "/link/bcde/zip",
 					UserDownloadable: false,
+					UploadEnabled:    true,
 				},
 			},
 		},
@@ -201,6 +181,7 @@ func TestLink(t *testing.T) {
 		linkID           string
 		linkName         string
 		userDownloadable bool
+		uploadEnabled    bool
 		maxFileSize      uint64
 		files            testutil.LinkFiles
 		res              *template.LinkView
@@ -210,6 +191,7 @@ func TestLink(t *testing.T) {
 			linkID:           "abcd",
 			linkName:         "My Link",
 			userDownloadable: false,
+			uploadEnabled:    false,
 			maxFileSize:      4096,
 			files: testutil.LinkFiles{
 				Name:  "abcd",
@@ -221,19 +203,21 @@ func TestLink(t *testing.T) {
 				TotalFiles:       0,
 				TotalSize:        "0 bytes",
 				MaxFileSize:      "4.00 KiB",
-				MaxFileSizeBytes: "4096",
+				MaxFileSizeBytes: 4096,
 				ViewLink:         "/link/abcd",
 				DeleteLink:       "/link/abcd/delete",
 				EditLink:         "/link/abcd/edit",
 				DownloadZIP:      "/link/abcd/zip",
 				UserDownloadable: false,
+				UploadEnabled:    false,
 			},
 		},
 		{
-			name:             "one file",
+			name:             "one file, upload enabled",
 			linkID:           "abcd",
 			linkName:         "My Link",
 			userDownloadable: false,
+			uploadEnabled:    true,
 			maxFileSize:      4096,
 			files: testutil.LinkFiles{
 				Name: "abcd",
@@ -249,12 +233,13 @@ func TestLink(t *testing.T) {
 				TotalFiles:       1,
 				TotalSize:        "1.00 KiB",
 				MaxFileSize:      "4.00 KiB",
-				MaxFileSizeBytes: "4096",
+				MaxFileSizeBytes: 4096,
 				ViewLink:         "/link/abcd",
 				DeleteLink:       "/link/abcd/delete",
 				EditLink:         "/link/abcd/edit",
 				DownloadZIP:      "/link/abcd/zip",
 				UserDownloadable: false,
+				UploadEnabled:    true,
 			},
 		},
 		{
@@ -262,6 +247,7 @@ func TestLink(t *testing.T) {
 			linkID:           "abcd",
 			linkName:         "My Link",
 			userDownloadable: true,
+			uploadEnabled:    false,
 			maxFileSize:      4096,
 			files: testutil.LinkFiles{
 				Name: "abcd",
@@ -284,12 +270,13 @@ func TestLink(t *testing.T) {
 				TotalFiles:       2,
 				TotalSize:        "4.00 KiB",
 				MaxFileSize:      "4.00 KiB",
-				MaxFileSizeBytes: "4096",
+				MaxFileSizeBytes: 4096,
 				ViewLink:         "/link/abcd",
 				DeleteLink:       "/link/abcd/delete",
 				EditLink:         "/link/abcd/edit",
 				DownloadZIP:      "/link/abcd/zip",
 				UserDownloadable: true,
+				UploadEnabled:    false,
 			},
 		},
 	} {
@@ -302,6 +289,7 @@ func TestLink(t *testing.T) {
 				tc.linkName,
 				mockTime,
 				tc.userDownloadable,
+				tc.uploadEnabled,
 				tc.maxFileSize,
 			)
 			fs.SetListLinkFilesResponse(tc.files.Name, tc.files.Files)
