@@ -1,0 +1,15 @@
+[Unit]
+Description=Send me the Data
+After=network.target
+Wants=systemd-logind.service
+
+[Service]
+User=smtd
+ExecStart=/usr/local/bin/smtd
+ProtectSystem=full
+EnvironmentFile=/etc/smtd.conf
+Restart=always
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
