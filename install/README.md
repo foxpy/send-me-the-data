@@ -4,3 +4,5 @@
 - `smtd.service` - systemd unit file
 
 The idea is that SmtD will run under its own `smtd` user which will store data in `/var/lib/smtd` owned by `smtd:smtd` with umask `0027`.
+
+Create user: `useradd -r -s /usr/bin/nologin smtd`
