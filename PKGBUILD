@@ -1,26 +1,27 @@
 pkgname=smtd
+pkglongname="send-me-the-data"
 pkgver=0.1
 pkgrel=1
 pkgdesc='Send me the Data'
 arch=(x86_64)
-url='https://github.com/foxpy/send-me-the-data'
+url="https://github.com/foxpy/$pkglongname"
 license=('MIT')
 depends=(glibc git)
 makedepends=(go)
 source=(
-    git+file://${PWD}
+    "git+$url.git"
 )
 sha256sums=(
     SKIP
 )
 
 prepare() {
-  cd "$pkgname"
+  cd "$pkglongname"
   GOFLAGS="-mod=readonly" go mod vendor -v
 }
 
 build() {
-  cd "$pkgname"
+  cd "$pkglongname"
   export CGO_LDFLAGS=${LDFLAGS}
   export CGO_CPPFLAGS=${CPPFLAGS}
   export CGO_CFLAGS=${CFLAGS}
@@ -32,16 +33,16 @@ build() {
     -compressdwarf=false \
     -linkmode=external \
   "
-  go build -v -ldflags "$ld_flags" -o build/smtd ./cmd/server
+  go build -v -ldflags "$ld_flags" -trimpath -o build/smtd ./cmd/server
 }
 
 check() {
-  cd "$pkgname"
+  cd "$pkglongname"
   go test -short ./...
 }
 
 package() {
-  cd "$pkgname"
+  cd "$pkglongname"
   install -vDm 755 -t "${pkgdir}/usr/bin" build/smtd
   install -vDm 600 -t "${pkgdir}/etc" install/smtd.conf
   install -vDm 644 -t "${pkgdir}/usr/lib/systemd/system" install/smtd.service
