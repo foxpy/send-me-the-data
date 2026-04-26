@@ -5,7 +5,7 @@ Wants=systemd-logind.service
 
 [Service]
 User=smtd
-ExecStart=/usr/local/bin/smtd
+ExecStart=/usr/bin/smtd
 ProtectSystem=full
 EnvironmentFile=/etc/smtd.conf
 Restart=always
