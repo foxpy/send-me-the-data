@@ -13,6 +13,7 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/idb/mockdb"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs/mockfs"
+	"github.com/foxpy/send-me-the-data/cmd/server/irnd/mockrnd"
 	"github.com/foxpy/send-me-the-data/cmd/server/testutil"
 
 	"golang.org/x/net/html"
@@ -192,9 +193,11 @@ func TestViewLinksPage(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			db := mockdb.NewMockDB()
-			defer db.CheckAllExpects()
 			fs := mockfs.NewMockFS()
-			h := NewAdminServer(db, fs)
+			rnd := mockrnd.NewMockRND()
+			h := NewAdminServer(db, fs, rnd)
+
+			defer db.CheckAllExpects()
 
 			db.MockAllLinksResponse(tc.links)
 			for _, f := range tc.files {

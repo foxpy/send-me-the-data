@@ -18,7 +18,7 @@ func (s *AdminServer) createLink(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
-	id := s.db.GenerateRandomPublicID()
+	id := s.rnd.PublicID()
 	userDownloadable := false
 	if r.FormValue("user_downloadable") == "on" {
 		userDownloadable = true

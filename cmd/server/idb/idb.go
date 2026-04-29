@@ -13,8 +13,6 @@ type Database interface {
 	CreateLink(name, id string, userDownloadable, uploadEnabled bool, maxFileSize uint64) error
 	AcquireLinkRLock(id string) (LinkRLock, error)
 	AcquireLinkWLock(id string) (LinkWLock, error)
-	// TODO: this function doesn't really belong here
-	GenerateRandomPublicID() string
 }
 
 type FileJournalEntry struct {

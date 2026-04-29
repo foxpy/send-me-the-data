@@ -6,15 +6,17 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/handler"
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
+	"github.com/foxpy/send-me-the-data/cmd/server/irnd"
 )
 
 type AdminServer struct {
-	db idb.Database
-	fs ifs.Filesystem
+	db  idb.Database
+	fs  ifs.Filesystem
+	rnd irnd.Random
 }
 
-func NewAdminServer(db idb.Database, fs ifs.Filesystem) http.Handler {
-	s := AdminServer{db, fs}
+func NewAdminServer(db idb.Database, fs ifs.Filesystem, rnd irnd.Random) http.Handler {
+	s := AdminServer{db, fs, rnd}
 	m := http.NewServeMux()
 
 	m.HandleFunc("GET /{$}", handler.HandleWith500OnError(s.viewLinksPage))

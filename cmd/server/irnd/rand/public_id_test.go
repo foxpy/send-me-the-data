@@ -1,4 +1,4 @@
-package postgres
+package rand
 
 import (
 	"regexp"
@@ -6,10 +6,10 @@ import (
 )
 
 func TestGenerateRandomPublicID(t *testing.T) {
-	p := Postgres{}
+	r := NewRandom()
 
 	for range 10 {
-		id := p.GenerateRandomPublicID()
+		id := r.PublicID()
 
 		matched, err := regexp.MatchString(`^[a-zA-Z0-9]{12}$`, id)
 		if err != nil {
@@ -23,19 +23,19 @@ func TestGenerateRandomPublicID(t *testing.T) {
 }
 
 func BenchmarkGenerateRandomPublicID(b *testing.B) {
-	p := Postgres{}
+	r := NewRandom()
 
 	for b.Loop() {
-		p.GenerateRandomPublicID()
+		r.PublicID()
 	}
 }
 
 func BenchmarkGenerateRandomPublicIDParallel(b *testing.B) {
-	p := Postgres{}
+	r := NewRandom()
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			p.GenerateRandomPublicID()
+			r.PublicID()
 		}
 	})
 }

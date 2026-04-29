@@ -17,6 +17,7 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/idb/postgres"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs/vfs"
+	"github.com/foxpy/send-me-the-data/cmd/server/irnd/rand"
 )
 
 func main() {
@@ -47,6 +48,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	rnd := rand.NewRandom()
+
 	err = cleanup(db, fs)
 	if err != nil {
 		slog.Error("failed to cleanup file journal", "error", err)
@@ -54,7 +57,7 @@ func main() {
 	}
 
 	go func() {
-		m := admin.NewAdminServer(db, fs)
+		m := admin.NewAdminServer(db, fs, rnd)
 		slog.Info("Starting admin HTTP server", "address", adminListenAddress)
 		err := http.ListenAndServe(adminListenAddress, m)
 		slog.Error("admin ListenAndServe failed", "error", err)

@@ -8,7 +8,6 @@ import (
 
 type MockDB struct {
 	allLinksResponse          []idb.Link
-	randomPublicIDResponses   []string
 	expectedCreateLinkCalls   []CreateLinkCall
 	acquireLinkRLockResponses map[string]idb.LinkRLock
 }

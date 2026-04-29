@@ -10,15 +10,18 @@ import (
 
 	"github.com/foxpy/send-me-the-data/cmd/server/idb/mockdb"
 	"github.com/foxpy/send-me-the-data/cmd/server/ifs/mockfs"
+	"github.com/foxpy/send-me-the-data/cmd/server/irnd/mockrnd"
 )
 
 func TestCreateLinkEmptyName(t *testing.T) {
 	db := mockdb.NewMockDB()
-	defer db.CheckAllExpects()
 	fs := mockfs.NewMockFS()
-	h := NewAdminServer(db, fs)
+	rnd := mockrnd.NewMockRND()
+	h := NewAdminServer(db, fs, rnd)
 
-	db.MockGenerateRandomPublicIDResponse("abcd")
+	defer db.CheckAllExpects()
+
+	rnd.MockPublicIDResponse("abcd")
 
 	// the application doesn't validate link name length, that's the job of the database.
 	// in real deployment, postgres would reject such a transaction.
@@ -47,11 +50,13 @@ func TestCreateLinkEmptyName(t *testing.T) {
 
 func TestCreateLink(t *testing.T) {
 	db := mockdb.NewMockDB()
-	defer db.CheckAllExpects()
 	fs := mockfs.NewMockFS()
-	h := NewAdminServer(db, fs)
+	rnd := mockrnd.NewMockRND()
+	h := NewAdminServer(db, fs, rnd)
 
-	db.MockGenerateRandomPublicIDResponse("abcd")
+	defer db.CheckAllExpects()
+
+	rnd.MockPublicIDResponse("abcd")
 	db.MockExpectedCreateLinkCall("My Link", "abcd", false, false, 9000, nil)
 
 	postValues := make(url.Values)
