@@ -12,6 +12,7 @@
     - [ ] upload multiple files
     - [ ] upload a directory
     - [x] optional feature: download files if allowed by admin
+    - [ ] also: download zip if download of files is allowed
   - [x] upload endpoint
 - [ ] Admin server
   - [x] Link management page
