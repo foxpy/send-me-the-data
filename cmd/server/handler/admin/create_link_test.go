@@ -18,7 +18,7 @@ func TestCreateLinkEmptyName(t *testing.T) {
 	fs := mockfs.NewMockFS()
 	h := NewAdminServer(db, fs)
 
-	db.MockGenerateRandomExternalKeyResponse("abcd")
+	db.MockGenerateRandomPublicIDResponse("abcd")
 
 	// the application doesn't validate link name length, that's the job of the database.
 	// in real deployment, postgres would reject such a transaction.
@@ -51,7 +51,7 @@ func TestCreateLink(t *testing.T) {
 	fs := mockfs.NewMockFS()
 	h := NewAdminServer(db, fs)
 
-	db.MockGenerateRandomExternalKeyResponse("abcd")
+	db.MockGenerateRandomPublicIDResponse("abcd")
 	db.MockExpectedCreateLinkCall("My Link", "abcd", false, false, 9000, nil)
 
 	postValues := make(url.Values)

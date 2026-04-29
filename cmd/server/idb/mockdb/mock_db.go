@@ -7,10 +7,10 @@ import (
 )
 
 type MockDB struct {
-	allLinksResponse           []idb.Link
-	randomExternalKeyResponses []string
-	expectedCreateLinkCalls    []CreateLinkCall
-	acquireLinkRLockResponses  map[string]idb.LinkRLock
+	allLinksResponse          []idb.Link
+	randomPublicIDResponses   []string
+	expectedCreateLinkCalls   []CreateLinkCall
+	acquireLinkRLockResponses map[string]idb.LinkRLock
 }
 
 type CreateLinkCall struct {
@@ -45,6 +45,6 @@ func (d *MockDB) CreateFileJournalEntry(*idb.FileJournalEntry) error {
 	panic("TODO")
 }
 
-func (d *MockDB) AcquireLinkWLock(externalKey string) (idb.LinkWLock, error) {
+func (d *MockDB) AcquireLinkWLock(string) (idb.LinkWLock, error) {
 	panic("TODO")
 }

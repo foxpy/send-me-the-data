@@ -81,11 +81,11 @@ func cleanup(db idb.Database, fs ifs.Filesystem) error {
 			return fmt.Errorf("failed to obtain a file journal entry: %w", err)
 		}
 
-		err = fs.RemoveLinkFile(entry.LinkExternalKey, entry.FileName)
+		err = fs.RemoveLinkFile(entry.LinkPublicID, entry.FileName)
 		if err != nil && !os.IsNotExist(err) {
 			return fmt.Errorf(
 				"failed to delete file %s from link %s referenced by the file journal: %w",
-				entry.FileName, entry.LinkExternalKey, err,
+				entry.FileName, entry.LinkPublicID, err,
 			)
 		}
 

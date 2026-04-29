@@ -18,7 +18,7 @@ func init() {
 	}
 }
 
-func (d *Postgres) GenerateRandomExternalKey() string {
+func (d *Postgres) GenerateRandomPublicID() string {
 	var result [12]byte
 	for i := range 12 {
 		n := rand.IntN(len(alphabet))

@@ -54,7 +54,7 @@ func prepareFilesView(db idb.Database, fs ifs.Filesystem, id string) (string, []
 
 	link, err := view.Link(lock, fs)
 	if err != nil {
-		return "", nil, nil, fmt.Errorf("failed to get link view for link %s: %w", lock.ExternalKey(), err)
+		return "", nil, nil, fmt.Errorf("failed to get link view for link %s: %w", lock.ID(), err)
 	}
 
 	return fmt.Sprintf("Upload files: %s", lock.Name()), files, link, nil

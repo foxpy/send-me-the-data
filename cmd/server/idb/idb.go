@@ -10,21 +10,21 @@ type Database interface {
 	CreateFileJournalEntry(*FileJournalEntry) error
 	// FIXME: do not read all links from database, use pagination instead
 	AllLinks() ([]Link, error)
-	CreateLink(name, externalKey string, userDownloadable, uploadEnabled bool, maxFileSize uint64) error
-	AcquireLinkRLock(externalKey string) (LinkRLock, error)
-	AcquireLinkWLock(externalKey string) (LinkWLock, error)
+	CreateLink(name, id string, userDownloadable, uploadEnabled bool, maxFileSize uint64) error
+	AcquireLinkRLock(id string) (LinkRLock, error)
+	AcquireLinkWLock(id string) (LinkWLock, error)
 	// TODO: this function doesn't really belong here
-	GenerateRandomExternalKey() string
+	GenerateRandomPublicID() string
 }
 
 type FileJournalEntry struct {
-	LinkExternalKey string
-	FileName        string
+	LinkPublicID string
+	FileName     string
 }
 
 type Link interface {
 	Name() string
-	ExternalKey() string
+	ID() string
 	CreatedAt() time.Time
 	UserDownloadable() bool
 	UploadEnabled() bool

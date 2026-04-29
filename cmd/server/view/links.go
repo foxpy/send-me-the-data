@@ -16,9 +16,9 @@ func Links(db idb.Database, fs ifs.Filesystem) ([]template.LinkView, error) {
 
 	linkViews := make([]template.LinkView, 0, len(links))
 	for _, link := range links {
-		files, err := fs.ListLinkFiles(link.ExternalKey())
+		files, err := fs.ListLinkFiles(link.ID())
 		if err != nil {
-			return nil, fmt.Errorf("failed to get all files for link %s: %w", link.ExternalKey(), err)
+			return nil, fmt.Errorf("failed to get all files for link %s: %w", link.ID(), err)
 		}
 
 		var totalSize uint64
@@ -33,10 +33,10 @@ func Links(db idb.Database, fs ifs.Filesystem) ([]template.LinkView, error) {
 			TotalSize:        bytesToHuman(totalSize),
 			MaxFileSize:      bytesToHuman(link.MaxFileSize()),
 			MaxFileSizeBytes: link.MaxFileSize(),
-			ViewLink:         fmt.Sprintf("/link/%s", link.ExternalKey()),
-			DeleteLink:       fmt.Sprintf("/link/%s/delete", link.ExternalKey()),
-			EditLink:         fmt.Sprintf("/link/%s/edit", link.ExternalKey()),
-			DownloadZIP:      fmt.Sprintf("/link/%s/zip", link.ExternalKey()),
+			ViewLink:         fmt.Sprintf("/link/%s", link.ID()),
+			DeleteLink:       fmt.Sprintf("/link/%s/delete", link.ID()),
+			EditLink:         fmt.Sprintf("/link/%s/edit", link.ID()),
+			DownloadZIP:      fmt.Sprintf("/link/%s/zip", link.ID()),
 			UserDownloadable: link.UserDownloadable(),
 			UploadEnabled:    link.UploadEnabled(),
 		})
@@ -46,7 +46,7 @@ func Links(db idb.Database, fs ifs.Filesystem) ([]template.LinkView, error) {
 }
 
 func Link(lock idb.LinkRLock, fs ifs.Filesystem) (*template.LinkView, error) {
-	id := lock.ExternalKey()
+	id := lock.ID()
 	files, err := fs.ListLinkFiles(id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get all files for link %s: %w", id, err)

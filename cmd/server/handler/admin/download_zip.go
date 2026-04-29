@@ -37,9 +37,9 @@ func (s *AdminServer) downloadZIP(w http.ResponseWriter, r *http.Request) error 
 		return nil
 	}
 
-	linkFS, err := s.fs.LinkFS(lock.ExternalKey())
+	linkFS, err := s.fs.LinkFS(lock.ID())
 	if err != nil {
-		return fmt.Errorf("failed to obtain FS for link %s: %w", lock.ExternalKey(), err)
+		return fmt.Errorf("failed to obtain FS for link %s: %w", lock.ID(), err)
 	}
 
 	w.Header().Add("Content-Type", "application/zip")
@@ -52,12 +52,12 @@ func (s *AdminServer) downloadZIP(w http.ResponseWriter, r *http.Request) error 
 	zw := zip.NewWriter(w)
 	err = zipAddFS(zw, linkFS, method)
 	if err != nil {
-		return fmt.Errorf("failed to create ZIP archive for link %s: %w", lock.ExternalKey(), err)
+		return fmt.Errorf("failed to create ZIP archive for link %s: %w", lock.ID(), err)
 	}
 
 	err = zw.Close()
 	if err != nil {
-		return fmt.Errorf("failed to finalize ZIP archive for link %s: %w", lock.ExternalKey(), err)
+		return fmt.Errorf("failed to finalize ZIP archive for link %s: %w", lock.ID(), err)
 	}
 
 	return nil

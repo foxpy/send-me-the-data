@@ -7,7 +7,7 @@ import (
 )
 
 type link struct {
-	name, externalKey               string
+	name, id                        string
 	createdAt                       time.Time
 	userDownloadable, uploadEnabled bool
 	maxFileSize                     uint64
@@ -29,20 +29,21 @@ func (l *link) CreatedAt() time.Time {
 	return l.createdAt
 }
 
-func (l *link) ExternalKey() string {
-	return l.externalKey
+func (l *link) ID() string {
+	return l.id
 }
 
 func (l *link) MaxFileSize() uint64 {
 	return l.maxFileSize
 }
 
-func NewLink(externalKey string,
+func NewLink(
+	id string,
 	name string,
 	createdAt time.Time,
 	userDownloadable bool,
 	uploadEnabled bool,
 	maxFileSize uint64,
 ) idb.Link {
-	return &link{name, externalKey, createdAt, userDownloadable, uploadEnabled, maxFileSize}
+	return &link{name, id, createdAt, userDownloadable, uploadEnabled, maxFileSize}
 }

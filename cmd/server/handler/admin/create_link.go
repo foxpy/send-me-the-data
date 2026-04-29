@@ -18,7 +18,7 @@ func (s *AdminServer) createLink(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
-	externalKey := s.db.GenerateRandomExternalKey()
+	id := s.db.GenerateRandomPublicID()
 	userDownloadable := false
 	if r.FormValue("user_downloadable") == "on" {
 		userDownloadable = true
@@ -28,10 +28,10 @@ func (s *AdminServer) createLink(w http.ResponseWriter, r *http.Request) error {
 		uploadEnabled = true
 	}
 
-	err = s.db.CreateLink(name, externalKey, userDownloadable, uploadEnabled, maxFileSize)
+	err = s.db.CreateLink(name, id, userDownloadable, uploadEnabled, maxFileSize)
 	var pqErr *pq.Error
 	if errors.As(err, &pqErr) && pqErr.Code.Name() == "unique_violation" {
-		// hopefully should never happen because externalKey collision chance is very low
+		// hopefully should never happen because PublicID collision chance is very low
 		flash.AddFlash(w, flash.ErrorFlash, "Failed to create link, try again")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return nil

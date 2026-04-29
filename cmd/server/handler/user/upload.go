@@ -51,8 +51,8 @@ func (s *UserServer) upload(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	fileJournalEntry := &idb.FileJournalEntry{
-		LinkExternalKey: id,
-		FileName:        fileName,
+		LinkPublicID: id,
+		FileName:     fileName,
 	}
 	err = s.db.CreateFileJournalEntry(fileJournalEntry)
 	if err != nil {

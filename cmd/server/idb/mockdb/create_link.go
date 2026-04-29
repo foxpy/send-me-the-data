@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-func (d *MockDB) CreateLink(name, externalKey string, userDownloadable, uploadEnabled bool, maxFileSize uint64) error {
+func (d *MockDB) CreateLink(name, id string, userDownloadable, uploadEnabled bool, maxFileSize uint64) error {
 	if len(d.expectedCreateLinkCalls) == 0 {
 		panic("must mock expected CreateLink() call")
 	}
@@ -15,7 +15,7 @@ func (d *MockDB) CreateLink(name, externalKey string, userDownloadable, uploadEn
 
 	actual := link{
 		name:             name,
-		externalKey:      externalKey,
+		id:               id,
 		userDownloadable: userDownloadable,
 		uploadEnabled:    uploadEnabled,
 		maxFileSize:      maxFileSize,
@@ -32,10 +32,10 @@ func (d *MockDB) CreateLink(name, externalKey string, userDownloadable, uploadEn
 	return mockedCall.resultFunc()
 }
 
-func (d *MockDB) MockExpectedCreateLinkCall(name, externalKey string, userDownloadable, uploadEnabled bool, maxFileSize uint64, mockedResult func() error) {
+func (d *MockDB) MockExpectedCreateLinkCall(name, id string, userDownloadable, uploadEnabled bool, maxFileSize uint64, mockedResult func() error) {
 	link := link{
 		name:             name,
-		externalKey:      externalKey,
+		id:               id,
 		userDownloadable: userDownloadable,
 		uploadEnabled:    uploadEnabled,
 		maxFileSize:      maxFileSize,

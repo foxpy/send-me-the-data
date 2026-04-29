@@ -9,7 +9,7 @@ import (
 )
 
 func Files(fs ifs.Filesystem, lock idb.LinkRLock) ([]template.FileView, error) {
-	linkID := lock.ExternalKey()
+	linkID := lock.ID()
 	files, err := fs.ListLinkFiles(linkID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get all files for link %s: %w", linkID, err)
