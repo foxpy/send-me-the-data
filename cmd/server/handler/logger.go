@@ -32,7 +32,8 @@ func (l *loggerMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		"handle HTTP request",
 		"server", l.name,
 		"method", r.Method,
-		"from", r.RemoteAddr, // TODO: it will be different with a reverse proxy
+		"from", r.RemoteAddr,
+		"forwarded_from", r.Header.Get("X-Forwarded-From"),
 		"url", r.URL,
 		"code", lw.statusCode,
 		"duration", duration,
