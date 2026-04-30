@@ -1,24 +1,26 @@
 package view
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 func bytesToHuman(bytes uint64) string {
 	b := float64(bytes)
-	sizes := []struct {
-		name, format string
-	}{
-		{"bytes", "%.0f %s"},
-		{"KiB", "%.2f %s"}, // TODO: I would like to omit .00 if the value is an integer
-		{"MiB", "%.2f %s"},
-		{"GiB", "%.2f %s"},
-		{"TiB", "%.2f %s"},
-		{"PiB", "%.2f %s"},
+	names := []string{
+		"bytes", "KiB", "MiB", "GiB", "TiB", "PiB",
 	}
 
 	i := 0
-	for b >= 1024 && i < len(sizes)-1 {
+	for b >= 1024 && i < len(names)-1 {
 		i++
 		b /= 1024
 	}
-	return fmt.Sprintf(sizes[i].format, b, sizes[i].name)
+
+	format := "%.2f %s"
+	if math.Floor(b) == b {
+		format = "%.0f %s"
+	}
+
+	return fmt.Sprintf(format, b, names[i])
 }

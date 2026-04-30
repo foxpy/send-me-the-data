@@ -50,7 +50,7 @@ func TestFiles(t *testing.T) {
 			res: []template.FileView{{
 				Name:              "file 1",
 				UploadedAt:        mockTimeMilli,
-				Size:              "1.00 KiB",
+				Size:              "1 KiB",
 				AdminDownloadLink: "/link/abcd/file/file 1",
 				UserDownloadLink:  "",
 				DeleteLink:        "/link/abcd/file/file 1/delete",
@@ -73,7 +73,7 @@ func TestFiles(t *testing.T) {
 			res: []template.FileView{{
 				Name:              "file 1",
 				UploadedAt:        mockTimeMilli,
-				Size:              "1.00 KiB",
+				Size:              "1 KiB",
 				AdminDownloadLink: "/link/abcd/file/file 1",
 				UserDownloadLink:  "/abcd/file 1",
 				DeleteLink:        "/link/abcd/file/file 1/delete",
@@ -109,7 +109,7 @@ func TestFiles(t *testing.T) {
 				{
 					Name:              "file 1",
 					UploadedAt:        mockTimeMilli,
-					Size:              "1.00 KiB",
+					Size:              "1 KiB",
 					AdminDownloadLink: "/link/abcd/file/file 1",
 					UserDownloadLink:  "",
 					DeleteLink:        "/link/abcd/file/file 1/delete",

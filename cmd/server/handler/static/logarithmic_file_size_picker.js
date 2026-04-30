@@ -31,7 +31,7 @@ function bytesToHuman(bytes) {
     if (Math.floor(bytes) == bytes) {
         bytes = String(bytes);
     } else {
-        bytes = bytes.toFixed(3);
+        bytes = bytes.toFixed(2);
     }
     return `${bytes} ${sizes[i]}`;
 }

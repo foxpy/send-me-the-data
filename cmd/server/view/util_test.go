@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// TODO: this should be in a separate testing module and used within all tests
 var mockTime = time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 var mockTimeMilli = uint64(mockTime.UTC().UnixMilli())
 
@@ -28,22 +29,27 @@ func TestBytesToHuman(t *testing.T) {
 		{
 			name:  "kibibytes",
 			bytes: 2048,
-			human: "2.00 KiB",
+			human: "2 KiB",
+		},
+		{
+			name:  "kibibytes fractional",
+			bytes: 2048 + 256,
+			human: "2.25 KiB",
 		},
 		{
 			name:  "tebibytes",
 			bytes: 5 * (1 << 40),
-			human: "5.00 TiB",
+			human: "5 TiB",
 		},
 		{
 			name:  "pebibytes",
 			bytes: 7_200 * (1 << 50),
-			human: "7200.00 PiB",
+			human: "7200 PiB",
 		},
 		{
-			name:  "fractional",
-			bytes: 1024 + 512,
-			human: "1.50 KiB",
+			name:  "pebibytes fractional",
+			bytes: 7_200*(1<<50) + 512*(1<<40),
+			human: "7200.50 PiB",
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
