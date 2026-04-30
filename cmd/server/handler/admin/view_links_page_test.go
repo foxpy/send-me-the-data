@@ -5,7 +5,6 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/flash"
 	"github.com/foxpy/send-me-the-data/cmd/server/flash/flashtest"
@@ -74,19 +73,19 @@ func TestViewLinksPage(t *testing.T) {
 		},
 		{
 			name:  "one link, no flashes",
-			links: []idb.Link{mockdb.NewLink("abcdef", "link1", time.UnixMicro(0).UTC(), false, false, 0)},
+			links: []idb.Link{mockdb.NewLink("abcdef", "link1", testutil.MockTime, false, false, 0)},
 			files: []testutil.LinkFiles{{
 				Name: "abcdef",
 				Files: []ifs.File{
 					{
 						Name:    "file 1",
 						Size:    1024,
-						ModTime: time.UnixMicro(0).UTC(),
+						ModTime: testutil.MockTime,
 					},
 					{
 						Name:    "file 2",
 						Size:    10240,
-						ModTime: time.UnixMicro(0).UTC(),
+						ModTime: testutil.MockTime,
 					},
 				},
 			}},
@@ -97,19 +96,19 @@ func TestViewLinksPage(t *testing.T) {
 		},
 		{
 			name:  "one link, success flash",
-			links: []idb.Link{mockdb.NewLink("abcdef", "link1", time.UnixMicro(0).UTC(), false, false, 0)},
+			links: []idb.Link{mockdb.NewLink("abcdef", "link1", testutil.MockTime, false, false, 0)},
 			files: []testutil.LinkFiles{{
 				Name: "abcdef",
 				Files: []ifs.File{
 					{
 						Name:    "file 1",
 						Size:    1024,
-						ModTime: time.UnixMicro(0).UTC(),
+						ModTime: testutil.MockTime,
 					},
 					{
 						Name:    "file 2",
 						Size:    10240,
-						ModTime: time.UnixMicro(0).UTC(),
+						ModTime: testutil.MockTime,
 					},
 				},
 			}},
@@ -123,19 +122,19 @@ func TestViewLinksPage(t *testing.T) {
 		},
 		{
 			name:  "one link, error flash",
-			links: []idb.Link{mockdb.NewLink("abcdef", "link1", time.UnixMicro(0).UTC(), false, false, 0)},
+			links: []idb.Link{mockdb.NewLink("abcdef", "link1", testutil.MockTime, false, false, 0)},
 			files: []testutil.LinkFiles{{
 				Name: "abcdef",
 				Files: []ifs.File{
 					{
 						Name:    "file 1",
 						Size:    1024,
-						ModTime: time.UnixMicro(0).UTC(),
+						ModTime: testutil.MockTime,
 					},
 					{
 						Name:    "file 2",
 						Size:    10240,
-						ModTime: time.UnixMicro(0).UTC(),
+						ModTime: testutil.MockTime,
 					},
 				},
 			}},
@@ -150,9 +149,9 @@ func TestViewLinksPage(t *testing.T) {
 		{
 			name: "multile links, no flashes",
 			links: []idb.Link{
-				mockdb.NewLink("abcdef", "link1", time.UnixMicro(0).UTC(), false, false, 0),
-				mockdb.NewLink("bcdef", "link2", time.UnixMicro(0).UTC(), false, false, 0),
-				mockdb.NewLink("cdef", "link3", time.UnixMicro(0).UTC(), false, false, 0),
+				mockdb.NewLink("abcdef", "link1", testutil.MockTime, false, false, 0),
+				mockdb.NewLink("bcdef", "link2", testutil.MockTime, false, false, 0),
+				mockdb.NewLink("cdef", "link3", testutil.MockTime, false, false, 0),
 			},
 			files: []testutil.LinkFiles{
 				{
@@ -161,12 +160,12 @@ func TestViewLinksPage(t *testing.T) {
 						{
 							Name:    "file 1",
 							Size:    1024,
-							ModTime: time.UnixMicro(0).UTC(),
+							ModTime: testutil.MockTime,
 						},
 						{
 							Name:    "file 2",
 							Size:    10240,
-							ModTime: time.UnixMicro(0).UTC(),
+							ModTime: testutil.MockTime,
 						},
 					},
 				},
@@ -176,7 +175,7 @@ func TestViewLinksPage(t *testing.T) {
 						{
 							Name:    "file 1",
 							Size:    1024,
-							ModTime: time.UnixMicro(0).UTC(),
+							ModTime: testutil.MockTime,
 						},
 					},
 				},

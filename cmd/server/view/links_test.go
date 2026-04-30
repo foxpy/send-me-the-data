@@ -27,7 +27,7 @@ func TestLinks(t *testing.T) {
 		},
 		{
 			desc:  "one link without files",
-			links: []idb.Link{mockdb.NewLink("abcd", "test 1", mockTime, false, false, 100)},
+			links: []idb.Link{mockdb.NewLink("abcd", "test 1", testutil.MockTime, false, false, 100)},
 			files: []testutil.LinkFiles{
 				{
 					Name:  "abcd",
@@ -37,7 +37,7 @@ func TestLinks(t *testing.T) {
 			res: []template.LinkView{
 				{
 					Name:             "test 1",
-					CreatedAt:        mockTimeMilli,
+					CreatedAt:        testutil.MockTimeMilli,
 					TotalFiles:       0,
 					TotalSize:        "0 bytes",
 					MaxFileSize:      "100 bytes",
@@ -53,7 +53,7 @@ func TestLinks(t *testing.T) {
 		},
 		{
 			desc:  "one link with files",
-			links: []idb.Link{mockdb.NewLink("abcd", "test 1", mockTime, true, true, 10240)},
+			links: []idb.Link{mockdb.NewLink("abcd", "test 1", testutil.MockTime, true, true, 10240)},
 			files: []testutil.LinkFiles{
 				{
 					Name: "abcd",
@@ -61,12 +61,12 @@ func TestLinks(t *testing.T) {
 						{
 							Name:    "file 1",
 							Size:    100,
-							ModTime: mockTime,
+							ModTime: testutil.MockTime,
 						},
 						{
 							Name:    "file 2",
 							Size:    500,
-							ModTime: mockTime,
+							ModTime: testutil.MockTime,
 						},
 					},
 				},
@@ -74,7 +74,7 @@ func TestLinks(t *testing.T) {
 			res: []template.LinkView{
 				{
 					Name:             "test 1",
-					CreatedAt:        mockTimeMilli,
+					CreatedAt:        testutil.MockTimeMilli,
 					TotalFiles:       2,
 					TotalSize:        "600 bytes",
 					MaxFileSize:      "10 KiB",
@@ -91,8 +91,8 @@ func TestLinks(t *testing.T) {
 		{
 			desc: "one link with files, one link without",
 			links: []idb.Link{
-				mockdb.NewLink("abcd", "test 1", mockTime, true, false, 10240),
-				mockdb.NewLink("bcde", "test 2", mockTime, false, true, 100),
+				mockdb.NewLink("abcd", "test 1", testutil.MockTime, true, false, 10240),
+				mockdb.NewLink("bcde", "test 2", testutil.MockTime, false, true, 100),
 			},
 			files: []testutil.LinkFiles{
 				{
@@ -101,12 +101,12 @@ func TestLinks(t *testing.T) {
 						{
 							Name:    "file 1",
 							Size:    100,
-							ModTime: mockTime,
+							ModTime: testutil.MockTime,
 						},
 						{
 							Name:    "file 2",
 							Size:    500,
-							ModTime: mockTime,
+							ModTime: testutil.MockTime,
 						},
 					},
 				},
@@ -118,7 +118,7 @@ func TestLinks(t *testing.T) {
 			res: []template.LinkView{
 				{
 					Name:             "test 1",
-					CreatedAt:        mockTimeMilli,
+					CreatedAt:        testutil.MockTimeMilli,
 					TotalFiles:       2,
 					TotalSize:        "600 bytes",
 					MaxFileSize:      "10 KiB",
@@ -132,7 +132,7 @@ func TestLinks(t *testing.T) {
 				},
 				{
 					Name:             "test 2",
-					CreatedAt:        mockTimeMilli,
+					CreatedAt:        testutil.MockTimeMilli,
 					TotalFiles:       0,
 					TotalSize:        "0 bytes",
 					MaxFileSize:      "100 bytes",
@@ -199,7 +199,7 @@ func TestLink(t *testing.T) {
 			},
 			res: &template.LinkView{
 				Name:             "My Link",
-				CreatedAt:        mockTimeMilli,
+				CreatedAt:        testutil.MockTimeMilli,
 				TotalFiles:       0,
 				TotalSize:        "0 bytes",
 				MaxFileSize:      "4 KiB",
@@ -224,12 +224,12 @@ func TestLink(t *testing.T) {
 				Files: []ifs.File{{
 					Name:    "file 1",
 					Size:    1024,
-					ModTime: mockTime,
+					ModTime: testutil.MockTime,
 				}},
 			},
 			res: &template.LinkView{
 				Name:             "My Link",
-				CreatedAt:        mockTimeMilli,
+				CreatedAt:        testutil.MockTimeMilli,
 				TotalFiles:       1,
 				TotalSize:        "1 KiB",
 				MaxFileSize:      "4 KiB",
@@ -255,18 +255,18 @@ func TestLink(t *testing.T) {
 					{
 						Name:    "file 1",
 						Size:    1024,
-						ModTime: mockTime,
+						ModTime: testutil.MockTime,
 					},
 					{
 						Name:    "file 2",
 						Size:    1024 * 3,
-						ModTime: mockTime,
+						ModTime: testutil.MockTime,
 					},
 				},
 			},
 			res: &template.LinkView{
 				Name:             "My Link",
-				CreatedAt:        mockTimeMilli,
+				CreatedAt:        testutil.MockTimeMilli,
 				TotalFiles:       2,
 				TotalSize:        "4 KiB",
 				MaxFileSize:      "4 KiB",
@@ -287,7 +287,7 @@ func TestLink(t *testing.T) {
 			db.SetAcquireLinkRLockResponse(
 				tc.linkID,
 				tc.linkName,
-				mockTime,
+				testutil.MockTime,
 				tc.userDownloadable,
 				tc.uploadEnabled,
 				tc.maxFileSize,

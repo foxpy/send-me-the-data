@@ -44,12 +44,12 @@ func TestFiles(t *testing.T) {
 				Files: []ifs.File{{
 					Name:    "file 1",
 					Size:    1024,
-					ModTime: mockTime,
+					ModTime: testutil.MockTime,
 				}},
 			}},
 			res: []template.FileView{{
 				Name:              "file 1",
-				UploadedAt:        mockTimeMilli,
+				UploadedAt:        testutil.MockTimeMilli,
 				Size:              "1 KiB",
 				AdminDownloadLink: "/link/abcd/file/file 1",
 				UserDownloadLink:  "",
@@ -67,12 +67,12 @@ func TestFiles(t *testing.T) {
 				Files: []ifs.File{{
 					Name:    "file 1",
 					Size:    1024,
-					ModTime: mockTime,
+					ModTime: testutil.MockTime,
 				}},
 			}},
 			res: []template.FileView{{
 				Name:              "file 1",
-				UploadedAt:        mockTimeMilli,
+				UploadedAt:        testutil.MockTimeMilli,
 				Size:              "1 KiB",
 				AdminDownloadLink: "/link/abcd/file/file 1",
 				UserDownloadLink:  "/abcd/file 1",
@@ -91,24 +91,24 @@ func TestFiles(t *testing.T) {
 					{
 						Name:    "file 1",
 						Size:    1024,
-						ModTime: mockTime,
+						ModTime: testutil.MockTime,
 					},
 					{
 						Name:    "file 2",
 						Size:    512,
-						ModTime: mockTime,
+						ModTime: testutil.MockTime,
 					},
 					{
 						Name:    "file 3",
 						Size:    512,
-						ModTime: mockTime,
+						ModTime: testutil.MockTime,
 					},
 				},
 			}},
 			res: []template.FileView{
 				{
 					Name:              "file 1",
-					UploadedAt:        mockTimeMilli,
+					UploadedAt:        testutil.MockTimeMilli,
 					Size:              "1 KiB",
 					AdminDownloadLink: "/link/abcd/file/file 1",
 					UserDownloadLink:  "",
@@ -116,7 +116,7 @@ func TestFiles(t *testing.T) {
 				},
 				{
 					Name:              "file 2",
-					UploadedAt:        mockTimeMilli,
+					UploadedAt:        testutil.MockTimeMilli,
 					Size:              "512 bytes",
 					AdminDownloadLink: "/link/abcd/file/file 2",
 					UserDownloadLink:  "",
@@ -124,7 +124,7 @@ func TestFiles(t *testing.T) {
 				},
 				{
 					Name:              "file 3",
-					UploadedAt:        mockTimeMilli,
+					UploadedAt:        testutil.MockTimeMilli,
 					Size:              "512 bytes",
 					AdminDownloadLink: "/link/abcd/file/file 3",
 					UserDownloadLink:  "",
@@ -137,7 +137,7 @@ func TestFiles(t *testing.T) {
 			db := mockdb.NewMockDB()
 			fs := mockfs.NewMockFS()
 
-			db.SetAcquireLinkRLockResponse(tc.linkID, tc.linkName, mockTime, tc.userDownloadable, false, tc.maxFileSize)
+			db.SetAcquireLinkRLockResponse(tc.linkID, tc.linkName, testutil.MockTime, tc.userDownloadable, false, tc.maxFileSize)
 			lock, err := db.AcquireLinkRLock(tc.linkID)
 			if err != nil {
 				t.Fatal(err)
