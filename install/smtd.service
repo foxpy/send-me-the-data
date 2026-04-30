@@ -1,7 +1,7 @@
 [Unit]
 Description=Send me the Data
-After=network.target
-Wants=systemd-logind.service
+After=network.target postgresql.service
+Wants=systemd-logind.service postgresql.service
 
 [Service]
 User=smtd
