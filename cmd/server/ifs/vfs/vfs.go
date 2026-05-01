@@ -40,22 +40,17 @@ func (f *VFS) ListLinkFiles(linkID string) ([]ifs.File, error) {
 		_ = linkFolder.Close()
 	}()
 
-	entries, err := linkFolder.ReadDir(0)
+	entries, err := linkFolder.Readdir(0)
 	if err != nil {
 		return nil, fmt.Errorf("failed to traverse directory of link %s: %w", linkID, err)
 	}
 
 	files := make([]ifs.File, 0, len(entries))
 	for _, entry := range entries {
-		info, err := entry.Info()
-		if err != nil {
-			return nil, fmt.Errorf("failed to get file info: %w", err)
-		}
-
 		files = append(files, ifs.File{
 			Name:    entry.Name(),
-			Size:    info.Size(),
-			ModTime: info.ModTime().UTC(),
+			Size:    entry.Size(),
+			ModTime: entry.ModTime().UTC(),
 		})
 	}
 
