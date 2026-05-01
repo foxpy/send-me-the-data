@@ -1,9 +1,3 @@
-- [x] Postgres schema
-  - [x] with migrations
-  - [ ] what can I use instead of postgres passwords?
-
-
-
 - [ ] Client server
   - [x] static upload web page
     - [x] successful upload flash
@@ -30,8 +24,3 @@
 - [ ] Tests
 - [x] favicon
 - [x] use tooltips to make UI tables not as wide
-
-File storage:
-- [x] $PREFIX is configurable and tells the server where to dump files to
-- [x] link:filename must be unique and user cannot reupload the file
-- all link:filename files are stored at $PREFIX/$link/$filename
