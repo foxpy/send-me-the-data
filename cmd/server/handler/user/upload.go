@@ -36,9 +36,7 @@ func (s *UserServer) upload(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("failed to acquire read lock on link %s: %w", id, err)
 	}
 
-	defer func() {
-		_ = lock.Release()
-	}()
+	defer lock.Release()
 
 	if uint64(header.Size) > lock.MaxFileSize() {
 		w.WriteHeader(http.StatusBadRequest)

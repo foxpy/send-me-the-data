@@ -30,7 +30,11 @@ func NewAdminServer(db idb.Database, fs ifs.Filesystem, rnd irnd.Random) http.Ha
 
 	m.HandleFunc("GET /link/{id}/zip", handler.HandleWith500OnError(s.downloadZIP))
 
-	m.HandleFunc("GET /link/{id}/file/{name}", handler.HandleWith500OnError(s.downloadFile))
+	m.HandleFunc("GET /link/{id}/file/{name}", handler.HandleWith500OnError(
+		func(w http.ResponseWriter, r *http.Request) error {
+			return handler.HandleDownloadFile(w, r, s.db, s.fs, false)
+		},
+	))
 	m.HandleFunc("POST /link/{id}/file/{name}/delete", handler.HandleWith500OnError(s.deleteFile))
 
 	m.Handle("GET /static/", http.FileServerFS(handler.Static))

@@ -2,7 +2,9 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
@@ -44,8 +46,11 @@ type linkRLock struct {
 	tx *sql.Tx
 }
 
-func (l *linkRLock) Release() error {
-	return l.tx.Rollback()
+func (l *linkRLock) Release() {
+	err := l.tx.Rollback()
+	if err != nil && !errors.Is(err, sql.ErrTxDone) {
+		slog.Error("failed to release link rlock", "link", l.id, "error", err)
+	}
 }
 
 type linkWLock struct {
@@ -89,8 +94,11 @@ func (l *linkWLock) Commit() error {
 	return l.tx.Commit()
 }
 
-func (l *linkWLock) Rollback() error {
-	return l.tx.Rollback()
+func (l *linkWLock) Rollback() {
+	err := l.tx.Rollback()
+	if err != nil && !errors.Is(err, sql.ErrTxDone) {
+		slog.Error("failed to release link wlock", "link", l.id, "error", err)
+	}
 }
 
 func (d *Postgres) AllLinks() ([]idb.Link, error) {

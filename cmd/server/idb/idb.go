@@ -31,7 +31,7 @@ type Link interface {
 
 type LinkRLock interface {
 	Link
-	Release() error
+	Release()
 }
 
 type LinkWLock interface {
@@ -39,5 +39,5 @@ type LinkWLock interface {
 	Update(name string, userDownloadable, uploadEnabled bool, maxFileSize uint64) error
 	Delete() error
 	Commit() error
-	Rollback() error
+	Rollback()
 }

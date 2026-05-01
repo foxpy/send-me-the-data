@@ -22,7 +22,11 @@ func NewUserServer(db idb.Database, fs ifs.Filesystem) http.Handler {
 		if r.PathValue("id") == "static" {
 			http.FileServerFS(handler.Static).ServeHTTP(w, r)
 		} else {
-			handler.HandleWith500OnError(s.downloadFile).ServeHTTP(w, r)
+			handler.HandleWith500OnError(
+				func(w http.ResponseWriter, r *http.Request) error {
+					return handler.HandleDownloadFile(w, r, s.db, s.fs, true)
+				},
+			).ServeHTTP(w, r)
 		}
 	})
 	return handler.WithLogger(m, "user")

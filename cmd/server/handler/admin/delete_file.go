@@ -18,9 +18,7 @@ func (s *AdminServer) deleteFile(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("failed to acquire read lock for link %s: %w", id, err)
 	}
 
-	defer func() {
-		_ = lock.Release()
-	}()
+	defer lock.Release()
 
 	name := r.PathValue("name")
 	err = s.fs.RemoveLinkFile(id, name)

@@ -20,9 +20,7 @@ func (s *AdminServer) editLinkPage(w http.ResponseWriter, r *http.Request) error
 		return fmt.Errorf("failed to acquire read lock on link %s: %w", id, err)
 	}
 
-	defer func() {
-		_ = lock.Release()
-	}()
+	defer lock.Release()
 
 	linkView, err := view.Link(lock, s.fs)
 	if err != nil {

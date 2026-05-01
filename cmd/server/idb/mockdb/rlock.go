@@ -10,7 +10,7 @@ type mockLinkRLock struct {
 	link
 }
 
-func (l *mockLinkRLock) Release() error {
+func (l *mockLinkRLock) Release() {
 	panic("TODO")
 }
 
