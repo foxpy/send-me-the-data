@@ -60,7 +60,7 @@ func TestViewLinksPage(t *testing.T) {
 		cookies         []*http.Cookie
 		expectedCode    int
 		expectedTables  []table
-		expectedFlashes []flashtest.Flash
+		expectedFlashes []flashtest.HTMLFlash
 	}{
 		{
 			name:            "no links, no flashes",
@@ -118,7 +118,7 @@ func TestViewLinksPage(t *testing.T) {
 			}},
 			expectedCode:    http.StatusOK,
 			expectedTables:  []table{{1}},
-			expectedFlashes: []flashtest.Flash{{Kind: flash.SuccessFlash, Text: "Link created successfully"}},
+			expectedFlashes: []flashtest.HTMLFlash{{Kind: flash.SuccessFlash, Text: "Link created successfully"}},
 		},
 		{
 			name:  "one link, error flash",
@@ -144,7 +144,7 @@ func TestViewLinksPage(t *testing.T) {
 			}},
 			expectedCode:    http.StatusOK,
 			expectedTables:  []table{{1}},
-			expectedFlashes: []flashtest.Flash{{Kind: flash.ErrorFlash, Text: "Failed to create link"}},
+			expectedFlashes: []flashtest.HTMLFlash{{Kind: flash.ErrorFlash, Text: "Failed to create link"}},
 		},
 		{
 			name: "multile links, no flashes",
