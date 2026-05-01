@@ -33,10 +33,6 @@ type AdminViewLinkParams struct {
 	Files []FileView
 }
 
-type AdminEditLinkParams struct {
-	Link LinkView
-}
-
 type AdminViewLinksParams struct {
 	Links []LinkView
 }
@@ -90,10 +86,6 @@ func RenderUserViewLink(w http.ResponseWriter, params Params[UserViewLinkParams]
 
 func RenderAdminViewLink(w http.ResponseWriter, params Params[AdminViewLinkParams]) error {
 	return renderHelper(w, "admin_view_link.gohtml", params)
-}
-
-func RenderAdminEditLink(w http.ResponseWriter, params Params[AdminEditLinkParams]) error {
-	return renderHelper(w, "admin_edit_link.gohtml", params)
 }
 
 func RenderAdminViewLinks(w http.ResponseWriter, params Params[AdminViewLinksParams]) error {

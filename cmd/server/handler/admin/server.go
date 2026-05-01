@@ -24,7 +24,6 @@ func NewAdminServer(db idb.Database, fs ifs.Filesystem, rnd irnd.Random) http.Ha
 	m.HandleFunc("GET /link/{id}", handler.HandleWith500OnError(s.viewLinkPage))
 	// TODO: relace POST with DELETE for delete methods
 	m.HandleFunc("POST /link/{id}/delete", handler.HandleWith500OnError(s.deleteLink))
-	m.HandleFunc("GET /link/{id}/edit", handler.HandleWith500OnError(s.editLinkPage))
 	m.HandleFunc("POST /link/{id}/edit", handler.HandleWith500OnError(s.editLink))
 	m.HandleFunc("POST /link", handler.HandleWith500OnError(s.createLink))
 
