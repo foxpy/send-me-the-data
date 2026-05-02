@@ -1,0 +1,151 @@
+package view
+
+import (
+	"reflect"
+	"testing"
+
+	"github.com/foxpy/send-me-the-data/cmd/server/idb/mockdb"
+	"github.com/foxpy/send-me-the-data/cmd/server/ifs"
+	"github.com/foxpy/send-me-the-data/cmd/server/ifs/mockfs"
+	"github.com/foxpy/send-me-the-data/cmd/server/template"
+	"github.com/foxpy/send-me-the-data/cmd/server/testutil"
+)
+
+func TestLink(t *testing.T) {
+	for _, tc := range []struct {
+		name             string
+		linkID           string
+		linkName         string
+		userDownloadable bool
+		uploadEnabled    bool
+		maxFileSize      uint64
+		files            testutil.LinkFiles
+		res              template.LinkView
+	}{
+		{
+			name:             "no files",
+			linkID:           "abcd",
+			linkName:         "My Link",
+			userDownloadable: false,
+			uploadEnabled:    false,
+			maxFileSize:      4096,
+			files: testutil.LinkFiles{
+				Name:  "abcd",
+				Files: []ifs.File{},
+			},
+			res: template.LinkView{
+				Name:             "My Link",
+				CreatedAt:        testutil.MockTimeMilli,
+				TotalFiles:       0,
+				TotalSize:        "0 bytes",
+				MaxFileSize:      "4 KiB",
+				MaxFileSizeBytes: 4096,
+				ViewLink:         "/link/abcd",
+				DeleteLink:       "/link/abcd/delete",
+				EditLink:         "/link/abcd/edit",
+				DownloadZIP:      "/link/abcd/zip",
+				UserDownloadable: false,
+				UploadEnabled:    false,
+			},
+		},
+		{
+			name:             "one file, upload enabled",
+			linkID:           "abcd",
+			linkName:         "My Link",
+			userDownloadable: false,
+			uploadEnabled:    true,
+			maxFileSize:      4096,
+			files: testutil.LinkFiles{
+				Name: "abcd",
+				Files: []ifs.File{{
+					Name:    "file 1",
+					Size:    1024,
+					ModTime: testutil.MockTime,
+				}},
+			},
+			res: template.LinkView{
+				Name:             "My Link",
+				CreatedAt:        testutil.MockTimeMilli,
+				TotalFiles:       1,
+				TotalSize:        "1 KiB",
+				MaxFileSize:      "4 KiB",
+				MaxFileSizeBytes: 4096,
+				ViewLink:         "/link/abcd",
+				DeleteLink:       "/link/abcd/delete",
+				EditLink:         "/link/abcd/edit",
+				DownloadZIP:      "/link/abcd/zip",
+				UserDownloadable: false,
+				UploadEnabled:    true,
+			},
+		},
+		{
+			name:             "many files, user downloadable",
+			linkID:           "abcd",
+			linkName:         "My Link",
+			userDownloadable: true,
+			uploadEnabled:    false,
+			maxFileSize:      4096,
+			files: testutil.LinkFiles{
+				Name: "abcd",
+				Files: []ifs.File{
+					{
+						Name:    "file 1",
+						Size:    1024,
+						ModTime: testutil.MockTime,
+					},
+					{
+						Name:    "file 2",
+						Size:    1024 * 3,
+						ModTime: testutil.MockTime,
+					},
+				},
+			},
+			res: template.LinkView{
+				Name:             "My Link",
+				CreatedAt:        testutil.MockTimeMilli,
+				TotalFiles:       2,
+				TotalSize:        "4 KiB",
+				MaxFileSize:      "4 KiB",
+				MaxFileSizeBytes: 4096,
+				ViewLink:         "/link/abcd",
+				DeleteLink:       "/link/abcd/delete",
+				EditLink:         "/link/abcd/edit",
+				DownloadZIP:      "/link/abcd/zip",
+				UserDownloadable: true,
+				UploadEnabled:    false,
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			db := mockdb.NewMockDB()
+			fs := mockfs.NewMockFS()
+
+			db.SetAcquireLinkRLockResponse(
+				tc.linkID,
+				tc.linkName,
+				testutil.MockTime,
+				tc.userDownloadable,
+				tc.uploadEnabled,
+				tc.maxFileSize,
+			)
+			fs.SetListLinkFilesResponse(tc.files.Name, tc.files.Files)
+			lock, err := db.AcquireLinkRLock(tc.linkID)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			files, err := fs.ListLinkFiles(lock.ID())
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			linkView := Link(lock, files)
+
+			if !reflect.DeepEqual(linkView, tc.res) {
+				t.Fatalf(`
+expected: %v,
+got:      %v`, tc.res, linkView)
+			}
+		})
+	}
+}

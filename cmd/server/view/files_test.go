@@ -19,6 +19,7 @@ func TestFiles(t *testing.T) {
 		userDownloadable bool
 		maxFileSize      uint64
 		files            []testutil.LinkFiles
+		offset, limit    int
 		res              []template.FileView
 	}{
 		{
@@ -31,7 +32,9 @@ func TestFiles(t *testing.T) {
 				Name:  "abcd",
 				Files: []ifs.File{},
 			}},
-			res: []template.FileView{},
+			offset: 0,
+			limit:  100,
+			res:    []template.FileView{},
 		},
 		{
 			desc:             "one file",
@@ -47,6 +50,8 @@ func TestFiles(t *testing.T) {
 					ModTime: testutil.MockTime,
 				}},
 			}},
+			offset: 0,
+			limit:  100,
 			res: []template.FileView{{
 				Name:              "file 1",
 				UploadedAt:        testutil.MockTimeMilli,
@@ -70,6 +75,8 @@ func TestFiles(t *testing.T) {
 					ModTime: testutil.MockTime,
 				}},
 			}},
+			offset: 0,
+			limit:  100,
 			res: []template.FileView{{
 				Name:              "file 1",
 				UploadedAt:        testutil.MockTimeMilli,
@@ -105,6 +112,8 @@ func TestFiles(t *testing.T) {
 					},
 				},
 			}},
+			offset: 0,
+			limit:  100,
 			res: []template.FileView{
 				{
 					Name:              "file 1",
@@ -132,6 +141,169 @@ func TestFiles(t *testing.T) {
 				},
 			},
 		},
+		{
+			desc:             "3 files, limit 2",
+			linkID:           "abcd",
+			linkName:         "My Link",
+			userDownloadable: false,
+			maxFileSize:      4096,
+			files: []testutil.LinkFiles{{
+				Name: "abcd",
+				Files: []ifs.File{
+					{
+						Name:    "file 1",
+						Size:    1024,
+						ModTime: testutil.MockTime,
+					},
+					{
+						Name:    "file 2",
+						Size:    512,
+						ModTime: testutil.MockTime,
+					},
+					{
+						Name:    "file 3",
+						Size:    512,
+						ModTime: testutil.MockTime,
+					},
+				},
+			}},
+			offset: 0,
+			limit:  2,
+			res: []template.FileView{
+				{
+					Name:              "file 1",
+					UploadedAt:        testutil.MockTimeMilli,
+					Size:              "1 KiB",
+					AdminDownloadLink: "/link/abcd/file/file 1",
+					UserDownloadLink:  "",
+					DeleteLink:        "/link/abcd/file/file 1/delete",
+				},
+				{
+					Name:              "file 2",
+					UploadedAt:        testutil.MockTimeMilli,
+					Size:              "512 bytes",
+					AdminDownloadLink: "/link/abcd/file/file 2",
+					UserDownloadLink:  "",
+					DeleteLink:        "/link/abcd/file/file 2/delete",
+				},
+			},
+		},
+		{
+			desc:             "3 files, offset 1",
+			linkID:           "abcd",
+			linkName:         "My Link",
+			userDownloadable: false,
+			maxFileSize:      4096,
+			files: []testutil.LinkFiles{{
+				Name: "abcd",
+				Files: []ifs.File{
+					{
+						Name:    "file 1",
+						Size:    1024,
+						ModTime: testutil.MockTime,
+					},
+					{
+						Name:    "file 2",
+						Size:    512,
+						ModTime: testutil.MockTime,
+					},
+					{
+						Name:    "file 3",
+						Size:    512,
+						ModTime: testutil.MockTime,
+					},
+				},
+			}},
+			offset: 1,
+			limit:  100,
+			res: []template.FileView{
+				{
+					Name:              "file 2",
+					UploadedAt:        testutil.MockTimeMilli,
+					Size:              "512 bytes",
+					AdminDownloadLink: "/link/abcd/file/file 2",
+					UserDownloadLink:  "",
+					DeleteLink:        "/link/abcd/file/file 2/delete",
+				},
+				{
+					Name:              "file 3",
+					UploadedAt:        testutil.MockTimeMilli,
+					Size:              "512 bytes",
+					AdminDownloadLink: "/link/abcd/file/file 3",
+					UserDownloadLink:  "",
+					DeleteLink:        "/link/abcd/file/file 3/delete",
+				},
+			},
+		},
+		{
+			desc:             "3 files, offset 1, limit 1",
+			linkID:           "abcd",
+			linkName:         "My Link",
+			userDownloadable: false,
+			maxFileSize:      4096,
+			files: []testutil.LinkFiles{{
+				Name: "abcd",
+				Files: []ifs.File{
+					{
+						Name:    "file 1",
+						Size:    1024,
+						ModTime: testutil.MockTime,
+					},
+					{
+						Name:    "file 2",
+						Size:    512,
+						ModTime: testutil.MockTime,
+					},
+					{
+						Name:    "file 3",
+						Size:    512,
+						ModTime: testutil.MockTime,
+					},
+				},
+			}},
+			offset: 1,
+			limit:  1,
+			res: []template.FileView{
+				{
+					Name:              "file 2",
+					UploadedAt:        testutil.MockTimeMilli,
+					Size:              "512 bytes",
+					AdminDownloadLink: "/link/abcd/file/file 2",
+					UserDownloadLink:  "",
+					DeleteLink:        "/link/abcd/file/file 2/delete",
+				},
+			},
+		},
+		{
+			desc:             "3 files, offset 5",
+			linkID:           "abcd",
+			linkName:         "My Link",
+			userDownloadable: false,
+			maxFileSize:      4096,
+			files: []testutil.LinkFiles{{
+				Name: "abcd",
+				Files: []ifs.File{
+					{
+						Name:    "file 1",
+						Size:    1024,
+						ModTime: testutil.MockTime,
+					},
+					{
+						Name:    "file 2",
+						Size:    512,
+						ModTime: testutil.MockTime,
+					},
+					{
+						Name:    "file 3",
+						Size:    512,
+						ModTime: testutil.MockTime,
+					},
+				},
+			}},
+			offset: 5,
+			limit:  100,
+			res:    []template.FileView{},
+		},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
 			db := mockdb.NewMockDB()
@@ -147,10 +319,12 @@ func TestFiles(t *testing.T) {
 				fs.SetListLinkFilesResponse(f.Name, f.Files)
 			}
 
-			fileViews, err := Files(fs, lock)
+			files, err := fs.ListLinkFiles(lock.ID())
 			if err != nil {
-				t.Fatalf("%s", err)
+				t.Fatal(err)
 			}
+
+			fileViews := Files(lock, files, tc.offset, tc.limit)
 
 			if len(fileViews) != len(tc.res) {
 				t.Fatalf("expected %d rendered files, got %d", len(tc.res), len(fileViews))

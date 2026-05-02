@@ -8,17 +8,23 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/template"
 )
 
-func Files(fs ifs.Filesystem, lock idb.LinkRLock) ([]template.FileView, error) {
-	linkID := lock.ID()
-	files, err := fs.ListLinkFiles(linkID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get all files for link %s: %w", linkID, err)
+func Files(link idb.Link, files []ifs.File, offset, limit int) []template.FileView {
+	if offset > len(files) {
+		return nil
 	}
+	files = files[offset:]
+
+	if limit <= len(files) {
+		files = files[:limit]
+	}
+
+	userDownloadable := link.UserDownloadable()
+	linkID := link.ID()
 
 	fileViews := make([]template.FileView, 0, len(files))
 	for _, file := range files {
 		userDownloadLink := ""
-		if lock.UserDownloadable() {
+		if userDownloadable {
 			userDownloadLink = fmt.Sprintf("/%s/%s", linkID, file.Name)
 		}
 
@@ -32,5 +38,5 @@ func Files(fs ifs.Filesystem, lock idb.LinkRLock) ([]template.FileView, error) {
 		})
 	}
 
-	return fileViews, nil
+	return fileViews
 }

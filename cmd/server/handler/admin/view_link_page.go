@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/flash"
 	"github.com/foxpy/send-me-the-data/cmd/server/handler"
@@ -23,22 +24,29 @@ func (s *AdminServer) viewLinkPage(w http.ResponseWriter, r *http.Request) error
 
 	defer lock.Release()
 
-	files, err := view.Files(s.fs, lock)
+	offset, err := strconv.ParseUint(r.URL.Query().Get("offset"), 10, 64)
 	if err != nil {
-		return fmt.Errorf("failed to get files view for link %s: %w", id, err)
+		offset = 0
 	}
 
-	link, err := view.Link(lock, s.fs)
-	if err != nil {
-		return fmt.Errorf("failed to get %s link view: %w", id, err)
+	limit, err := strconv.ParseUint(r.URL.Query().Get("limit"), 10, 64)
+	if err != nil || limit > 100 {
+		limit = 100
 	}
 
-	lock.Release()
+	files, err := s.fs.ListLinkFiles(id)
+	if err != nil {
+		return fmt.Errorf("failed to get all files for link %s: %w", id, err)
+	}
+
+	// TODO: pagination UI elements
 
 	var params template.Params[template.AdminViewLinkParams]
 	params.Title = fmt.Sprintf("Link: %s", lock.Name())
-	params.Data.Files = files
-	params.Data.Link = *link
+	params.Data.Files = view.Files(lock, files, int(offset), int(limit))
+	params.Data.Link = view.Link(lock, files)
+
+	lock.Release()
 
 	flashes := flash.GetFlashes(w, r)
 	params.SuccessFlash = flashes[flash.SuccessFlash]

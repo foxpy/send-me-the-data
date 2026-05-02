@@ -7,7 +7,6 @@ import (
 )
 
 type Filesystem interface {
-	// FIXME: do not read all dir entries into memory at once, use pagination instead
 	ListLinkFiles(linkID string) ([]File, error)
 	RemoveLinkFiles(linkID string) error
 	RemoveLinkFile(linkID, fileName string) error

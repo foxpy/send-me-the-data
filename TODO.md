@@ -14,6 +14,7 @@
       - [x] create
         - [x] set maximum file size
         - [ ] DIFFICULT: set maximum total file size
+        - [ ] DIFFICULT: set maximum total file count
       - [x] edit
       - [x] delete
   - [x] Link view page (allows downloading files)
