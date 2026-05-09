@@ -39,12 +39,11 @@ func (s *UserServer) viewLinkPage(w http.ResponseWriter, r *http.Request) error 
 		return fmt.Errorf("failed to get all files for link %s: %w", id, err)
 	}
 
-	// TODO: pagination UI elements
-
 	var params template.Params[template.UserViewLinkParams]
 	params.Title = "Send me the Data"
 	params.Data.Files = view.Files(lock, files, int(offset), int(limit))
 	params.Data.Link = view.Link(lock, files)
+	params.Data.Pages = view.Pagination(uint(offset), uint(len(files)), 100, fmt.Sprintf("/%s", id))
 
 	lock.Release()
 

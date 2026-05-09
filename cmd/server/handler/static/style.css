@@ -54,3 +54,14 @@ form {
 #file_size_label {
     margin-left: auto;
 }
+
+.pagination {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0.5rem 0.5rem 0.5rem auto;
+    width: fit-content;
+}
+
+.pagination > * {
+    margin: 0;
+}

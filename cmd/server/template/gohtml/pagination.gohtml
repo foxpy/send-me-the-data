@@ -1,0 +1,11 @@
+<div class="pagination">
+{{ range . }}
+    {{ if .IsPlaceholder }}
+    <p>...</p>
+    {{ else if .Link }}
+    <a href="{{ .Link }}">{{ .Number }}</a>
+    {{ else }}
+    <p>{{ .Number }}</p>
+    {{ end }}
+{{ end }}
+</div>

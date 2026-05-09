@@ -26,11 +26,13 @@ type Params[T any] struct {
 type UserViewLinkParams struct {
 	Link  LinkView
 	Files []FileView
+	Pages []PaginationView
 }
 
 type AdminViewLinkParams struct {
 	Link  LinkView
 	Files []FileView
+	Pages []PaginationView
 }
 
 type AdminViewLinksParams struct {
@@ -59,6 +61,12 @@ type LinkView struct {
 	DownloadZIP      string
 	UserDownloadable bool
 	UploadEnabled    bool
+}
+
+type PaginationView struct {
+	Number        uint
+	Link          string
+	IsPlaceholder bool
 }
 
 func renderHelper(w http.ResponseWriter, templateName string, data any) error {
