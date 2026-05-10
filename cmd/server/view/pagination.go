@@ -6,6 +6,8 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/template"
 )
 
+const paginatorWidth = 3
+
 func Pagination(
 	currentItem, totalItems, itemsPerPage uint,
 	baseUrl string,
@@ -28,10 +30,10 @@ func Pagination(
 				Link:          "",
 				IsPlaceholder: true,
 			})
-			if i+2 < currentPage {
-				i = currentPage - 3
-			} else if i+2 < totalPages {
-				i = totalPages - 3
+			if i+paginatorWidth-1 < currentPage {
+				i = currentPage - paginatorWidth
+			} else if i+paginatorWidth-1 < totalPages {
+				i = totalPages - paginatorWidth
 			}
 			continue
 		}
@@ -59,5 +61,5 @@ func isCloseTo(x, target uint) bool {
 		diff = target - x
 	}
 
-	return diff <= 2
+	return diff <= paginatorWidth-1
 }
