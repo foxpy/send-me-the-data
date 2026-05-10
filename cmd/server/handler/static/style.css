@@ -58,10 +58,14 @@ form {
 .pagination {
     display: flex;
     gap: 0.25rem;
-    margin: 0.5rem 0.5rem 0.5rem auto;
+    margin: 0.5rem;
     width: fit-content;
 }
 
 .pagination > * {
     margin: 0;
+}
+
+.pagination > a:visited, .pagination > a:link {
+    color: blue;
 }

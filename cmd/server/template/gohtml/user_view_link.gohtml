@@ -28,6 +28,8 @@
 
     <h2>List of files</h2>
 
+    {{ template "pagination.gohtml" .Data.Pages }}
+
     <div>
         <table>
             <thead>
@@ -54,8 +56,6 @@
             </tbody>
         </table>
     </div>
-
-    {{ template "pagination.gohtml" .Data.Pages }}
 
     <script src="/static/format_timestamps.js"></script>
 </body>
