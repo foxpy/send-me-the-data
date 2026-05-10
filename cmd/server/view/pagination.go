@@ -21,31 +21,24 @@ func Pagination(
 	}
 
 	pages := make([]template.PaginationView, 0, totalPages)
-	collapsing := false
-	// TODO: this O(N) algorithm could be O(C)
-	for j := range totalPages {
-		i := j + 1
-		toCollapse := true
-		if isCloseTo(i, 1) || isCloseTo(i, totalPages) || isCloseTo(i, currentPage) {
-			toCollapse = false
-			collapsing = false
-		}
-
-		if toCollapse {
-			if !collapsing {
-				pages = append(pages, template.PaginationView{
-					Number:        0,
-					Link:          "",
-					IsPlaceholder: true,
-				})
-				collapsing = true
+	for i := uint(1); i <= totalPages; i++ {
+		if !(isCloseTo(i, 1) || isCloseTo(i, totalPages) || isCloseTo(i, currentPage)) {
+			pages = append(pages, template.PaginationView{
+				Number:        0,
+				Link:          "",
+				IsPlaceholder: true,
+			})
+			if i+2 < currentPage {
+				i = currentPage - 3
+			} else if i+2 < totalPages {
+				i = totalPages - 3
 			}
 			continue
 		}
 
 		var link string
 		if i != currentPage {
-			link = fmt.Sprintf("%s?offset=%d", baseUrl, j*itemsPerPage)
+			link = fmt.Sprintf("%s?offset=%d", baseUrl, (i-1)*itemsPerPage)
 		}
 
 		pages = append(pages, template.PaginationView{
