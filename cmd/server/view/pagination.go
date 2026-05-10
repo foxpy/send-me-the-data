@@ -45,7 +45,7 @@ func Pagination(
 
 		var link string
 		if i != currentPage {
-			link = fmt.Sprintf("%s?offset=%d&limit=%d", baseUrl, j*itemsPerPage, itemsPerPage)
+			link = fmt.Sprintf("%s?offset=%d", baseUrl, j*itemsPerPage)
 		}
 
 		pages = append(pages, template.PaginationView{

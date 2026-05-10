@@ -29,11 +29,6 @@ func (s *UserServer) viewLinkPage(w http.ResponseWriter, r *http.Request) error 
 		offset = 0
 	}
 
-	limit, err := strconv.ParseUint(r.URL.Query().Get("limit"), 10, 64)
-	if err != nil || limit > 100 {
-		limit = 100
-	}
-
 	files, err := s.fs.ListLinkFiles(id)
 	if err != nil {
 		return fmt.Errorf("failed to get all files for link %s: %w", id, err)
@@ -41,7 +36,7 @@ func (s *UserServer) viewLinkPage(w http.ResponseWriter, r *http.Request) error 
 
 	var params template.Params[template.UserViewLinkParams]
 	params.Title = "Send me the Data"
-	params.Data.Files = view.Files(lock, files, int(offset), int(limit))
+	params.Data.Files = view.Files(lock, files, int(offset), 100)
 	params.Data.Link = view.Link(lock, files)
 	params.Data.Pages = view.Pagination(uint(offset), uint(len(files)), 100, fmt.Sprintf("/%s", id))
 
