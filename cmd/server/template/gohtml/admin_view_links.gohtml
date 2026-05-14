@@ -77,6 +77,7 @@
                     <td>{{ if .UserDownloadable }}yes{{ else }}no{{ end }}</td>
                     <td>{{ if .UploadEnabled }}yes{{ else }}no{{ end }}</td>
                     <td>
+                        {{ if .TotalFiles }}
                         <form action="{{ .DownloadZIP }}" method="get">
                             <input type="submit" value="ZIP" />
                         </form>
@@ -84,6 +85,7 @@
                             <input type="submit" value="Uncompressed ZIP" />
                             <input type="hidden" name="method" value="store" />
                         </form>
+                        {{ end }}
                         <form action="{{ .DeleteLink }}" method="post">
                             <input type="submit" value="Delete" />
                         </form>
