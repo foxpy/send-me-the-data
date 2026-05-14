@@ -13,6 +13,8 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/handler"
 )
 
+// FIXME: ZIP download fails for an empty newly created link
+
 func (s *AdminServer) downloadZIP(w http.ResponseWriter, r *http.Request) error {
 	id := r.PathValue("id")
 	lock, err := s.db.AcquireLinkRLock(id)

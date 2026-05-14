@@ -7,7 +7,8 @@ import (
 )
 
 type MockDB struct {
-	allLinksResponse          []idb.Link
+	listLinksResponses        map[struct{ offset, limit uint }][]idb.Link
+	totalLinksResponse        *uint64
 	expectedCreateLinkCalls   []CreateLinkCall
 	acquireLinkRLockResponses map[string]idb.LinkRLock
 }
@@ -21,6 +22,7 @@ var _ idb.Database = &MockDB{}
 
 func NewMockDB() *MockDB {
 	return &MockDB{
+		listLinksResponses:        make(map[struct{ offset, limit uint }][]idb.Link),
 		acquireLinkRLockResponses: make(map[string]idb.LinkRLock),
 	}
 }

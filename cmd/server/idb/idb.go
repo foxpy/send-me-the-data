@@ -8,8 +8,8 @@ type Database interface {
 	GetFileJournalEntry() (*FileJournalEntry, error)
 	DeleteFileJournalEntry(*FileJournalEntry) error
 	CreateFileJournalEntry(*FileJournalEntry) error
-	// FIXME: do not read all links from database, use pagination instead
-	AllLinks() ([]Link, error)
+	TotalLinks() (uint64, error)
+	ListLinks(offset, limit uint) ([]Link, error)
 	CreateLink(name, id string, userDownloadable, uploadEnabled bool, maxFileSize uint64) error
 	AcquireLinkRLock(id string) (LinkRLock, error)
 	AcquireLinkWLock(id string) (LinkWLock, error)

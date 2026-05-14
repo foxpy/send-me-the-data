@@ -6,12 +6,29 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/idb"
 )
 
-func (d *Postgres) AllLinks() ([]idb.Link, error) {
+func (d *Postgres) TotalLinks() (uint64, error) {
+	row := d.db.QueryRow(`
+		SELECT count(link_id) FROM smtd.links
+	`)
+
+	var n uint64
+	err := row.Scan(&n)
+	if err != nil {
+		return 0, err
+	}
+
+	return n, nil
+}
+
+func (d *Postgres) ListLinks(offset, limit uint) ([]idb.Link, error) {
 	rows, err := d.db.Query(`
 		SELECT
 			name, public_id, created_at, user_downloadable, upload_enabled, max_file_size
 		FROM smtd.links
-	`)
+		ORDER BY created_at DESC
+		LIMIT $1
+		OFFSET $2
+	`, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query links from the database: %w", err)
 	}

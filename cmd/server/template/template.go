@@ -37,6 +37,7 @@ type AdminViewLinkParams struct {
 
 type AdminViewLinksParams struct {
 	Links []LinkView
+	Pages []PaginationView
 }
 
 type FileView struct {

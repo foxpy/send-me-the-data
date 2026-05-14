@@ -198,7 +198,9 @@ func TestViewLinksPage(t *testing.T) {
 
 			defer db.CheckAllExpects()
 
-			db.MockAllLinksResponse(tc.links)
+			// TODO: test different pagination scenarios
+			db.MockListLinksResponse(0, 100, tc.links)
+			db.MockTotalLinksResponse(uint64(len(tc.links)))
 			for _, f := range tc.files {
 				fs.SetListLinkFilesResponse(f.Name, f.Files)
 			}

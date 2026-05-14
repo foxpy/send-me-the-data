@@ -35,6 +35,8 @@
 
     <h2>List of links</h2>
 
+    {{ template "pagination.gohtml" .Data.Pages }}
+
     <div>
         <table>
             <thead>
@@ -91,6 +93,7 @@
             </tbody>
         </table>
     </div>
+
     <script src="/static/format_timestamps.js"></script>
 </body>
 

@@ -45,6 +45,9 @@ func (f *VFS) ListLinkFiles(linkID string) ([]ifs.File, error) {
 		return nil, fmt.Errorf("failed to traverse directory of link %s: %w", linkID, err)
 	}
 
+	// FIXME: readdir(3): The order in which filenames are read by successive calls to readdir()
+	// depends on the filesystem implementation; it is unlikely that the names will be sorted
+	// in any fashion.
 	files := make([]ifs.File, 0, len(entries))
 	for _, entry := range entries {
 		files = append(files, ifs.File{

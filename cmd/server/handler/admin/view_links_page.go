@@ -3,6 +3,7 @@ package admin
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/foxpy/send-me-the-data/cmd/server/flash"
 	"github.com/foxpy/send-me-the-data/cmd/server/template"
@@ -10,7 +11,17 @@ import (
 )
 
 func (s *AdminServer) viewLinksPage(w http.ResponseWriter, r *http.Request) error {
-	links, err := s.db.AllLinks()
+	offset, err := strconv.ParseUint(r.URL.Query().Get("offset"), 10, 64)
+	if err != nil {
+		offset = 0
+	}
+
+	totalLinks, err := s.db.TotalLinks()
+	if err != nil {
+		return fmt.Errorf("failed to count total links: %w", err)
+	}
+
+	links, err := s.db.ListLinks(uint(offset), 100)
 	if err != nil {
 		return fmt.Errorf("failed to query all links from database: %w", err)
 	}
@@ -26,6 +37,7 @@ func (s *AdminServer) viewLinksPage(w http.ResponseWriter, r *http.Request) erro
 
 		params.Data.Links = append(params.Data.Links, view.Link(link, files))
 	}
+	params.Data.Pages = view.Pagination(uint(offset), uint(totalLinks), 100, "/")
 
 	flashes := flash.GetFlashes(w, r)
 	params.SuccessFlash = flashes[flash.SuccessFlash]
