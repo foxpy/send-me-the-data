@@ -11,6 +11,9 @@ import (
 	"github.com/foxpy/send-me-the-data/cmd/server/testutil"
 )
 
+// TODO: more tests with more links to check that all is sorted correctly
+// TODO: replace mockTimeMilli with mockTimeNano
+
 func TestFiles(t *testing.T) {
 	for _, tc := range []struct {
 		desc             string
@@ -19,7 +22,7 @@ func TestFiles(t *testing.T) {
 		userDownloadable bool
 		maxFileSize      uint64
 		files            []testutil.LinkFiles
-		offset, limit    int
+		offset, limit    uint
 		res              []template.FileView
 	}{
 		{
@@ -98,17 +101,17 @@ func TestFiles(t *testing.T) {
 					{
 						Name:    "file 1",
 						Size:    1024,
-						ModTime: testutil.MockTime,
-					},
-					{
-						Name:    "file 2",
-						Size:    512,
-						ModTime: testutil.MockTime,
+						ModTime: testutil.MockTime.Add(1),
 					},
 					{
 						Name:    "file 3",
 						Size:    512,
-						ModTime: testutil.MockTime,
+						ModTime: testutil.MockTime.Add(3),
+					},
+					{
+						Name:    "file 2",
+						Size:    512,
+						ModTime: testutil.MockTime.Add(2),
 					},
 				},
 			}},
@@ -116,12 +119,12 @@ func TestFiles(t *testing.T) {
 			limit:  100,
 			res: []template.FileView{
 				{
-					Name:              "file 1",
+					Name:              "file 3",
 					UploadedAt:        testutil.MockTimeMilli,
-					Size:              "1 KiB",
-					AdminDownloadLink: "/link/abcd/file/file 1",
+					Size:              "512 bytes",
+					AdminDownloadLink: "/link/abcd/file/file 3",
 					UserDownloadLink:  "",
-					DeleteLink:        "/link/abcd/file/file 1/delete",
+					DeleteLink:        "/link/abcd/file/file 3/delete",
 				},
 				{
 					Name:              "file 2",
@@ -132,12 +135,12 @@ func TestFiles(t *testing.T) {
 					DeleteLink:        "/link/abcd/file/file 2/delete",
 				},
 				{
-					Name:              "file 3",
+					Name:              "file 1",
 					UploadedAt:        testutil.MockTimeMilli,
-					Size:              "512 bytes",
-					AdminDownloadLink: "/link/abcd/file/file 3",
+					Size:              "1 KiB",
+					AdminDownloadLink: "/link/abcd/file/file 1",
 					UserDownloadLink:  "",
-					DeleteLink:        "/link/abcd/file/file 3/delete",
+					DeleteLink:        "/link/abcd/file/file 1/delete",
 				},
 			},
 		},
@@ -151,19 +154,19 @@ func TestFiles(t *testing.T) {
 				Name: "abcd",
 				Files: []ifs.File{
 					{
+						Name:    "file 3",
+						Size:    512,
+						ModTime: testutil.MockTime.Add(3),
+					},
+					{
 						Name:    "file 1",
 						Size:    1024,
-						ModTime: testutil.MockTime,
+						ModTime: testutil.MockTime.Add(1),
 					},
 					{
 						Name:    "file 2",
 						Size:    512,
-						ModTime: testutil.MockTime,
-					},
-					{
-						Name:    "file 3",
-						Size:    512,
-						ModTime: testutil.MockTime,
+						ModTime: testutil.MockTime.Add(2),
 					},
 				},
 			}},
@@ -171,12 +174,12 @@ func TestFiles(t *testing.T) {
 			limit:  2,
 			res: []template.FileView{
 				{
-					Name:              "file 1",
+					Name:              "file 3",
 					UploadedAt:        testutil.MockTimeMilli,
-					Size:              "1 KiB",
-					AdminDownloadLink: "/link/abcd/file/file 1",
+					Size:              "512 bytes",
+					AdminDownloadLink: "/link/abcd/file/file 3",
 					UserDownloadLink:  "",
-					DeleteLink:        "/link/abcd/file/file 1/delete",
+					DeleteLink:        "/link/abcd/file/file 3/delete",
 				},
 				{
 					Name:              "file 2",
@@ -198,19 +201,19 @@ func TestFiles(t *testing.T) {
 				Name: "abcd",
 				Files: []ifs.File{
 					{
-						Name:    "file 1",
-						Size:    1024,
-						ModTime: testutil.MockTime,
-					},
-					{
 						Name:    "file 2",
 						Size:    512,
-						ModTime: testutil.MockTime,
+						ModTime: testutil.MockTime.Add(2),
+					},
+					{
+						Name:    "file 1",
+						Size:    1024,
+						ModTime: testutil.MockTime.Add(1),
 					},
 					{
 						Name:    "file 3",
 						Size:    512,
-						ModTime: testutil.MockTime,
+						ModTime: testutil.MockTime.Add(3),
 					},
 				},
 			}},
@@ -226,12 +229,12 @@ func TestFiles(t *testing.T) {
 					DeleteLink:        "/link/abcd/file/file 2/delete",
 				},
 				{
-					Name:              "file 3",
+					Name:              "file 1",
 					UploadedAt:        testutil.MockTimeMilli,
-					Size:              "512 bytes",
-					AdminDownloadLink: "/link/abcd/file/file 3",
+					Size:              "1 KiB",
+					AdminDownloadLink: "/link/abcd/file/file 1",
 					UserDownloadLink:  "",
-					DeleteLink:        "/link/abcd/file/file 3/delete",
+					DeleteLink:        "/link/abcd/file/file 1/delete",
 				},
 			},
 		},
@@ -245,19 +248,19 @@ func TestFiles(t *testing.T) {
 				Name: "abcd",
 				Files: []ifs.File{
 					{
-						Name:    "file 1",
-						Size:    1024,
-						ModTime: testutil.MockTime,
-					},
-					{
 						Name:    "file 2",
 						Size:    512,
-						ModTime: testutil.MockTime,
+						ModTime: testutil.MockTime.Add(2),
 					},
 					{
 						Name:    "file 3",
 						Size:    512,
-						ModTime: testutil.MockTime,
+						ModTime: testutil.MockTime.Add(3),
+					},
+					{
+						Name:    "file 1",
+						Size:    1024,
+						ModTime: testutil.MockTime.Add(1),
 					},
 				},
 			}},
@@ -284,19 +287,19 @@ func TestFiles(t *testing.T) {
 				Name: "abcd",
 				Files: []ifs.File{
 					{
-						Name:    "file 1",
-						Size:    1024,
-						ModTime: testutil.MockTime,
+						Name:    "file 3",
+						Size:    512,
+						ModTime: testutil.MockTime.Add(3),
 					},
 					{
 						Name:    "file 2",
 						Size:    512,
-						ModTime: testutil.MockTime,
+						ModTime: testutil.MockTime.Add(2),
 					},
 					{
-						Name:    "file 3",
-						Size:    512,
-						ModTime: testutil.MockTime,
+						Name:    "file 1",
+						Size:    1024,
+						ModTime: testutil.MockTime.Add(1),
 					},
 				},
 			}},
@@ -332,7 +335,9 @@ func TestFiles(t *testing.T) {
 
 			for i := range fileViews {
 				if !reflect.DeepEqual(fileViews[i], tc.res[i]) {
-					t.Fatalf("expected %v, got %v", tc.res[i], fileViews[i])
+					t.Fatalf(`incorrect file view at index %d:
+expected: %v
+got:      %v`, i, tc.res[i], fileViews[i])
 				}
 			}
 		})

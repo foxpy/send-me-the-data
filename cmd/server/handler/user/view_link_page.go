@@ -36,7 +36,7 @@ func (s *UserServer) viewLinkPage(w http.ResponseWriter, r *http.Request) error 
 
 	var params template.Params[template.UserViewLinkParams]
 	params.Title = "Send me the Data"
-	params.Data.Files = view.Files(lock, files, int(offset), 100)
+	params.Data.Files = view.Files(lock, files, uint(offset), 100)
 	params.Data.Link = view.Link(lock, files)
 	params.Data.Pages = view.Pagination(uint(offset), uint(len(files)), 100, fmt.Sprintf("/%s", id))
 
