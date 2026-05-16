@@ -48,9 +48,8 @@ func (f *VFS) ListLinkFiles(linkID string) ([]ifs.File, error) {
 	files := make([]ifs.File, 0, len(entries))
 	for _, entry := range entries {
 		files = append(files, ifs.File{
-			Name: entry.Name(),
-			Size: entry.Size(),
-			// TODO: why do I use mod time when creation time must be a better choice?
+			Name:    entry.Name(),
+			Size:    entry.Size(),
 			ModTime: entry.ModTime().UTC(),
 		})
 	}

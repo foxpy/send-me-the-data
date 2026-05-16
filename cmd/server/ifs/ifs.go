@@ -15,7 +15,9 @@ type Filesystem interface {
 }
 
 type File struct {
-	Name    string
-	Size    int64
+	Name string
+	Size int64
+	// A wiser choice would be to rely on creation time instead,
+	// but since it is not required by POSIX, it is not supported by Go either
 	ModTime time.Time
 }
