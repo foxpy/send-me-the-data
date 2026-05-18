@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestGenerateRandomPublicID(t *testing.T) {
+func TestPublicID(t *testing.T) {
 	r := NewRandom()
 
 	for range 10 {
@@ -22,7 +22,7 @@ func TestGenerateRandomPublicID(t *testing.T) {
 	}
 }
 
-func BenchmarkGenerateRandomPublicID(b *testing.B) {
+func BenchmarkPublicID(b *testing.B) {
 	r := NewRandom()
 
 	for b.Loop() {
@@ -30,7 +30,7 @@ func BenchmarkGenerateRandomPublicID(b *testing.B) {
 	}
 }
 
-func BenchmarkGenerateRandomPublicIDParallel(b *testing.B) {
+func BenchmarkParallelPublicID(b *testing.B) {
 	r := NewRandom()
 
 	b.RunParallel(func(pb *testing.PB) {
