@@ -49,3 +49,23 @@ func (d *MockDB) CreateFileJournalEntry(*idb.FileJournalEntry) error {
 func (d *MockDB) AcquireLinkWLock(string) (idb.LinkWLock, error) {
 	panic("TODO")
 }
+
+func (d *MockDB) GetAdminPasswordHash(username string) ([]byte, error) {
+	panic("TODO")
+}
+
+func (d *MockDB) CreateSessionToken(token idb.SessionToken) error {
+	panic("TODO")
+}
+
+func (d *MockDB) GetSessionToken(token string) (*idb.SessionToken, error) {
+	panic("TODO")
+}
+
+func (d *MockDB) DeleteSessionToken(token string) error {
+	panic("TODO")
+}
+
+func (d *MockDB) DeleteOutdatedSessionTokens() error {
+	panic("TODO")
+}

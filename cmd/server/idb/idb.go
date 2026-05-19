@@ -13,6 +13,11 @@ type Database interface {
 	CreateLink(name, id string, userDownloadable, uploadEnabled bool, maxFileSize uint64) error
 	AcquireLinkRLock(id string) (LinkRLock, error)
 	AcquireLinkWLock(id string) (LinkWLock, error)
+	GetAdminPasswordHash(username string) ([]byte, error)
+	CreateSessionToken(token SessionToken) error
+	GetSessionToken(token string) (*SessionToken, error)
+	DeleteSessionToken(token string) error
+	DeleteOutdatedSessionTokens() error
 }
 
 type FileJournalEntry struct {
@@ -40,4 +45,10 @@ type LinkWLock interface {
 	Delete() error
 	Commit() error
 	Rollback()
+}
+
+type SessionToken struct {
+	Token     string
+	Username  string
+	ExpiresAt time.Time
 }
