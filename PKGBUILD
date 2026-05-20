@@ -33,7 +33,7 @@ build() {
     -compressdwarf=false \
     -linkmode=external \
   "
-  go build -v -ldflags "$ld_flags" -trimpath -o build/smtd ./cmd/server
+  go build -v -ldflags "$ld_flags" -trimpath -o build/smtd ./cmd/smtd
 }
 
 check() {

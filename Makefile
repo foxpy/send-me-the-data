@@ -1,12 +1,12 @@
 DB_URL = "postgres://postgres:i_am@localhost:5432/postgres?sslmode=disable"
-MIGRATIONS = "cmd/server/idb/postgres/migrations/"
+MIGRATIONS = "src/idb/postgres/migrations/"
 
 .PHONY: start-server test goose-status goose-up goose-down
 
 start-server:
 	POSTGRES_URL="$(DB_URL)" \
 	PREFIX="./dump" \
-	go run ./cmd/server
+	go run ./cmd/smtd
 
 test:
 	go test ./...
