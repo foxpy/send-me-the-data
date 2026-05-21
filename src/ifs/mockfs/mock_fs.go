@@ -20,17 +20,17 @@ func NewMockFS() *MockFS {
 }
 
 func (f *MockFS) RemoveLinkFiles(linkID string) error {
-	panic("TODO")
+	panic("not implemented")
 }
 
 func (f *MockFS) RemoveLinkFile(linkID, fileName string) error {
-	panic("TODO")
+	panic("not implemented")
 }
 
 func (f *MockFS) LinkFS(linkID string) (fs.FS, error) {
-	panic("TODO")
+	panic("not implemented")
 }
 
 func (f *MockFS) CreateNewFile(linkID, fileName string) (*os.File, error) {
-	panic("TODO")
+	panic("not implemented")
 }

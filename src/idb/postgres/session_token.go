@@ -14,7 +14,7 @@ func (d *Postgres) CreateSessionToken(token idb.SessionToken) error {
 		VALUES (
 			$1,
 			$2,
-			(SELECT admin_id FROM smtd.admins WHERE username = $3)
+			(SELECT admin_id FROM smtd.admins WHERE username = $3 FOR SHARE)
 		)
 	`, token.Token, token.ExpiresAt, token.Username)
 	if err != nil {

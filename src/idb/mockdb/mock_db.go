@@ -35,37 +35,45 @@ func (d *MockDB) CheckAllExpects() {
 }
 
 func (d *MockDB) GetFileJournalEntry() (*idb.FileJournalEntry, error) {
-	panic("TODO")
+	panic("not implemented")
 }
 
 func (d *MockDB) DeleteFileJournalEntry(*idb.FileJournalEntry) error {
-	panic("TODO")
+	panic("not implemented")
 }
 
 func (d *MockDB) CreateFileJournalEntry(*idb.FileJournalEntry) error {
-	panic("TODO")
+	panic("not implemented")
 }
 
 func (d *MockDB) AcquireLinkWLock(string) (idb.LinkWLock, error) {
-	panic("TODO")
+	panic("not implemented")
 }
 
 func (d *MockDB) GetAdminPasswordHash(username string) ([]byte, error) {
-	panic("TODO")
+	panic("not implemented")
 }
 
 func (d *MockDB) CreateSessionToken(token idb.SessionToken) error {
-	panic("TODO")
+	panic("not implemented")
 }
 
 func (d *MockDB) GetSessionToken(token string) (*idb.SessionToken, error) {
-	panic("TODO")
+	panic("not implemented")
 }
 
 func (d *MockDB) DeleteSessionToken(token string) error {
-	panic("TODO")
+	panic("not implemented")
 }
 
 func (d *MockDB) DeleteOutdatedSessionTokens() error {
-	panic("TODO")
+	panic("not implemented")
+}
+
+func (d *MockDB) CreateAdmin(username string, passwordHash []byte) error {
+	panic("not implemented")
+}
+
+func (d *MockDB) DeleteAdmin(username string) error {
+	panic("not implemented")
 }

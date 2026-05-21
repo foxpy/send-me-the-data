@@ -18,6 +18,8 @@ type Database interface {
 	GetSessionToken(token string) (*SessionToken, error)
 	DeleteSessionToken(token string) error
 	DeleteOutdatedSessionTokens() error
+	CreateAdmin(username string, passwordHash []byte) error
+	DeleteAdmin(username string) error
 }
 
 type FileJournalEntry struct {

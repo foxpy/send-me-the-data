@@ -34,6 +34,7 @@ build() {
     -linkmode=external \
   "
   go build -v -ldflags "$ld_flags" -trimpath -o build/smtd ./cmd/smtd
+  go build -v -ldflags "$ld_flags" -trimpath -o build/smtd-credentials ./cmd/smtd-credentials
 }
 
 check() {
@@ -44,6 +45,7 @@ check() {
 package() {
   cd "$pkglongname"
   install -vDm 755 -t "${pkgdir}/usr/bin" build/smtd
+  install -vDm 755 -t "${pkgdir}/usr/bin" build/smtd-credentials
   install -vDm 600 -t "${pkgdir}/etc" install/smtd.conf
   install -vDm 644 -t "${pkgdir}/usr/lib/systemd/system" install/smtd.service
   install -vDm 644 install/smtd.tmpfiles "${pkgdir}/usr/lib/tmpfiles.d/smtd.conf"
