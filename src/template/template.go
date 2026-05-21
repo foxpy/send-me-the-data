@@ -100,3 +100,7 @@ func RenderAdminViewLink(w http.ResponseWriter, params Params[AdminViewLinkParam
 func RenderAdminViewLinks(w http.ResponseWriter, params Params[AdminViewLinksParams]) error {
 	return renderHelper(w, "admin_view_links.gohtml", params)
 }
+
+func RenderAdminLogin(w http.ResponseWriter, params Params[struct{}]) error {
+	return renderHelper(w, "admin_login.gohtml", params)
+}

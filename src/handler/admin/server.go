@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/foxpy/send-me-the-data/src/handler"
+	"github.com/foxpy/send-me-the-data/src/handler/auth"
 	"github.com/foxpy/send-me-the-data/src/idb"
 	"github.com/foxpy/send-me-the-data/src/ifs"
 	"github.com/foxpy/send-me-the-data/src/irnd"
@@ -17,6 +18,19 @@ type AdminServer struct {
 
 func NewAdminServer(db idb.Database, fs ifs.Filesystem, rnd irnd.Random) http.Handler {
 	s := AdminServer{db, fs, rnd}
+	m := http.NewServeMux()
+
+	m.HandleFunc("GET /login", handler.HandleWith500OnError(s.loginPage))
+	m.HandleFunc("POST /login", auth.LoginHandler(db, rnd, "/login", "/"))
+
+	m.Handle("/", s.authenticated())
+
+	m.Handle("GET /static/", http.FileServerFS(handler.Static))
+
+	return handler.WithLogger(m, "admin")
+}
+
+func (s *AdminServer) authenticated() http.Handler {
 	m := http.NewServeMux()
 
 	m.HandleFunc("GET /{$}", handler.HandleWith500OnError(s.viewLinksPage))
@@ -36,6 +50,5 @@ func NewAdminServer(db idb.Database, fs ifs.Filesystem, rnd irnd.Random) http.Ha
 	))
 	m.HandleFunc("POST /link/{id}/file/{name}/delete", handler.HandleWith500OnError(s.deleteFile))
 
-	m.Handle("GET /static/", http.FileServerFS(handler.Static))
-	return handler.WithLogger(m, "admin")
+	return auth.WithAuthentication(m, "/login", s.db)
 }

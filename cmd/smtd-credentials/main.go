@@ -38,6 +38,7 @@ var bcryptBenchmarkCommand = &cobra.Command{
 
 var bcryptCost int
 var addAdminCommand = &cobra.Command{
+	// TODO: do not read password from command line arguments to avoid saving it in shell history
 	Use:   "add-admin [username] [password]",
 	Short: "Register new administrator",
 	Args:  cobra.ExactArgs(2),

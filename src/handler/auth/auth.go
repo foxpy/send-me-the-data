@@ -8,15 +8,15 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/foxpy/send-me-the-data/src/flash"
 	"github.com/foxpy/send-me-the-data/src/idb"
 	"github.com/foxpy/send-me-the-data/src/irnd"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// TODO: external tool to manage admins and passwords
-// TODO: GET /login: login page
-// TODO: POST /login: login API
-// TODO: protect admin endpoints behind WithAuthentication()
+// TODO: When redirecting to /login, remember where user was going to and save it in a cookie,
+//       then after successful authentication, redirect them using this cookie (if it is set).
+//       Each successfull authentication should always erase this cookie.
 
 type authenticationMiddleware struct {
 	handler  http.Handler
@@ -54,6 +54,7 @@ func (a *authenticationMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Requ
 		if err != nil {
 			slog.Error("failed to delete session token from database", "error", err)
 		}
+		flash.AddFlash(w, flash.ErrorFlash, "Session expired")
 		http.Redirect(w, r, a.loginURL, http.StatusSeeOther)
 		return
 	}
@@ -100,6 +101,9 @@ func LoginHandler(db idb.Database, rnd irnd.Random, loginURL, successRedirectURL
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		// TODO: check if already authenticated, redirect immediately on success
+		// TODO: I will need to implement a log out button first
+
 		username := r.FormValue("user")
 		password := r.FormValue("password")
 		if len(username) == 0 || len(password) == 0 {
@@ -118,6 +122,7 @@ func LoginHandler(db idb.Database, rnd irnd.Random, loginURL, successRedirectURL
 			if !errors.Is(err, sql.ErrNoRows) {
 				slog.Error("failed to get password hash from database", "error", err)
 			}
+			flash.AddFlash(w, flash.ErrorFlash, "Invalid username or password")
 			http.Redirect(w, r, loginURL, http.StatusSeeOther)
 			return
 		}
@@ -132,6 +137,7 @@ func LoginHandler(db idb.Database, rnd irnd.Random, loginURL, successRedirectURL
 		passwordMatches := <-responseChan
 		close(responseChan)
 		if !passwordMatches {
+			flash.AddFlash(w, flash.ErrorFlash, "Invalid username or password")
 			http.Redirect(w, r, loginURL, http.StatusSeeOther)
 			return
 		}
