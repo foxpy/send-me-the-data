@@ -39,6 +39,7 @@ var bcryptBenchmarkCommand = &cobra.Command{
 var bcryptCost int
 var addAdminCommand = &cobra.Command{
 	// TODO: do not read password from command line arguments to avoid saving it in shell history
+	// TODO: option to generate and print password
 	Use:   "add-admin [username] [password]",
 	Short: "Register new administrator",
 	Args:  cobra.ExactArgs(2),
@@ -114,6 +115,7 @@ func init() {
 	rootCmd.AddCommand(bcryptBenchmarkCommand)
 	rootCmd.AddCommand(addAdminCommand)
 	rootCmd.AddCommand(deleteAdminCommand)
+	// TODO: change admin password
 	// TODO: list admins
 	// TODO: list sessions
 
