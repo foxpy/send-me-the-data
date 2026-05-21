@@ -17,7 +17,7 @@ func TestCreateLinkEmptyName(t *testing.T) {
 	db := mockdb.NewMockDB()
 	fs := mockfs.NewMockFS()
 	rnd := mockrnd.NewMockRND()
-	h := NewAdminServer(db, fs, rnd)
+	h := NewAdminServer(db, fs, rnd, 0)
 
 	defer db.CheckAllExpects()
 
@@ -52,7 +52,7 @@ func TestCreateLink(t *testing.T) {
 	db := mockdb.NewMockDB()
 	fs := mockfs.NewMockFS()
 	rnd := mockrnd.NewMockRND()
-	h := NewAdminServer(db, fs, rnd)
+	h := NewAdminServer(db, fs, rnd, 0)
 
 	defer db.CheckAllExpects()
 

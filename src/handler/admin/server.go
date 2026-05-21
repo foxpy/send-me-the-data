@@ -16,21 +16,30 @@ type AdminServer struct {
 	rnd irnd.Random
 }
 
-func NewAdminServer(db idb.Database, fs ifs.Filesystem, rnd irnd.Random) http.Handler {
+func NewAdminServer(
+	db idb.Database,
+	fs ifs.Filesystem,
+	rnd irnd.Random,
+	passwordHashThreads uint,
+) http.Handler {
 	s := AdminServer{db, fs, rnd}
 	m := http.NewServeMux()
 
 	m.HandleFunc("GET /login", handler.HandleWith500OnError(s.loginPage))
-	m.HandleFunc("POST /login", auth.LoginHandler(db, rnd, "/login", "/"))
+	m.HandleFunc("POST /login", auth.LoginHandler(db, rnd, "/login", "/", passwordHashThreads))
 
-	m.Handle("/", s.authenticated())
+	enableAuthentication := false
+	if passwordHashThreads > 0 {
+		enableAuthentication = true
+	}
+	m.Handle("/", s.authenticated(enableAuthentication))
 
 	m.Handle("GET /static/", http.FileServerFS(handler.Static))
 
 	return handler.WithLogger(m, "admin")
 }
 
-func (s *AdminServer) authenticated() http.Handler {
+func (s *AdminServer) authenticated(enableAuthentication bool) http.Handler {
 	m := http.NewServeMux()
 
 	m.HandleFunc("GET /{$}", handler.HandleWith500OnError(s.viewLinksPage))
@@ -50,5 +59,9 @@ func (s *AdminServer) authenticated() http.Handler {
 	))
 	m.HandleFunc("POST /link/{id}/file/{name}/delete", handler.HandleWith500OnError(s.deleteFile))
 
-	return auth.WithAuthentication(m, "/login", s.db)
+	if enableAuthentication {
+		return auth.WithAuthentication(m, "/login", s.db)
+	} else {
+		return m
+	}
 }

@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
@@ -39,6 +41,18 @@ func main() {
 	userListenAddress := cmp.Or(os.Getenv("USER_LISTEN_ADDRESS"), ":6969")
 	adminListenAddress := cmp.Or(os.Getenv("ADMIN_LISTEN_ADDRESS"), ":6767")
 
+	defaultPasswordHashThreads := (runtime.NumCPU() + 1) / 2
+	passwordHashThreads, err := strconv.ParseUint(
+		cmp.Or(
+			os.Getenv("PASSWORD_HASH_THREADS"),
+			strconv.Itoa(defaultPasswordHashThreads),
+		),
+		10, 64,
+	)
+	if err != nil || passwordHashThreads == 0 || passwordHashThreads > uint64(runtime.NumCPU())*4 {
+		passwordHashThreads = uint64(defaultPasswordHashThreads)
+	}
+
 	db, err := postgres.NewPostgres(postgresURL)
 	if err != nil {
 		slog.Error("failed to initialize database", "error", err)
@@ -61,7 +75,7 @@ func main() {
 
 	adminServer := &http.Server{
 		Addr:    adminListenAddress,
-		Handler: admin.NewAdminServer(db, fs, rnd),
+		Handler: admin.NewAdminServer(db, fs, rnd, uint(passwordHashThreads)),
 		// TODO: set up ReadTimeout or ReadHeaderTimeout
 	}
 	go func() {

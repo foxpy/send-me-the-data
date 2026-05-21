@@ -91,12 +91,24 @@ func (pc passwordChecker) run(c <-chan passwordCheckRequest) {
 	}
 }
 
-func LoginHandler(db idb.Database, rnd irnd.Random, loginURL, successRedirectURL string) http.HandlerFunc {
+func LoginHandler(
+	db idb.Database,
+	rnd irnd.Random,
+	loginURL string,
+	successRedirectURL string,
+	passwordHashThreads uint,
+) http.HandlerFunc {
+	if passwordHashThreads == 0 {
+		return func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+		}
+	}
+
 	pc := passwordChecker{}
 	requestChan := make(chan passwordCheckRequest)
+	slog.Info("starting password hash checker", "threads", passwordHashThreads)
 	// TODO: graceful shutdown
-	// TODO: configurable parallelism
-	for range 2 {
+	for range passwordHashThreads {
 		go pc.run(requestChan)
 	}
 
