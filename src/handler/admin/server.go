@@ -36,7 +36,7 @@ func (s *AdminServer) authenticated() http.Handler {
 	m.HandleFunc("GET /{$}", handler.HandleWith500OnError(s.viewLinksPage))
 
 	m.HandleFunc("GET /link/{id}", handler.HandleWith500OnError(s.viewLinkPage))
-	// TODO: relace POST with DELETE for delete methods
+	// TODO: replace POST with DELETE for delete methods
 	m.HandleFunc("POST /link/{id}/delete", handler.HandleWith500OnError(s.deleteLink))
 	m.HandleFunc("POST /link/{id}/edit", handler.HandleWith500OnError(s.editLink))
 	m.HandleFunc("POST /link", handler.HandleWith500OnError(s.createLink))

@@ -2,6 +2,7 @@ package main
 
 import (
 	"cmp"
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -9,7 +10,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
+	"time"
 
 	"github.com/foxpy/send-me-the-data/src/handler/admin"
 	"github.com/foxpy/send-me-the-data/src/handler/user"
@@ -56,23 +59,63 @@ func main() {
 		os.Exit(1)
 	}
 
+	adminServer := &http.Server{
+		Addr:    adminListenAddress,
+		Handler: admin.NewAdminServer(db, fs, rnd),
+		// TODO: set up ReadTimeout or ReadHeaderTimeout
+	}
 	go func() {
-		m := admin.NewAdminServer(db, fs, rnd)
-		slog.Info("Starting admin HTTP server", "address", adminListenAddress)
-		err := http.ListenAndServe(adminListenAddress, m)
-		slog.Error("admin ListenAndServe failed", "error", err)
-	}()
-	go func() {
-		m := user.NewUserServer(db, fs)
-		slog.Info("Starting user HTTP server", "address", userListenAddress)
-		err := http.ListenAndServe(userListenAddress, m)
-		slog.Error("user ListenAndServe failed", "error", err)
+		slog.Info("starting admin HTTP server", "address", adminServer.Addr)
+		err := adminServer.ListenAndServe()
+		if err != http.ErrServerClosed {
+			slog.Error("admin HTTP server failed", "error", err)
+		}
 	}()
 
-	// TODO: graceful shutdown?
+	userServer := &http.Server{
+		Addr:    userListenAddress,
+		Handler: user.NewUserServer(db, fs),
+		// TODO: set up ReadTimeout or ReadHeaderTimeout
+	}
+	go func() {
+		slog.Info("starting user HTTP server", "address", userServer.Addr)
+		err := userServer.ListenAndServe()
+		if err != http.ErrServerClosed {
+			slog.Error("user HTTP server failed", "error", err)
+		}
+	}()
+
+	// wait for keyboard interrupt
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 	<-c
+
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	go func() {
+		defer wg.Done()
+		err := adminServer.Shutdown(ctx)
+		if err != nil {
+			slog.Error("failed to stop admin HTTP server", "error", err)
+		} else {
+			slog.Info("admin HTTP server stopped")
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		err := userServer.Shutdown(ctx)
+		if err != nil {
+			slog.Error("failed to stop user HTTP server", "error", err)
+		} else {
+			slog.Info("user HTTP server stopped")
+		}
+	}()
+
+	wg.Wait()
 }
 
 func cleanup(db idb.Database, fs ifs.Filesystem) error {
