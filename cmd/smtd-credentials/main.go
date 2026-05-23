@@ -1,11 +1,16 @@
 package main
 
 import (
+	cryptorand "crypto/rand"
 	"database/sql"
 	"errors"
 	"fmt"
 	"log"
+	"math/big"
+	mathrand "math/rand"
+	"os"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -14,6 +19,7 @@ import (
 	"github.com/pressly/goose/v3"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/term"
 )
 
 var bcryptBenchmarkCommand = &cobra.Command{
@@ -39,17 +45,57 @@ var bcryptBenchmarkCommand = &cobra.Command{
 }
 
 var bcryptCost int
+var passwordFile string
+var generatePassword bool
 var addAdminCommand = &cobra.Command{
-	// TODO: do not read password from command line arguments to avoid saving it in shell history
-	// TODO: option to generate and print password
-	Use:   "add-admin [username] [password]",
-	Short: "Register new administrator",
-	Args:  cobra.ExactArgs(2),
+	Use:   "add-admin [username]",
+	Short: "Register new administrator, password is read from stdin by default",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		username := args[0]
-		password := args[1]
+		if len(passwordFile) > 0 && generatePassword {
+			cobra.CheckErr(fmt.Errorf("conflicting options --password-file and --generate-password"))
+		}
 
-		err := checkPasswordStrength(password)
+		username := args[0]
+		var password string
+		var err error
+		if generatePassword {
+			password, err = getRandomPassword()
+			cobra.CheckErr(err)
+
+		} else if len(passwordFile) > 0 {
+			f, err := os.OpenFile(passwordFile, os.O_RDONLY, 0)
+			cobra.CheckErr(err)
+
+			defer f.Close()
+			var buf [256]byte
+			// FIXME: this allows creating a newline-terminated password
+			//        I don't think users will be happy about it
+			n, err := f.Read(buf[:])
+			cobra.CheckErr(err)
+
+			password = string(buf[:n])
+		} else {
+			fmt.Print("Type password: ")
+			// FIXME: this function leaves terminal in a broken state after Ctrl-C
+			// FIXME: this function ignores Ctrl-D
+			pwd1, err := term.ReadPassword(int(os.Stdin.Fd()))
+			fmt.Println()
+			cobra.CheckErr(err)
+
+			fmt.Print("Retype password: ")
+			pwd2, err := term.ReadPassword(int(os.Stdin.Fd()))
+			fmt.Println()
+			cobra.CheckErr(err)
+
+			if !slices.Equal(pwd1, pwd2) {
+				cobra.CheckErr(fmt.Errorf("Sorry, passwords do not match"))
+			}
+
+			password = string(pwd1)
+		}
+
+		err = checkPasswordStrength(password)
 		cobra.CheckErr(err)
 
 		if bcryptCost < bcrypt.MinCost || bcryptCost > bcrypt.MaxCost {
@@ -70,7 +116,11 @@ var addAdminCommand = &cobra.Command{
 			cobra.CheckErr(err)
 		}
 
-		fmt.Printf("Added admin '%s' with password hash '%s'\n", username, string(passwordHash))
+		if generatePassword {
+			fmt.Printf("Added admin '%s' with password:\n%s\n", username, password)
+		} else {
+			fmt.Printf("Added admin '%s'\n", username)
+		}
 	},
 }
 
@@ -78,7 +128,7 @@ var (
 	matchLowercase    = regexp.MustCompile(`[a-z]`)
 	matchUppercase    = regexp.MustCompile(`[A-Z]`)
 	matchNumeric      = regexp.MustCompile(`\d`)
-	specialCharacters = `_+=%*&^$"'/\|.,:;?!(){}~`
+	specialCharacters = `_+=%*&^$/\|.,:!(){}[]~`
 )
 
 func checkPasswordStrength(password string) error {
@@ -103,6 +153,38 @@ func checkPasswordStrength(password string) error {
 	}
 
 	return nil
+}
+
+func getRandomPassword() (string, error) {
+	var password []byte
+
+	gen := func(numCharacters, alphabetSize int, alphabetBase byte) error {
+		for range numCharacters {
+			n, err := cryptorand.Int(cryptorand.Reader, big.NewInt(int64(alphabetSize)))
+			if err != nil {
+				return err
+			}
+			password = append(password, byte(n.Int64())+alphabetBase)
+		}
+		return nil
+	}
+
+	if gen(8, 26, 'a') != nil || gen(8, 26, 'A') != nil || gen(5, 10, '0') != nil {
+		return "", nil
+	}
+
+	for range 3 {
+		n, err := cryptorand.Int(cryptorand.Reader, big.NewInt(int64(len(specialCharacters))))
+		if err != nil {
+			return "", err
+		}
+		password = append(password, specialCharacters[n.Int64()])
+	}
+
+	mathrand.Shuffle(len(password), func(i, j int) {
+		password[i], password[j] = password[j], password[i]
+	})
+	return string(password), nil
 }
 
 var deleteAdminCommand = &cobra.Command{
@@ -138,6 +220,18 @@ func init() {
 		"bcrypt-cost",
 		bcrypt.DefaultCost,
 		fmt.Sprintf("bcrypt cost level, a value in range [%d, %d]", bcrypt.MinCost, bcrypt.MaxCost),
+	)
+	addAdminCommand.PersistentFlags().StringVar(
+		&passwordFile,
+		"password-file",
+		"",
+		"Read password from specified file",
+	)
+	addAdminCommand.PersistentFlags().BoolVar(
+		&generatePassword,
+		"generate-password",
+		false,
+		"Generate password and print to stdin",
 	)
 
 	rootCmd.PersistentFlags().StringVar(
