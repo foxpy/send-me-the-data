@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/foxpy/send-me-the-data/src/idb/postgres"
@@ -47,7 +49,8 @@ var addAdminCommand = &cobra.Command{
 		username := args[0]
 		password := args[1]
 
-		// TODO: check password strength
+		err := checkPasswordStrength(password)
+		cobra.CheckErr(err)
 
 		if bcryptCost < bcrypt.MinCost || bcryptCost > bcrypt.MaxCost {
 			cobra.CheckErr(fmt.Errorf("invalid bcrypt cost"))
@@ -69,6 +72,37 @@ var addAdminCommand = &cobra.Command{
 
 		fmt.Printf("Added admin '%s' with password hash '%s'\n", username, string(passwordHash))
 	},
+}
+
+var (
+	matchLowercase    = regexp.MustCompile(`[a-z]`)
+	matchUppercase    = regexp.MustCompile(`[A-Z]`)
+	matchNumeric      = regexp.MustCompile(`\d`)
+	specialCharacters = `_+=%*&^$"'/\|.,:;?!(){}~`
+)
+
+func checkPasswordStrength(password string) error {
+	if len(password) < 8 {
+		return errors.New("password must be at least 8 characters long")
+	}
+
+	if !matchLowercase.MatchString(password) {
+		return errors.New("password must have at least one lowercase letter")
+	}
+
+	if !matchUppercase.MatchString(password) {
+		return errors.New("password must have at least one uppercase letter")
+	}
+
+	if !matchNumeric.MatchString(password) {
+		return errors.New("password must have at least one numeric character")
+	}
+
+	if !strings.ContainsAny(password, specialCharacters) {
+		return fmt.Errorf("password must have at least one special character from this list: %s", specialCharacters)
+	}
+
+	return nil
 }
 
 var deleteAdminCommand = &cobra.Command{
