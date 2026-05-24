@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/foxpy/send-me-the-data/src/flash"
+	"github.com/foxpy/send-me-the-data/src/handler/auth"
 	"github.com/foxpy/send-me-the-data/src/template"
 	"github.com/foxpy/send-me-the-data/src/view"
 )
@@ -28,6 +29,7 @@ func (s *AdminServer) viewLinksPage(w http.ResponseWriter, r *http.Request) erro
 
 	var params template.Params[template.AdminViewLinksParams]
 	params.Title = "Send me the Data"
+	params.Username = auth.GetUsername(r)
 	params.Data.Links = make([]template.LinkView, 0, len(links))
 	for _, link := range links {
 		files, err := s.fs.ListLinkFiles(link.ID())

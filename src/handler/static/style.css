@@ -69,3 +69,14 @@ form {
 .pagination > a:visited, .pagination > a:link {
     color: blue;
 }
+
+.account {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0.3rem 0.3rem 0.3rem auto;
+    width: fit-content;
+}
+
+.account > * {
+    margin: 0;
+}

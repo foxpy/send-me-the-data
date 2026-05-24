@@ -9,6 +9,7 @@ import (
 
 	"github.com/foxpy/send-me-the-data/src/flash"
 	"github.com/foxpy/send-me-the-data/src/handler"
+	"github.com/foxpy/send-me-the-data/src/handler/auth"
 	"github.com/foxpy/send-me-the-data/src/template"
 	"github.com/foxpy/send-me-the-data/src/view"
 )
@@ -36,6 +37,7 @@ func (s *AdminServer) viewLinkPage(w http.ResponseWriter, r *http.Request) error
 
 	var params template.Params[template.AdminViewLinkParams]
 	params.Title = fmt.Sprintf("Link: %s", lock.Name())
+	params.Username = auth.GetUsername(r)
 	params.Data.Files = view.Files(lock, files, uint(offset), 100)
 	params.Data.Link = view.Link(lock, files)
 	params.Data.Pages = view.Pagination(uint(offset), uint(len(files)), 100, fmt.Sprintf("/link/%s", id))
