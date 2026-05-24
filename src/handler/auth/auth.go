@@ -16,58 +16,68 @@ import (
 //       then after successful authentication, redirect them using this cookie (if it is set).
 //       Each successfull authentication should always erase this cookie.
 
+const sessionTokenCookieName = "session_token"
+const sessionTokenDuration = 30 * 24 * time.Hour
+
 type authenticationMiddleware struct {
 	handler  http.Handler
 	loginURL string
 	db       idb.Database
 }
 
-type username struct{}
+type authKey struct{}
 
-const sessionTokenCookieName = "session_token"
-const sessionTokenDuration = 30 * 24 * time.Hour
+type authenticationResult struct {
+	token     *idb.SessionToken
+	userError string
+	err       error
+}
 
-func (a *authenticationMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func authenticationData(db idb.Database, r *http.Request) authenticationResult {
 	tokenCookie, err := r.Cookie(sessionTokenCookieName)
 	if err != nil {
 		if err != http.ErrNoCookie {
 			slog.Error("failed to obtain session token cookie from user request", "error", err)
 		}
-		http.Redirect(w, r, a.loginURL, http.StatusSeeOther)
-		return
+		return authenticationResult{nil, "", err}
 	}
 
 	// TODO: maybe it is a good idea to cache them in memory
-	token, err := a.db.GetSessionToken(tokenCookie.Value)
+	token, err := db.GetSessionToken(tokenCookie.Value)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			slog.Error("failed to get session token from database", "error", err)
 		}
-		http.SetCookie(w, &http.Cookie{
-			Name:   sessionTokenCookieName,
-			Path:   "/",
-			MaxAge: -1,
-		})
-		http.Redirect(w, r, a.loginURL, http.StatusSeeOther)
-		return
+		return authenticationResult{nil, "Session expired", err}
 	}
 
 	if token.ExpiresAt.Before(time.Now()) {
-		err = a.db.DeleteSessionToken(tokenCookie.Value)
+		err = db.DeleteSessionToken(token.Token)
 		if err != nil {
 			slog.Error("failed to delete session token from database", "error", err)
 		}
+		return authenticationResult{nil, "Session expired", err}
+	}
+
+	return authenticationResult{token, "", nil}
+}
+
+func (a *authenticationMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	res := authenticationData(a.db, r)
+	if res.err != nil {
 		http.SetCookie(w, &http.Cookie{
 			Name:   sessionTokenCookieName,
 			Path:   "/",
 			MaxAge: -1,
 		})
-		flash.AddFlash(w, flash.ErrorFlash, "Session expired")
+		if len(res.userError) > 0 {
+			flash.AddFlash(w, flash.ErrorFlash, res.userError)
+		}
 		http.Redirect(w, r, a.loginURL, http.StatusSeeOther)
 		return
 	}
 
-	ctx := context.WithValue(r.Context(), username{}, token.Username)
+	ctx := context.WithValue(r.Context(), authKey{}, res.token)
 	a.handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
@@ -75,7 +85,11 @@ func WithAuthentication(handler http.Handler, loginURL string, db idb.Database) 
 	return &authenticationMiddleware{handler, loginURL, db}
 }
 
-func GetUsername(r *http.Request) string {
-	username, _ := r.Context().Value(username{}).(string)
-	return username
+func GetAuth(r *http.Request) *idb.SessionToken {
+	token, _ := r.Context().Value(authKey{}).(*idb.SessionToken)
+	if token == nil {
+		return &idb.SessionToken{}
+	}
+
+	return token
 }

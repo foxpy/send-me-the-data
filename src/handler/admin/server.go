@@ -60,6 +60,7 @@ func (s *AdminServer) authenticated(enableAuthentication bool) http.Handler {
 	m.HandleFunc("POST /link/{id}/file/{name}/delete", handler.HandleWith500OnError(s.deleteFile))
 
 	if enableAuthentication {
+		m.HandleFunc("POST /logout", auth.LogoutHandler(s.db, "/login"))
 		return auth.WithAuthentication(m, "/login", s.db)
 	} else {
 		return m

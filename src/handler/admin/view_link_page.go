@@ -37,7 +37,7 @@ func (s *AdminServer) viewLinkPage(w http.ResponseWriter, r *http.Request) error
 
 	var params template.Params[template.AdminViewLinkParams]
 	params.Title = fmt.Sprintf("Link: %s", lock.Name())
-	params.Username = auth.GetUsername(r)
+	params.Username = auth.GetAuth(r).Username
 	params.Data.Files = view.Files(lock, files, uint(offset), 100)
 	params.Data.Link = view.Link(lock, files)
 	params.Data.Pages = view.Pagination(uint(offset), uint(len(files)), 100, fmt.Sprintf("/link/%s", id))

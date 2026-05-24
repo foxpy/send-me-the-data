@@ -29,7 +29,7 @@ func (s *AdminServer) viewLinksPage(w http.ResponseWriter, r *http.Request) erro
 
 	var params template.Params[template.AdminViewLinksParams]
 	params.Title = "Send me the Data"
-	params.Username = auth.GetUsername(r)
+	params.Username = auth.GetAuth(r).Username
 	params.Data.Links = make([]template.LinkView, 0, len(links))
 	for _, link := range links {
 		files, err := s.fs.ListLinkFiles(link.ID())

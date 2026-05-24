@@ -52,7 +52,6 @@ func LoginHandler(
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		// TODO: check if already authenticated, redirect immediately on success
-		// TODO: I will need to implement a log out button first
 
 		username := r.FormValue("user")
 		password := r.FormValue("password")
