@@ -43,7 +43,11 @@ func (a *authenticationMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Requ
 		if !errors.Is(err, sql.ErrNoRows) {
 			slog.Error("failed to get session token from database", "error", err)
 		}
-		// TODO: set cookie: delete session_token
+		http.SetCookie(w, &http.Cookie{
+			Name:   sessionTokenCookieName,
+			Path:   "/",
+			MaxAge: -1,
+		})
 		http.Redirect(w, r, a.loginURL, http.StatusSeeOther)
 		return
 	}
@@ -53,7 +57,11 @@ func (a *authenticationMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Requ
 		if err != nil {
 			slog.Error("failed to delete session token from database", "error", err)
 		}
-		// TODO: set cookie: delete session_token
+		http.SetCookie(w, &http.Cookie{
+			Name:   sessionTokenCookieName,
+			Path:   "/",
+			MaxAge: -1,
+		})
 		flash.AddFlash(w, flash.ErrorFlash, "Session expired")
 		http.Redirect(w, r, a.loginURL, http.StatusSeeOther)
 		return
