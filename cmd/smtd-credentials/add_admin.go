@@ -3,14 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
-	"os"
-	"slices"
 
 	"github.com/foxpy/send-me-the-data/src/idb/postgres"
 	"github.com/lib/pq"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/bcrypt"
-	"golang.org/x/term"
 )
 
 var bcryptCost int
@@ -30,31 +27,12 @@ var addAdminCommand = &cobra.Command{
 		var err error
 		if generatePassword {
 			password, err = getRandomPassword()
-			cobra.CheckErr(err)
-
 		} else if len(passwordFile) > 0 {
 			password, err = readPasswordFile(passwordFile)
-			cobra.CheckErr(err)
-
 		} else {
-			fmt.Print("Type password: ")
-			// FIXME: this function leaves terminal in a broken state after Ctrl-C
-			// FIXME: this function ignores Ctrl-D
-			pwd1, err := term.ReadPassword(int(os.Stdin.Fd()))
-			fmt.Println()
-			cobra.CheckErr(err)
-
-			fmt.Print("Retype password: ")
-			pwd2, err := term.ReadPassword(int(os.Stdin.Fd()))
-			fmt.Println()
-			cobra.CheckErr(err)
-
-			if !slices.Equal(pwd1, pwd2) {
-				cobra.CheckErr(fmt.Errorf("Sorry, passwords do not match"))
-			}
-
-			password = string(pwd1)
+			password, err = readPasswordStdin()
 		}
+		cobra.CheckErr(err)
 
 		err = checkPasswordStrength(password)
 		cobra.CheckErr(err)

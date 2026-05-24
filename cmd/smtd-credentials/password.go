@@ -8,33 +8,43 @@ import (
 	"math/big"
 	mathrand "math/rand"
 	"os"
+	"os/signal"
 	"regexp"
+	"slices"
 	"strings"
+	"syscall"
+
+	"golang.org/x/sys/unix"
+	"golang.org/x/term"
 )
 
 var (
-	matchLowercase       = regexp.MustCompile(`[a-z]`)
-	matchUppercase       = regexp.MustCompile(`[A-Z]`)
-	matchNumeric         = regexp.MustCompile(`\d`)
-	specialCharacters    = `_+=%*&^$/\|.,:!(){}[]~`
-	errorNotPasswordFile = errors.New("the specified file does not contain a password")
+	matchLowercase      = regexp.MustCompile(`[a-z]`)
+	matchUppercase      = regexp.MustCompile(`[A-Z]`)
+	matchNumeric        = regexp.MustCompile(`\d`)
+	specialCharacters   = `_+=%*&^$/\|.,:!(){}[]~`
+	errNotPasswordFile  = errors.New("the specified file does not contain a password")
+	errShortPassword    = errors.New("password must be at least 8 characters long")
+	errMissingLowercase = errors.New("password must have at least one lowercase letter")
+	errMissingUppercase = errors.New("password must have at least one uppercase letter")
+	errMissingNumeric   = errors.New("password must have at least one numeric letter")
 )
 
 func checkPasswordStrength(password string) error {
 	if len(password) < 8 {
-		return errors.New("password must be at least 8 characters long")
+		return errShortPassword
 	}
 
 	if !matchLowercase.MatchString(password) {
-		return errors.New("password must have at least one lowercase letter")
+		return errMissingLowercase
 	}
 
 	if !matchUppercase.MatchString(password) {
-		return errors.New("password must have at least one uppercase letter")
+		return errMissingUppercase
 	}
 
 	if !matchNumeric.MatchString(password) {
-		return errors.New("password must have at least one numeric character")
+		return errMissingNumeric
 	}
 
 	if !strings.ContainsAny(password, specialCharacters) {
@@ -89,8 +99,50 @@ func readPasswordFile(path string) (string, error) {
 	}
 
 	if isPrefix {
-		return "", errorNotPasswordFile
+		return "", errNotPasswordFile
 	}
 
 	return string(line), nil
+}
+
+const ioctlReadTermios = unix.TCGETS
+const ioctlWriteTermios = unix.TCSETS
+
+var errorPasswordsDontMatch = errors.New("sorry, passwords do not match")
+
+// FIXME: this function ignores Ctrl-D
+func readPasswordStdin() (string, error) {
+	fd := int(os.Stdin.Fd())
+	termios, err := unix.IoctlGetTermios(fd, ioctlReadTermios)
+	if err != nil {
+		return "", err
+	}
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-c
+		unix.IoctlSetTermios(fd, ioctlWriteTermios, termios)
+		os.Exit(1)
+	}()
+
+	fmt.Print("Type password: ")
+	pwd1, err := term.ReadPassword(int(os.Stdin.Fd()))
+	fmt.Println()
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Print("Retype password: ")
+	pwd2, err := term.ReadPassword(int(os.Stdin.Fd()))
+	fmt.Println()
+	if err != nil {
+		return "", err
+	}
+
+	if !slices.Equal(pwd1, pwd2) {
+		return "", errorPasswordsDontMatch
+	}
+
+	return string(pwd1), nil
 }
