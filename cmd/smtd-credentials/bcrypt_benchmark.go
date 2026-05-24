@@ -9,7 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var bcryptBenchmarkCommand = &cobra.Command{
+var bcryptBenchmarkCmd = &cobra.Command{
 	Use:   "bcrypt-benchmark",
 	Short: "Benchmark bcrypt performance and print table with results for every cost level",
 	Run: func(cmd *cobra.Command, args []string) {

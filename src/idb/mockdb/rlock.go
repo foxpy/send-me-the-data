@@ -11,7 +11,7 @@ type mockLinkRLock struct {
 }
 
 func (l *mockLinkRLock) Release() {
-	panic("TODO")
+	panic("unimplemented")
 }
 
 func (d *MockDB) AcquireLinkRLock(id string) (idb.LinkRLock, error) {

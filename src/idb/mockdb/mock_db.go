@@ -74,6 +74,10 @@ func (d *MockDB) CreateAdmin(username string, passwordHash []byte) error {
 	panic("not implemented")
 }
 
+func (d *MockDB) UpdateAdmin(username string, passwordHash []byte) error {
+	panic("not implemented")
+}
+
 func (d *MockDB) DeleteAdmin(username string) error {
 	panic("not implemented")
 }

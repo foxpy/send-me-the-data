@@ -1,8 +1,11 @@
 package postgres
 
 import (
+	"errors"
 	"fmt"
 )
+
+var errAdminNotExist = errors.New("this admin doesn't exist")
 
 func (d *Postgres) GetAdminPasswordHash(username string) ([]byte, error) {
 	var hash []byte
@@ -22,6 +25,22 @@ func (d *Postgres) CreateAdmin(username string, passwordHash []byte) error {
 	`, username, passwordHash)
 	if err != nil {
 		return fmt.Errorf("failed to create admin: %w", err)
+	}
+
+	return nil
+}
+
+func (d *Postgres) UpdateAdmin(username string, passwordHash []byte) error {
+	res, err := d.db.Exec(`
+		UPDATE smtd.admins SET password_hash=$1 WHERE username = $2
+	`, passwordHash, username)
+	if err != nil {
+		return fmt.Errorf("failed to update admin: %w", err)
+	}
+
+	n, err := res.RowsAffected()
+	if n == 0 {
+		return errAdminNotExist
 	}
 
 	return nil

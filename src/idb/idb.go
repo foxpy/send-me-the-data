@@ -19,6 +19,7 @@ type Database interface {
 	DeleteSessionToken(token string) error
 	DeleteOutdatedSessionTokens() error
 	CreateAdmin(username string, passwordHash []byte) error
+	UpdateAdmin(username string, passwordHash []byte) error
 	DeleteAdmin(username string) error
 }
 

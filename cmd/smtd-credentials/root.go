@@ -15,10 +15,10 @@ func init() {
 		"postgres:///smtd?host=/run/postgresql",
 		"PostgreSQL database connection URL",
 	)
-	rootCmd.AddCommand(bcryptBenchmarkCommand)
-	rootCmd.AddCommand(addAdminCommand)
-	rootCmd.AddCommand(deleteAdminCommand)
-	// TODO: change admin password
+	rootCmd.AddCommand(bcryptBenchmarkCmd)
+	rootCmd.AddCommand(addAdminCmd)
+	rootCmd.AddCommand(deleteAdminCmd)
+	rootCmd.AddCommand(changeAdminPasswordCmd)
 	// TODO: list admins
 	// TODO: list sessions
 

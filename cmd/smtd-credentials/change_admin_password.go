@@ -1,21 +1,16 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/foxpy/send-me-the-data/src/idb/postgres"
-	"github.com/lib/pq"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var bcryptCost int
-var passwordFile string
-var generatePassword bool
-var addAdminCmd = &cobra.Command{
-	Use:   "add-admin <username>",
-	Short: "Register new administrator, password is read from stdin by default",
+var changeAdminPasswordCmd = &cobra.Command{
+	Use:   "change-admin-password <username>",
+	Short: "Change administrator password, password is read from stdin by default",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(passwordFile) > 0 && generatePassword {
@@ -47,36 +42,31 @@ var addAdminCmd = &cobra.Command{
 		passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
 		cobra.CheckErr(err)
 
-		err = db.CreateAdmin(username, passwordHash)
-		var pqErr *pq.Error
-		if errors.As(err, &pqErr) && pqErr.Code.Name() == "unique_violation" {
-			cobra.CheckErr(fmt.Errorf("admin '%s' already exists", username))
-		} else if err != nil {
-			cobra.CheckErr(err)
-		}
+		err = db.UpdateAdmin(username, passwordHash)
+		cobra.CheckErr(err)
 
 		if generatePassword {
-			fmt.Printf("Added admin '%s' with password:\n%s\n", username, password)
+			fmt.Printf("Updated admin '%s' password to:\n%s\n", username, password)
 		} else {
-			fmt.Printf("Added admin '%s'\n", username)
+			fmt.Printf("Updated admin '%s' password\n", username)
 		}
 	},
 }
 
 func init() {
-	addAdminCmd.PersistentFlags().IntVar(
+	changeAdminPasswordCmd.PersistentFlags().IntVar(
 		&bcryptCost,
 		"bcrypt-cost",
 		bcrypt.DefaultCost,
 		fmt.Sprintf("bcrypt cost level, a value in range [%d, %d]", bcrypt.MinCost, bcrypt.MaxCost),
 	)
-	addAdminCmd.PersistentFlags().StringVar(
+	changeAdminPasswordCmd.PersistentFlags().StringVar(
 		&passwordFile,
 		"password-file",
 		"",
 		"Read password from specified file",
 	)
-	addAdminCmd.PersistentFlags().BoolVar(
+	changeAdminPasswordCmd.PersistentFlags().BoolVar(
 		&generatePassword,
 		"generate-password",
 		false,

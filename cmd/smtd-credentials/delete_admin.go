@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var deleteAdminCommand = &cobra.Command{
-	Use:   "delete-admin [username]",
+var deleteAdminCmd = &cobra.Command{
+	Use:   "delete-admin <username>",
 	Short: "Delete administrator",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
