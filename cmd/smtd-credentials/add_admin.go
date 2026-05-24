@@ -33,17 +33,9 @@ var addAdminCommand = &cobra.Command{
 			cobra.CheckErr(err)
 
 		} else if len(passwordFile) > 0 {
-			f, err := os.OpenFile(passwordFile, os.O_RDONLY, 0)
+			password, err = readPasswordFile(passwordFile)
 			cobra.CheckErr(err)
 
-			defer f.Close()
-			var buf [256]byte
-			// FIXME: this allows creating a newline-terminated password
-			//        I don't think users will be happy about it
-			n, err := f.Read(buf[:])
-			cobra.CheckErr(err)
-
-			password = string(buf[:n])
 		} else {
 			fmt.Print("Type password: ")
 			// FIXME: this function leaves terminal in a broken state after Ctrl-C

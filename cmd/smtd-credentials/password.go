@@ -1,20 +1,23 @@
 package main
 
 import (
+	"bufio"
 	cryptorand "crypto/rand"
 	"errors"
 	"fmt"
 	"math/big"
 	mathrand "math/rand"
+	"os"
 	"regexp"
 	"strings"
 )
 
 var (
-	matchLowercase    = regexp.MustCompile(`[a-z]`)
-	matchUppercase    = regexp.MustCompile(`[A-Z]`)
-	matchNumeric      = regexp.MustCompile(`\d`)
-	specialCharacters = `_+=%*&^$/\|.,:!(){}[]~`
+	matchLowercase       = regexp.MustCompile(`[a-z]`)
+	matchUppercase       = regexp.MustCompile(`[A-Z]`)
+	matchNumeric         = regexp.MustCompile(`\d`)
+	specialCharacters    = `_+=%*&^$/\|.,:!(){}[]~`
+	errorNotPasswordFile = errors.New("the specified file does not contain a password")
 )
 
 func checkPasswordStrength(password string) error {
@@ -71,4 +74,23 @@ func getRandomPassword() (string, error) {
 		password[i], password[j] = password[j], password[i]
 	})
 	return string(password), nil
+}
+
+func readPasswordFile(path string) (string, error) {
+	f, err := os.OpenFile(path, os.O_RDONLY, 0)
+	if err != nil {
+		return "", err
+	}
+
+	r := bufio.NewReaderSize(f, 256)
+	line, isPrefix, err := r.ReadLine()
+	if err != nil {
+		return "", err
+	}
+
+	if isPrefix {
+		return "", errorNotPasswordFile
+	}
+
+	return string(line), nil
 }
