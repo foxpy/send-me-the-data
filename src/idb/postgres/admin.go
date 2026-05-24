@@ -3,6 +3,8 @@ package postgres
 import (
 	"errors"
 	"fmt"
+	"iter"
+	"log/slog"
 )
 
 var errAdminNotExist = errors.New("this admin doesn't exist")
@@ -78,4 +80,31 @@ func (d *Postgres) DeleteAdmin(username string) error {
 	}
 
 	return nil
+}
+
+func (d *Postgres) GetAllAdmins() (iter.Seq[string], error) {
+	rows, err := d.db.Query(`SELECT username FROM smtd.admins`)
+	if err != nil {
+		return nil, err
+	}
+
+	return func(yield func(string) bool) {
+		var username string
+		defer rows.Close()
+		for rows.Next() {
+			err = rows.Scan(&username)
+			if err != nil {
+				slog.Error("failed to scan admin username", "error", err)
+				return
+			}
+
+			if !yield(username) {
+				return
+			}
+		}
+		err := rows.Err()
+		if err != nil {
+			slog.Error("failed to read admins", "error", err)
+		}
+	}, nil
 }

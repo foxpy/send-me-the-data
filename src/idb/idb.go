@@ -1,6 +1,7 @@
 package idb
 
 import (
+	"iter"
 	"time"
 )
 
@@ -21,6 +22,7 @@ type Database interface {
 	CreateAdmin(username string, passwordHash []byte) error
 	UpdateAdmin(username string, passwordHash []byte) error
 	DeleteAdmin(username string) error
+	GetAllAdmins() (iter.Seq[string], error)
 }
 
 type FileJournalEntry struct {

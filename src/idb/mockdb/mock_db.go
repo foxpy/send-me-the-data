@@ -2,6 +2,7 @@ package mockdb
 
 import (
 	"fmt"
+	"iter"
 
 	"github.com/foxpy/send-me-the-data/src/idb"
 )
@@ -79,5 +80,9 @@ func (d *MockDB) UpdateAdmin(username string, passwordHash []byte) error {
 }
 
 func (d *MockDB) DeleteAdmin(username string) error {
+	panic("not implemented")
+}
+
+func (d *MockDB) GetAllAdmins() (iter.Seq[string], error) {
 	panic("not implemented")
 }

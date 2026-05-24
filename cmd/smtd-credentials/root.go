@@ -19,7 +19,7 @@ func init() {
 	rootCmd.AddCommand(addAdminCmd)
 	rootCmd.AddCommand(deleteAdminCmd)
 	rootCmd.AddCommand(changeAdminPasswordCmd)
-	// TODO: list admins
+	rootCmd.AddCommand(listAdminsCmd)
 	// TODO: list sessions
 
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
